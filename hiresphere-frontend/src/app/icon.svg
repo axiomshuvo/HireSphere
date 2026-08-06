@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Dark Container Gradient -->
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1b1c1e" />
+      <stop offset="100%" stop-color="#0a0b0d" />
+    </radialGradient>
+
+    <!-- Sphere Main Gradient (Cyan Blue to Vibrant Orange) -->
+    <linearGradient id="sphereGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00C6FF" />
+      <stop offset="50%" stop-color="#0072FF" />
+      <stop offset="100%" stop-color="#FF6A00" />
+    </linearGradient>
+
+    <!-- Orbit Ring Gradient -->
+    <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF6A00" />
+      <stop offset="100%" stop-color="#00C6FF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded Container Background -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGlow)" />
+  <rect width="512" height="512" rx="128" fill="none" stroke="#ffffff" stroke-opacity="0.1" stroke-width="8" />
+
+  <!-- Outer Orbit Ring -->
+  <ellipse
+    cx="256"
+    cy="256"
+    rx="200"
+    ry="80"
+    fill="none"
+    stroke="url(#orbitGrad)"
+    stroke-width="32"
+    transform="rotate(-25 256 256)"
+    stroke-dasharray="800"
+    stroke-dashoffset="80"
+  />
+
+  <!-- Central HireSphere Sphere -->
+  <circle cx="256" cy="256" r="140" fill="url(#sphereGrad)" />
+
+  <!-- Sphere Highlight Arc -->
+  <path
+    d="M 170,190 A 110,110 0 0,1 320,150"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="18"
+    stroke-linecap="round"
+    opacity="0.45"
+  />
+</svg>
