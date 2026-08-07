@@ -7,7 +7,7 @@ export default function Home() {
     <div className="relative w-full overflow-hidden ">
       {/* 🌟 Seamless Globe & Atmospheric Glow Container */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 top-[28%] sm:top-[22%] md:top-[18%] w-full max-w-7xl h-[800px] pointer-events-none z-0 overflow-hidden"
+        className="absolute left-1/2 -translate-x-1/2  w-full max-w-7xl h-[1800px] pointer-events-none z-0 overflow-hidden"
         aria-hidden="true"
       >
         {/* Atmosphere Blue Glow */}
