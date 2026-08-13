@@ -1,4 +1,6 @@
+import FeaturesSection from "@/components/FeatureSection";
 import Hero from "@/components/HeroSection";
+import JobBoard from "@/components/JobBoard";
 import JobStats from "@/components/JobStats";
 import Image from "next/image";
 
@@ -29,7 +31,9 @@ export default function Home() {
       <div className="relative z-10">
         <Hero />
         <JobStats />
+        <JobBoard />
       </div>
+      <FeaturesSection />
     </div>
   );
 }

@@ -77,7 +77,7 @@ export default function SignIn() {
       });
 
       setTimeout(() => {
-        router.push("/");
+        router.push("/dashboard");
       }, 1000);
     } catch (err) {
       console.error("Critical Signin Error:", err);

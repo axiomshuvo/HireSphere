@@ -261,10 +261,10 @@ export default function Navbar() {
   // );
 
   return (
-    <header className="w-full max-w-7xl mx-auto px-4 py-4">
+    <header className=" px-4 py-4 border-b ">
       <nav
         data-theme={isDark ? "dark" : "light"}
-        className="relative z-40 border rounded-2xl px-5 h-14 flex items-center justify-between backdrop-blur-md shadow-sm"
+        className=" w-full max-w-7xl mx-auto relative z-40 px-5 h-14 flex items-center justify-between backdrop-blur-md  "
         aria-label="Main Navigation"
       >
         {logo}

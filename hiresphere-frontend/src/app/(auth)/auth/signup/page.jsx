@@ -10,7 +10,7 @@ import {
   Person,
 } from "@gravity-ui/icons";
 // STRICTLY V3 API: using global `toast`, absolutely NO `addToast`
-import { Button, toast } from "@heroui/react";
+import { Button, Description, Radio, RadioGroup, toast } from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,6 +23,7 @@ export default function SignUp() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "seeker", // Default role is "seeker"
   });
 
   // State to hold field-specific inline validation errors
@@ -75,12 +76,14 @@ export default function SignUp() {
 
     try {
       // Send sign-up request to better-auth endpoints
+
       const { error: authError } = await authClient.signUp.email({
         name: formData.name.trim(),
         email: formData.email.trim(),
         password: formData.password,
+        role: formData.role, // Default to "seeker" if not provided
       });
-
+      console.log("Attempting to sign up with data:", formData);
       // 2. Server API Error Response -> Shown in v3 Toast
       if (authError) {
         toast.danger("Registration Failed", {
@@ -101,7 +104,7 @@ export default function SignUp() {
 
       // Redirect the user automatically
       setTimeout(() => {
-        router.push("/auth/signin");
+        router.push("/dashboard");
       }, 1200);
     } catch (err) {
       console.error("Critical Signup Error:", err);
@@ -272,6 +275,39 @@ export default function SignUp() {
                 {errors.confirmPassword}
               </p>
             )}
+          </div>
+          <div className="mt-4 ">
+            <RadioGroup
+              value={formData.role}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  role: value,
+                }))
+              }
+              name="role"
+              orientation="horizontal"
+              className="justify-center"
+            >
+              <Radio value="seeker">
+                <Radio.Content>
+                  <Radio.Control>
+                    <Radio.Indicator />
+                  </Radio.Control>
+                  Job Seeker
+                </Radio.Content>
+                <Description>For Hunt Jobs</Description>
+              </Radio>
+              <Radio value="recruiter">
+                <Radio.Content>
+                  <Radio.Control>
+                    <Radio.Indicator />
+                  </Radio.Control>
+                  Recruiter
+                </Radio.Content>
+                <Description> Hunt Talent </Description>
+              </Radio>
+            </RadioGroup>
           </div>
 
           {/* HeroUI V3 Button */}

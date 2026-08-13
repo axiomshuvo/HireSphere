@@ -2,7 +2,6 @@
 # Node.js Dependencies
 # ==========================================================
 node_modules/
-**/node_modules/
 
 # Package Managers
 .pnp
@@ -12,6 +11,7 @@ node_modules/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnpm-store/
+*.tgz
 
 # ==========================================================
 # Environment Variables & Secrets
@@ -24,6 +24,15 @@ node_modules/
 *.pem
 *.key
 *.cert
+*.crt
+
+# ==========================================================
+# Command Code
+# ==========================================================
+# Only the personal/local override file. Taste & skill files
+# (.commandcode/taste/) are meant to be committed and shared
+# via git — don't ignore the whole .commandcode/ folder.
+**/.commandcode/settings.local.json
 
 # ==========================================================
 # Next.js / React Build Output
@@ -84,6 +93,7 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 ehthumbs.db
+Desktop.ini
 
 # ==========================================================
 # Python (Optional)
@@ -122,6 +132,7 @@ public/uploads/
 # ==========================================================
 .eslintcache
 .stylelintcache
+.prettiercache
 
 # ==========================================================
 # Miscellaneous

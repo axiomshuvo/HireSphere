@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(npx eslint src/app/dashboard/page.jsx)",
+      "Shell(npx eslint src/components/dashboard/CompanyListItem.jsx)",
+      "Shell(npx eslint src/components/dashboard/DataTable.jsx)",
+      "Shell(npx eslint src/components/dashboard/CompanyNotRegistered.jsx src/components/dashboard/RegisterCompanyModal.jsx src/app/dashboard/mycompany/page.jsx)",
+      "Shell(node -e \"const fs=require('fs');const p='src/app/dashboard/page.jsx';const s=fs.readFileSync(p,'utf8');console.log('chars',s.length);console.log('hasBOM',s.charCodeAt(0)===0xFEFF);console.log('last100',JSON.stringify(s.slice(-120)));\")",
+      "Shell(rm:*)",
+      "Shell(npm:*)",
+      "Shell(npx eslint src/app/dashboard/DashBoardSideBar.jsx)",
+      "Shell(npx eslint src/app/dashboard/jobs/page.jsx src/app/dashboard/applications/page.jsx src/app/dashboard/settings/page.jsx)",
+      "Shell(npx eslint src/components/dashboard/DashboardTopBar.jsx src/app/dashboard/layout.js src/components/dashboard/company/CompanyHeader.jsx src/components/dashboard/company/CompanyStatCard.jsx src/components/dashboard/company/LifeAtCompany.jsx src/components/dashboard/company/ActiveRoleCard.jsx src/components/dashboard/company/ActiveRolesList.jsx src/components/dashboard/company/HiringTeamCard.jsx src/components/dashboard/company/CompanyProfile.jsx src/app/dashboard/mycompany/page.jsx)",
+      "Shell(npx eslint \"src/app/layout.js\" \"src/app/(public)/layout.js\" \"src/app/(public)/page.js\" \"src/components/dashboard/DashboardTopBar.jsx\" \"src/app/dashboard/DashBoardSideBar.jsx\")",
+      "Shell(npx eslint src/components/dashboard/DashboardTopBar.jsx src/app/dashboard/help/page.jsx)",
+      "Shell(npx eslint src/components/JobBoard.jsx)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
