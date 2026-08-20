@@ -2,37 +2,27 @@
 
 import JobsTable from "@/components/dashboard/jobs/JobsTable";
 import PlanUsageCard from "@/components/dashboard/jobs/PlanUsageCard";
-import {
-  getActiveCount,
-  getPlanUsage,
-  INITIAL_JOBS,
-} from "@/lib/jobs";
+import { useJobs } from "@/context/JobsContext";
+import { getActiveCount, getPlanUsage } from "@/lib/jobs";
 import { CirclePlus } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function RecruiterJobsPage() {
   const router = useRouter();
-  const [jobs, setJobs] = useState(INITIAL_JOBS);
+  const { jobs, toggleStatus, deleteJob } = useJobs();
 
   const usage = getPlanUsage(getActiveCount(jobs));
 
   const handleToggleStatus = (job) => {
-    setJobs((prev) =>
-      prev.map((item) =>
-        item.id === job.id
-          ? { ...item, status: item.status === "active" ? "closed" : "active" }
-          : item,
-      ),
-    );
+    toggleStatus(job.id);
     toast.success(job.status === "active" ? "Job closed" : "Job reopened", {
       description: `${job.title} status updated.`,
     });
   };
 
   const handleDelete = (job) => {
-    setJobs((prev) => prev.filter((item) => item.id !== job.id));
+    deleteJob(job.id);
   };
 
   return (

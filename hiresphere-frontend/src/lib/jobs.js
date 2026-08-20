@@ -113,3 +113,65 @@ export function getPlanUsage(activeCount) {
     hasAvailableSlots: activeCount < limit,
   };
 }
+
+export const EMPTY_JOB_FORM = {
+  title: "",
+  category: "Technology",
+  type: "Full-time",
+  salaryMin: "",
+  salaryMax: "",
+  currency: "USD",
+  city: "",
+  country: "",
+  remote: false,
+  deadline: "",
+  responsibilities: "",
+  requirements: "",
+  benefits: "",
+};
+
+export function formatPostedDate(date = new Date()) {
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+}
+
+export function buildJobId() {
+  return `job-${Date.now()}`;
+}
+
+export function buildLocation({ remote, city, country }) {
+  return remote ? "Remote" : [city, country].filter(Boolean).join(", ");
+}
+
+export function jobFromForm(formData, existingJob) {
+  if (existingJob) {
+    return {
+      ...existingJob,
+      ...formData,
+      title: formData.title.trim(),
+      type: formData.type,
+      location: buildLocation(formData),
+    };
+  }
+
+  return {
+    id: buildJobId(),
+    title: formData.title.trim(),
+    status: "active",
+    applicants: 0,
+    datePosted: formatPostedDate(),
+    type: formData.type,
+    location: buildLocation(formData),
+    ...formData,
+  };
+}
+
+export function jobToFormValues(job) {
+  return {
+    ...EMPTY_JOB_FORM,
+    ...job,
+  };
+}

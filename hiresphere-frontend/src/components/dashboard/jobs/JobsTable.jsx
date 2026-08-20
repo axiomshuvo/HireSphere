@@ -13,7 +13,7 @@ export default function JobsTable({ jobs, onToggleStatus, onDelete }) {
   const router = useRouter();
 
   const handleEdit = (job) => {
-    router.push(`/dashboard/recruiter/jobs/new?edit=${job.id}`);
+    router.push(`/dashboard/recruiter/jobs/${job.id}/edit`);
   };
 
   const handleViewApplicants = (job) => {
