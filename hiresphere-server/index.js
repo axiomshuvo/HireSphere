@@ -8,7 +8,7 @@ dotenv.config();
 
 app.use(cors());
 
-const port = process.env.port;
+const port = process.env.PORT || process.env.port;
 
 //mongodb connection
 
@@ -330,6 +330,10 @@ app.get("/", (req, res) => {
   `);
 });
 
-app.listen(port, () => {
-  console.log(`HireSphere is running on port ${port}`);
-});
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`HireSphere is running on port ${port}`);
+  });
+}
