@@ -1,6 +1,6 @@
 "use server";
 
-const baseUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_CLIENT_URI;
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 async function request(path, options = {}) {
   const res = await fetch(`${baseUrl}${path}`, {

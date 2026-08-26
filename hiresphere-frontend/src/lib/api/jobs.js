@@ -1,4 +1,4 @@
-const baseUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_CLIENT_URI;
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const getCompanyJobs = async (companyId, status = "active") => {
   const res = await fetch(
