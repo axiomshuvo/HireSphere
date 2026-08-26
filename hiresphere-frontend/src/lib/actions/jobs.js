@@ -5,6 +5,7 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 async function request(path, options = {}) {
   const res = await fetch(`${baseUrl}${path}`, {
     headers: { "Content-Type": "application/json" },
+    cache: "no-store",
     ...options,
   });
 
