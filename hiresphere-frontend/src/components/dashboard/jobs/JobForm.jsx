@@ -1,18 +1,19 @@
 "use client";
 
-import { useJobs } from "@/context/JobsContext";
+import { createJob, updateJob } from "@/lib/actions/jobs";
+import { getCompanyId, getCompanyName } from "@/lib/companies";
 import {
   CURRENCIES,
   EMPTY_JOB_FORM,
   JOB_CATEGORIES,
   JOB_TYPES,
-  MOCK_COMPANY,
-  getActiveCount,
+  getJobId,
   getPlanUsage,
   jobToFormValues,
-} from "@/lib/jobs";
+} from "@/lib/jobstruture";
 import { CircleCheckFill, CircleInfo } from "@gravity-ui/icons";
-import { toast } from "@heroui/react";
+import { ListBox, ListBoxItem, Select, toast } from "@heroui/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -35,16 +36,19 @@ function Field({ label, error, children }) {
   );
 }
 
-export default function JobForm({ job }) {
+export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
   const router = useRouter();
-  const { jobs } = useJobs();
   const isEditing = Boolean(job);
-  const usage = getPlanUsage(getActiveCount(jobs));
+  const usage = getPlanUsage(activeJobCount);
 
   const [formData, setFormData] = useState(() =>
     job ? jobToFormValues(job) : { ...EMPTY_JOB_FORM },
   );
   const [errors, setErrors] = useState({});
+
+  const selectedCompany = companies.find(
+    (c) => getCompanyId(c) === formData.companyId,
+  );
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -58,10 +62,19 @@ export default function JobForm({ job }) {
     }
   };
 
+  const handleCompanyChange = (key) => {
+    setFormData((prev) => ({ ...prev, companyId: key ?? "" }));
+    if (errors.companyId) {
+      setErrors((prev) => ({ ...prev, companyId: "" }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
+    if (!formData.companyId)
+      newErrors.companyId = "Please select a company.";
     if (!formData.title.trim()) newErrors.title = "Job title is required.";
     if (!formData.salaryMin)
       newErrors.salaryMin = "Minimum salary is required.";
@@ -86,36 +99,33 @@ export default function JobForm({ job }) {
       return;
     }
 
-    if (!isEditing && !usage.hasAvailableSlots) {
-      toast.warning("Plan limit reached", {
-        description: "Close an active job or upgrade your plan to post more.",
-      });
-      return;
-    }
-
     const payload = {
       ...formData,
       title: formData.title.trim(),
+      _id: undefined,
+      id: undefined,
     };
 
-    console.log("[JobForm] Submit payload:", {
-      mode: isEditing ? "edit" : "create",
-      jobId: job?.id ?? null,
-      payload,
-    });
+    console.log("[JobForm] Payload:", payload);
 
-    // TODO: call your API here, e.g.
-    // const res = await fetch("/api/jobs", {
-    //   method: isEditing ? "PATCH" : "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(payload),
-    // });
-
-    // toast.success(isEditing ? "Job updated" : "Job posted successfully", {
-    //   description: `${formData.title} is saved.`,
-    // });
-
-    // router.push("/dashboard/recruiter/jobs");
+    try {
+      if (isEditing) {
+        const jobId = getJobId(job);
+        await updateJob(jobId, payload);
+        toast.success("Job updated", {
+          description: `${formData.title} is saved.`,
+        });
+      } else {
+        await createJob(payload);
+        toast.success("Job posted successfully", {
+          description: `${formData.title} is saved.`,
+        });
+      }
+      router.push("/dashboard/recruiter/jobs");
+    } catch (error) {
+      console.error("[JobForm] Error submitting job form:", error);
+      toast.warning("An error occurred while saving the job.");
+    }
   };
 
   return (
@@ -127,10 +137,16 @@ export default function JobForm({ job }) {
               {isEditing ? "Edit Job" : "Job Details"}
             </h2>
             <p className="mt-0.5 text-xs text-gray-500">
-              {MOCK_COMPANY.name} ·{" "}
-              <span className="inline-flex items-center gap-1 text-green-400">
-                <CircleCheckFill className="size-3" /> Approved
-              </span>
+              {selectedCompany ? (
+                <>
+                  {getCompanyName(selectedCompany)} ·{" "}
+                  <span className="inline-flex items-center gap-1 text-green-400">
+                    <CircleCheckFill className="size-3" /> Approved
+                  </span>
+                </>
+              ) : (
+                "Pick the company this job belongs to."
+              )}
             </p>
           </div>
           <span className="text-xs text-gray-500">
@@ -139,6 +155,51 @@ export default function JobForm({ job }) {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <Field label="Company" error={errors.companyId}>
+              {companies.length === 0 ? (
+                <p className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-200">
+                  You don&apos;t have any companies yet.{" "}
+                  <Link
+                    href="/dashboard/mycompany/new"
+                    className="font-medium text-yellow-100 underline"
+                  >
+                    Add a company
+                  </Link>{" "}
+                  before posting a job.
+                </p>
+              ) : (
+                <Select
+                  selectedKey={formData.companyId || null}
+                  onSelectionChange={handleCompanyChange}
+                  isInvalid={Boolean(errors.companyId)}
+                  aria-label="Company"
+                >
+                  <Select.Trigger>
+                    <Select.Value placeholder="Select a company" />
+                    <Select.Indicator />
+                  </Select.Trigger>
+                  <Select.Popover>
+                    <ListBox>
+                      {companies.map((company) => {
+                        const id = getCompanyId(company);
+                        return (
+                          <ListBoxItem
+                            key={id}
+                            id={id}
+                            textValue={getCompanyName(company)}
+                          >
+                            {getCompanyName(company)}
+                          </ListBoxItem>
+                        );
+                      })}
+                    </ListBox>
+                  </Select.Popover>
+                </Select>
+              )}
+            </Field>
+          </div>
+
           <div className="sm:col-span-2">
             <Field label="Job Title" error={errors.title}>
               <input
@@ -261,6 +322,18 @@ export default function JobForm({ job }) {
               />
               <span className="text-sm text-gray-300">
                 This job is fully remote
+              </span>
+            </label>
+            <label className="mt-2 flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                name="isPublicVisible"
+                checked={formData.isPublicVisible}
+                onChange={handleChange}
+                className="size-4 accent-indigo-500"
+              />
+              <span className="text-sm text-gray-300">
+                Show this job publicly on the careers page
               </span>
             </label>
           </div>

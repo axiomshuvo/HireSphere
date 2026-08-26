@@ -1,18 +1,40 @@
+import ButtonLink from "@/components/shared/ButtonLink";
 import JobForm from "@/components/dashboard/jobs/JobForm";
+import { fetchCompanies } from "@/lib/actions/company";
+import { fetchJobs } from "@/lib/actions/jobs";
+import { ArrowLeft } from "@gravity-ui/icons";
+import { getActiveCount } from "@/lib/jobstruture";
 
-export default function NewJobPage() {
+export default async function NewJobPage() {
+  let activeJobCount = 0;
+  let companies = [];
+
+  try {
+    const [jobs, companiesData] = await Promise.all([
+      fetchJobs(),
+      fetchCompanies(),
+    ]);
+    activeJobCount = getActiveCount(jobs);
+    companies = Array.isArray(companiesData) ? companiesData : [];
+  } catch (error) {
+    console.error("Failed to load job form data:", error);
+  }
+
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">
-          Post a Job
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Fill in the details below to publish a new job post.
-        </p>
+      <div className="mx-auto mb-6 max-w-3xl">
+        <ButtonLink
+          href="/dashboard/recruiter/jobs"
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground hover:text-white"
+        >
+          <ArrowLeft className="size-4" />
+          Back to Manage Jobs
+        </ButtonLink>
       </div>
 
-      <JobForm />
+      <JobForm activeJobCount={activeJobCount} companies={companies} />
     </div>
   );
 }

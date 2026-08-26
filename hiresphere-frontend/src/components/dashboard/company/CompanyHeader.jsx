@@ -1,43 +1,103 @@
 "use client";
 
-import { ArrowUpRightFromSquare, CircleCheckFill, Globe, PersonPlus } from "@gravity-ui/icons";
+import { MapPin, Pencil, TrashBin } from "@gravity-ui/icons";
 import { Avatar, Button, Chip } from "@heroui/react";
 
-export default function CompanyHeader({ company }) {
+const planLabels = {
+  free: "Free",
+  growth: "Growth",
+  enterprise: "Enterprise",
+};
+
+export default function CompanyHeader({ company, onEdit, onDelete }) {
+  const websiteUrl = company.website
+    ? company.website.startsWith("http")
+      ? company.website
+      : `https://${company.website}`
+    : null;
+
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-default bg-[radial-gradient(circle_at_70%_20%,rgba(99,102,241,0.35),transparent_40%),radial-gradient(circle_at_30%_70%,rgba(59,130,246,0.25),transparent_45%)] p-6 lg:p-8">
-      <Globe className="pointer-events-none absolute -right-10 -top-10 size-64 text-white/5" />
+    <section className="relative overflow-hidden rounded-2xl border border-default bg-[radial-gradient(circle_at_78%_18%,rgba(99,102,241,0.30),transparent_45%),radial-gradient(circle_at_18%_82%,rgba(56,189,248,0.22),transparent_50%),linear-gradient(180deg,#16181c,#0f1013)] p-6 lg:p-8">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-12 -top-12 size-56 rounded-full bg-indigo-500/10 blur-3xl"
+      />
 
       <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <Avatar.Root className="size-16 shrink-0 rounded-2xl border border-default bg-amber-400 text-xl font-bold text-black">
-            <Avatar.Fallback>{company.initials}</Avatar.Fallback>
+          <Avatar.Root className="size-20 shrink-0 rounded-2xl border border-white/10 bg-[#1b1c1e] text-2xl font-bold text-white shadow-lg">
+            <Avatar.Fallback>
+              {company.initials ?? company.name?.[0]?.toUpperCase() ?? "?"}
+            </Avatar.Fallback>
           </Avatar.Root>
 
-          <div>
+          <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-semibold text-white lg:text-3xl">
+              <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 {company.name}
               </h1>
-              <Chip color="success" size="sm" variant="soft">
-                <CircleCheckFill className="size-3" />
-                APPROVED
+              {company.plan && (
+                <Chip color="primary" size="sm" variant="soft">
+                  {planLabels[company.plan] ?? company.plan}
+                </Chip>
+              )}
+              <Chip
+                color={company.isApproved ? "success" : "warning"}
+                size="sm"
+                variant="soft"
+              >
+                {company.isApproved ? "Approved" : "Pending"}
               </Chip>
             </div>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              {company.tagline}
-            </p>
+
+            {company.tagline && (
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                {company.tagline}
+              </p>
+            )}
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              {company.industry && (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-indigo-400" />
+                  {company.industry}
+                </span>
+              )}
+              {company.location && (
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="size-3" />
+                  {company.location}
+                </span>
+              )}
+              {websiteUrl && (
+                <a
+                  href={websiteUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-indigo-400 transition-colors hover:text-indigo-300"
+                >
+                  {company.website}
+                </a>
+              )}
+            </div>
+
+            {company.id && (
+              <div className="mt-4 inline-flex items-center gap-2 rounded-md border border-white/10 bg-[#1b1c1e] px-2 py-1 font-mono text-[10px] text-muted-foreground">
+                <span className="text-white/40">ID</span>
+                <span>{company.id}</span>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-wrap gap-3">
-          <Button variant="secondary">
-            <PersonPlus className="size-4" />
-            Follow
+        <div className="flex shrink-0 items-center gap-2">
+          <Button variant="secondary" onPress={onDelete}>
+            <TrashBin className="size-4" />
+            Delete
           </Button>
-          <Button variant="primary">
-            <Globe className="size-4" />
-            Visit Website
+          <Button variant="primary" onPress={onEdit}>
+            <Pencil className="size-4" />
+            Update
           </Button>
         </div>
       </div>

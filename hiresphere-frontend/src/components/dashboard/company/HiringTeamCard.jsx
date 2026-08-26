@@ -4,7 +4,11 @@ import { Avatar, Button, Card, Typography } from "@heroui/react";
 
 export default function HiringTeamCard({
   title = "HIRING TEAM",
-  member = { name: "Sarah Chen", title: "Head of Talent Acquisition", initials: "SC" },
+  member = {
+    name: "Sarah Chen",
+    title: "Head of Talent Acquisition",
+    initials: "SC",
+  },
   actionLabel = "Message Team",
 }) {
   return (

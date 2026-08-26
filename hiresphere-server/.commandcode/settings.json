@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(curl -s -w \"\\nHTTP_STATUS:%{http_code}\\n\" -X POST http://localhost:5001/api/jobs -H \"Content-Type: application/json\" -d '{\"title\":\"Test Job\",\"category\":\"Technology\",\"type\":\"Full-time\",\"salaryMin\":\"60000\",\"salaryMax\":\"90000\",\"currency\":\"USD\",\"city\":\"\",\"country\":\"\",\"remote\":true,\"deadline\":\"2026-09-01\",\"responsibilities\":\"Test responsibilities\",\"requirements\":\"Test requirements\",\"benefits\":\"\"}')",
+      "Shell(curl -s -w \\nHTTP_STATUS:%{http_code}\\n -X PUT http://localhost:5001/api/jobs/6a8cdbe7af28219c2e3bda56 -H Content-Type: application/json -d {\"status\":\"closed\"})",
+      "Shell(curl -s -w \\nHTTP_STATUS:%{http_code}\\n -X PUT http://localhost:5001/api/jobs/6a8cdbe7af28219c2e3bda56 -H Content-Type: application/json -d {\"_id\":\"hack\"})"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}

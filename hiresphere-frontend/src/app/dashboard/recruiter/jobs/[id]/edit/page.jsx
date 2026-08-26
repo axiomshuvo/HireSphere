@@ -1,46 +1,44 @@
-"use client";
-
+import ButtonLink from "@/components/shared/ButtonLink";
 import JobForm from "@/components/dashboard/jobs/JobForm";
-import { useJobs } from "@/context/JobsContext";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { fetchCompanies } from "@/lib/actions/company";
+import { fetchJobs } from "@/lib/actions/jobs";
+import { ArrowLeft } from "@gravity-ui/icons";
+import { getActiveCount, getJobId } from "@/lib/jobstruture";
 
-export default function EditJobPage() {
-  const params = useParams();
-  const { jobs } = useJobs();
-  const job = jobs.find((item) => item.id === params.id);
+export default async function EditJobPage({ params }) {
+  const { id } = await params;
 
-  if (!job) {
-    return (
-      <div className="flex-1 px-4 py-8 lg:px-8">
-        <div className="rounded-2xl border border-white/10 bg-[#121316] p-6 text-center">
-          <h1 className="text-xl font-semibold text-white">Job not found</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            This job may have been deleted or the link is invalid.
-          </p>
-          <Link
-            href="/dashboard/recruiter/jobs"
-            className="mt-4 inline-flex h-10 items-center rounded-lg bg-white px-5 text-sm font-semibold text-black transition-colors hover:bg-gray-200"
-          >
-            Back to Jobs
-          </Link>
-        </div>
-      </div>
-    );
+  let job = null;
+  let activeJobCount = 0;
+  let companies = [];
+
+  try {
+    const [jobs, companiesData] = await Promise.all([
+      fetchJobs(),
+      fetchCompanies(),
+    ]);
+    activeJobCount = getActiveCount(jobs);
+    job = jobs.find((item) => getJobId(item) === id) ?? null;
+    companies = Array.isArray(companiesData) ? companiesData : [];
+  } catch (error) {
+    console.error("Failed to load job:", error);
   }
 
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">
-          Edit Job
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Update the details for {job.title}.
-        </p>
+      <div className="mx-auto mb-6 max-w-3xl">
+        <ButtonLink
+          href="/dashboard/recruiter/jobs"
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground hover:text-white"
+        >
+          <ArrowLeft className="size-4" />
+          Back to Manage Jobs
+        </ButtonLink>
       </div>
 
-      <JobForm job={job} />
+      <JobForm job={job} activeJobCount={activeJobCount} companies={companies} />
     </div>
   );
 }

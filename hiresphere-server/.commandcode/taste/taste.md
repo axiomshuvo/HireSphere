@@ -1,0 +1,1 @@
+- Prefers polished, modern UI over plain/basic HTML + CSS; favors richer styling approaches (e.g., CSS frameworks, component libraries) when building user-facing interfaces. Confidence: 0.7
