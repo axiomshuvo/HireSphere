@@ -1,11 +1,14 @@
 "use server";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+import { revalidateTag } from "next/cache";
 
-async function request(path, options = {}) {
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+const REVALIDATE_SECONDS = 30;
+
+async function request(path, { tags, ...options } = {}) {
   const res = await fetch(`${baseUrl}${path}`, {
     headers: { "Content-Type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: REVALIDATE_SECONDS, tags },
     ...options,
   });
 
@@ -18,23 +21,33 @@ async function request(path, options = {}) {
 }
 
 export async function fetchCompanies() {
-  return request("/api/companies");
+  return request("/api/companies", { tags: ["companies"] });
 }
 
 export async function createCompany(companyData) {
-  return request("/api/companies", {
+  const result = await request("/api/companies", {
     method: "POST",
     body: JSON.stringify(companyData),
   });
+  revalidateTag("companies");
+  revalidateTag("jobs");
+  return result;
 }
 
 export async function updateCompany(companyId, companyData) {
-  return request(`/api/companies/${companyId}`, {
+  const result = await request(`/api/companies/${companyId}`, {
     method: "PUT",
     body: JSON.stringify(companyData),
   });
+  revalidateTag("companies");
+  return result;
 }
 
 export async function deleteCompany(companyId) {
-  return request(`/api/companies/${companyId}`, { method: "DELETE" });
+  const result = await request(`/api/companies/${companyId}`, {
+    method: "DELETE",
+  });
+  revalidateTag("companies");
+  revalidateTag("jobs");
+  return result;
 }

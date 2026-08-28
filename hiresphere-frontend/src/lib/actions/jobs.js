@@ -1,11 +1,14 @@
 "use server";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+import { revalidateTag } from "next/cache";
 
-async function request(path, options = {}) {
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+const REVALIDATE_SECONDS = 30;
+
+async function request(path, { tags, ...options } = {}) {
   const res = await fetch(`${baseUrl}${path}`, {
     headers: { "Content-Type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: REVALIDATE_SECONDS, tags },
     ...options,
   });
 
@@ -18,34 +21,44 @@ async function request(path, options = {}) {
 }
 
 export async function fetchJobs() {
-  return request("/api/jobs");
+  return request("/api/jobs", { tags: ["jobs"] });
 }
 
 export async function fetchJob(jobId) {
-  return request(`/api/jobs/${jobId}`);
+  return request(`/api/jobs/${jobId}`, { tags: [`job:${jobId}`, "jobs"] });
 }
 
 export async function createJob(jobData) {
-  return request("/api/jobs", {
+  const result = await request("/api/jobs", {
     method: "POST",
     body: JSON.stringify(jobData),
   });
+  revalidateTag("jobs");
+  return result;
 }
 
 export async function updateJob(jobId, jobData) {
-  return request(`/api/jobs/${jobId}`, {
+  const result = await request(`/api/jobs/${jobId}`, {
     method: "PUT",
     body: JSON.stringify(jobData),
   });
+  revalidateTag("jobs");
+  revalidateTag(`job:${jobId}`);
+  return result;
 }
 
 export async function updateJobStatus(jobId, status) {
-  return request(`/api/jobs/${jobId}/status`, {
+  const result = await request(`/api/jobs/${jobId}/status`, {
     method: "PATCH",
     body: JSON.stringify({ status }),
   });
+  revalidateTag("jobs");
+  revalidateTag(`job:${jobId}`);
+  return result;
 }
 
 export async function deleteJob(jobId) {
-  return request(`/api/jobs/${jobId}`, { method: "DELETE" });
+  const result = await request(`/api/jobs/${jobId}`, { method: "DELETE" });
+  revalidateTag("jobs");
+  return result;
 }

@@ -87,7 +87,19 @@
       "Shell(curl -sS -o /dev/null -w \"HTTP:%{http_code}\\n\" \"http://localhost:3000/dashboard/recruiter/jobs/6a8f55366dc05ecb44d21f85\")",
       "Shell(cat /Users/pradiptasarker/CodeHub/coder/work/Code/HireSphere/hiresphere-frontend/.env* 2>/dev/null; echo \"---server---\"; cat /Users/pradiptasarker/CodeHub/coder/work/Code/HireSphere/hiresphere-server/.env* 2>/dev/null)",
       "Shell( sed:*)",
-      "Shell(curl -sS -o /dev/null -w companies:%{http_code}\\n http://localhost:5001/api/companies)"
+      "Shell(curl -sS -o /dev/null -w companies:%{http_code}\\n http://localhost:5001/api/companies)",
+      "Shell(curl -sS https://hire-sphere-two.vercel.app/api/companies)",
+      "Shell(curl -sS -o /dev/null -w status: %{http_code}\\n https://hire-sphere-two.vercel.app/api/companies)",
+      "Shell(curl -sS https://hire-sphere-indol.vercel.app/api/companies)",
+      "Shell(curl -sS -o /dev/null -w %{http_code}\\n https://hire-sphere-indol.vercel.app/api/companies)",
+      "Shell(curl -sS -o /dev/null -w status: %{http_code}\\n https://hire-sphere-indol.vercel.app/api/companies)",
+      "Shell(echo:*)",
+      "Shell(curl -sS https://hire-sphere-two.vercel.app/dashboard/mycompany/new 2 > /dev/null)",
+      "Shell(curl -sS https://hire-sphere-two.vercel.app/dashboard/mycompany 2 > /dev/null)",
+      "Shell(curl -sS -A \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\" -o /dev/null -w \"status: %{http_code}\\n\" https://hire-sphere-indol.vercel.app/api/companies)",
+      "Shell(curl -sS -A Mozilla/5.0 -v https://hire-sphere-indol.vercel.app/api/companies 2 >& 1)",
+      "Shell(curl -sS -A Mozilla/5.0 https://hire-sphere-indol.vercel.app/api/companies)",
+      "Shell(cd /Users/pradiptasarker/CodeHub/coder/work/Code/HireSphere/hiresphere-frontend && git reset HEAD src/lib/actions/ && git add src/lib/actions/company.js src/lib/actions/jobs.js && git commit -F - <<'EOF' perf: cache company and job fetches with 30s SWR + tag invalidation Replace cache: \"no-store\" with Next.js revalidate-tag caching so repeat navigations hit a 30s SWR cache. Mutations call revalidateTag() to bust the affected tag immediately, so a create/edit/delete never shows stale data while still feeling instant on every other navigation. Co-authored-by: CommandCodeBot <noreply@commandcode.ai> EOF)"
     ],
     "deny": [],
     "defaultMode": "default"
