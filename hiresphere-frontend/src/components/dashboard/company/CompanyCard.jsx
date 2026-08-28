@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin } from "@gravity-ui/icons";
+import { Briefcase, MapPin } from "@gravity-ui/icons";
 import { Avatar, Card, Chip } from "@heroui/react";
 import Link from "next/link";
 
@@ -11,16 +11,17 @@ const planLabels = {
 };
 
 export default function CompanyCard({ company }) {
+  const activeJobs = Number(company.activeJobs ?? 0);
+
   return (
     <Link
       href={`/dashboard/mycompany/${company.companySlug}`}
-      className="group"
+      className="group block"
     >
-      <Card className="h-full rounded-2xl border border-default bg-content1 p-5 transition-colors group-hover:border-indigo-500/50">
+      <Card className="flex h-full flex-col gap-3 rounded-2xl border border-default bg-content1 p-5 transition-colors group-hover:border-indigo-500/50">
         <div className="flex items-start gap-3">
           <Avatar.Root className="size-12 shrink-0 overflow-hidden rounded-xl bg-default text-base font-semibold text-default-foreground">
             {company.logo ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={company.logo}
                 alt={company.name}
@@ -43,11 +44,11 @@ export default function CompanyCard({ company }) {
           </div>
         </div>
 
-        <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
+        <p className="line-clamp-2 text-sm text-muted-foreground">
           {company.tagline}
         </p>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Chip color="primary" size="sm" variant="soft">
             {planLabels[company.plan] ?? company.plan}
           </Chip>
@@ -58,7 +59,16 @@ export default function CompanyCard({ company }) {
           >
             {company.isApproved ? "Approved" : "Pending"}
           </Chip>
-          <span className="ml-auto rounded-md border border-white/10 bg-[#1b1c1e] px-2 py-1 font-mono text-[10px] text-muted-foreground">
+        </div>
+
+        <div className="mt-auto flex items-center justify-between border-t border-default pt-3">
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Briefcase className="size-3.5" />
+            {activeJobs === 0
+              ? "No open roles"
+              : `${activeJobs} open ${activeJobs === 1 ? "role" : "roles"}`}
+          </span>
+          <span className="font-mono text-[10px] text-muted-foreground/70">
             {company.companySlug}
           </span>
         </div>

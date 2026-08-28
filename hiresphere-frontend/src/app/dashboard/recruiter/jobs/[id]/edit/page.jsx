@@ -1,8 +1,8 @@
 import JobForm from "@/components/dashboard/jobs/JobForm";
 import ButtonLink from "@/components/shared/ButtonLink";
-import { fetchCompanies } from "@/lib/actions/company";
-import { fetchJobs } from "@/lib/actions/jobs";
-import { getActiveCount, getJobId } from "@/lib/api/jobstruture";
+import { getRecruiterCompanies } from "@/lib/actions/company";
+import { getRecruiterJob, getRecruiterJobStats } from "@/lib/actions/jobs";
+import { getJobId } from "@/lib/api/jobstruture";
 import { ArrowLeft } from "@gravity-ui/icons";
 
 export default async function EditJobPage({ params }) {
@@ -13,13 +13,20 @@ export default async function EditJobPage({ params }) {
   let companies = [];
 
   try {
-    const [jobs, companiesData] = await Promise.all([
-      fetchJobs(),
-      fetchCompanies(),
+    const [stats, jobData, companiesData] = await Promise.all([
+      getRecruiterJobStats(),
+      getRecruiterJob(id),
+      getRecruiterCompanies({ pageSize: 100 }),
     ]);
-    activeJobCount = getActiveCount(jobs);
-    job = jobs.find((item) => getJobId(item) === id) ?? null;
-    companies = Array.isArray(companiesData) ? companiesData : [];
+    activeJobCount = stats?.active ?? 0;
+    job = jobData ?? null;
+    if (job) {
+      const resolvedId = getJobId(job) ?? job.id ?? job._id ?? id;
+      job = { ...job, id: resolvedId };
+    }
+    companies = Array.isArray(companiesData)
+      ? companiesData
+      : (companiesData?.items ?? []);
   } catch (error) {
     console.error("Failed to load job:", error);
   }

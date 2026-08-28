@@ -1,129 +1,189 @@
-"use client";
+import { headers } from "next/headers";
+import { Card, Typography } from "@heroui/react";
+import { auth } from "@/lib/auth";
+import {
+  getRecruiterCompanies,
+  getRecruiterCompanyStats,
+} from "@/lib/actions/company";
+import {
+  getRecruiterJobs,
+  getRecruiterJobStats,
+} from "@/lib/actions/jobs";
+import { getActiveCount } from "@/lib/api/jobstruture";
+import ButtonLink from "@/components/shared/ButtonLink";
+import RecruiterHomeView from "@/components/dashboard/RecruiterHomeView";
 
-import CompanyList from "@/components/dashboard/CompanyList";
-import DataTable from "@/components/dashboard/DataTable";
-import StatCard from "@/components/dashboard/StatCard";
-import { FaceSmile, FileText, Persons, Thunderbolt } from "@gravity-ui/icons";
-import { Chip, Typography } from "@heroui/react";
+function getInitials(name) {
+  const parts = name?.trim().split(/\s+/) ?? [];
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return `${first}${last}`.toUpperCase() || "U";
+}
 
-const stats = [
-  { label: "Total Job Posts", value: "48", icon: FileText },
-  { label: "Total Applicants", value: "1,284", icon: Persons },
-  { label: "Active Jobs", value: "18", icon: Thunderbolt },
-  { label: "Jobs Closed", value: "32", icon: FaceSmile },
-];
+function extractItems(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.items)) return payload.items;
+  return [];
+}
 
-const applicationColumns = [
-  { key: "name", label: "Candidate Name" },
-  { key: "role", label: "Role" },
-  { key: "date", label: "Date Applied" },
-  { key: "experience", label: "Experience" },
-  {
-    key: "status",
-    label: "Status",
-    render: (row) => (
-      <Chip color={row.statusColor} size="sm" variant="soft">
-        {row.status}
-      </Chip>
+async function safeCall(label, fallback, fn) {
+  try {
+    return await fn();
+  } catch (error) {
+    console.warn(`[RecruiterHome] ${label} failed:`, error?.message ?? error);
+    return fallback;
+  }
+}
+
+async function RecruiterHome({ user }) {
+  const [companyStats, jobStats, companiesPage, jobsPage] = await Promise.all([
+    safeCall("getRecruiterCompanyStats", { total: 0 }, () => getRecruiterCompanyStats()),
+    safeCall("getRecruiterJobStats", { total: 0, active: 0, closed: 0, applicantsTotal: 0 }, () => getRecruiterJobStats()),
+    safeCall("getRecruiterCompanies", { items: [] }, () => getRecruiterCompanies({ page: 1, pageSize: 4 })),
+    safeCall("getRecruiterJobs", { items: [] }, () => getRecruiterJobs({ page: 1, pageSize: 5 })),
+  ]);
+
+  const companies = extractItems(companiesPage);
+  const jobs = extractItems(jobsPage);
+
+  const totalJobs = jobStats?.total ?? jobs.length;
+  const activeJobs = jobStats?.active ?? getActiveCount(jobs);
+  const closedJobs = jobStats?.closed ?? Math.max(totalJobs - activeJobs, 0);
+  const totalApplicants = jobStats?.applicantsTotal ?? 0;
+  const totalCompanies = companyStats?.total ?? companies.length;
+
+  const greeting = user.name ?? "there";
+  const subtitle =
+    totalCompanies === 0
+      ? "Get started by creating your first company."
+      : `Managing ${totalCompanies} ${totalCompanies === 1 ? "company" : "companies"} and ${activeJobs} active ${activeJobs === 1 ? "job" : "jobs"}.`;
+
+  const recentJobsColumns = [
+    { key: "title", label: "Title" },
+    { key: "company", label: "Company" },
+    { key: "status", label: "Status" },
+  ];
+  const recentJobs = jobs.map((job) => ({
+    id: job._id ?? job.id,
+    title: job.title ?? "Untitled",
+    company: job.companySlug ?? "—",
+    status: job.status ?? "draft",
+  }));
+
+  const companyItems = companies.map((company) => ({
+    name: company.name ?? "Unnamed",
+    field: company.industry ?? "—",
+    location: company.location ?? "—",
+    activeJobs: getActiveCount(
+      jobs.filter((job) => job.companySlug === (company.companySlug ?? company.id)),
     ),
-  },
-];
+    initials: getInitials(company.name ?? ""),
+  }));
 
-const applications = [
-  {
-    id: "julianne-moore",
-    name: "Julianne Moore",
-    role: "Senior Product Designer",
-    date: "Oct 24, 2023",
-    experience: "6 years",
-    status: "Interviewing",
-    statusColor: "success",
-  },
-  {
-    id: "robert-downey",
-    name: "Robert Downey",
-    role: "Backend Engineer",
-    date: "Oct 23, 2023",
-    experience: "4 years",
-    status: "New",
-    statusColor: "default",
-  },
-  {
-    id: "emma-stone",
-    name: "Emma Stone",
-    role: "Marketing Lead",
-    date: "Oct 22, 2023",
-    experience: "8 years",
-    status: "Reviewing",
-    statusColor: "warning",
-  },
-  {
-    id: "chris-pratt",
-    name: "Chris Pratt",
-    role: "Product Manager",
-    date: "Oct 21, 2023",
-    experience: "5 years",
-    status: "Rejected",
-    statusColor: "danger",
-  },
-];
+  if (totalCompanies === 0) {
+    return (
+      <div className="flex-1 px-4 py-8 lg:px-8">
+        <h1 className="mb-2 text-3xl font-semibold tracking-tight text-white">
+          Welcome back, {greeting}
+        </h1>
+        <p className="mb-8 text-muted-foreground">{subtitle}</p>
 
-const companies = [
-  {
-    name: "Google Inc.",
-    field: "Technology",
-    location: "Mountain View",
-    activeJobs: 24,
-    initials: "G",
-  },
-  {
-    name: "Meta Platforms",
-    field: "Social Media",
-    location: "Menlo Park",
-    activeJobs: 18,
-    initials: "M",
-  },
-  {
-    name: "Stripe",
-    field: "Fintech",
-    location: "San Francisco",
-    activeJobs: 12,
-    initials: "S",
-  },
-  {
-    name: "Tesla",
-    field: "Automotive",
-    location: "Austin",
-    activeJobs: 31,
-    initials: "T",
-  },
-];
+        <Card className="mb-8 rounded-2xl border border-default bg-content1 p-6">
+          <Typography.Heading className="text-lg font-semibold text-white" level={2}>
+            Create your first company
+          </Typography.Heading>
+          <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
+            You need a company profile before you can post jobs.
+          </Typography.Paragraph>
+          <ButtonLink
+            href="/dashboard/mycompany/new"
+            className="mt-4 w-fit"
+          >
+            Add Company
+          </ButtonLink>
+        </Card>
 
-export default function DashBoard() {
+        <RecruiterHomeView
+          greeting={greeting}
+          subtitle={`Once you create a company you'll see your active jobs and applications here.`}
+          totalJobs={totalJobs}
+          totalApplicants={totalApplicants}
+          activeJobs={activeJobs}
+          closedJobs={closedJobs}
+          recentJobs={recentJobs}
+          recentJobsColumns={recentJobsColumns}
+          companyItems={companyItems}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <RecruiterHomeView
+      greeting={greeting}
+      subtitle={subtitle}
+      totalJobs={totalJobs}
+      totalApplicants={totalApplicants}
+      activeJobs={activeJobs}
+      closedJobs={closedJobs}
+      recentJobs={recentJobs}
+      recentJobsColumns={recentJobsColumns}
+      companyItems={companyItems}
+    />
+  );
+}
+
+function SeekerHome({ user }) {
+  const greeting = user.name ?? "there";
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
-      <Typography.Heading
-        className="mb-8 text-3xl font-semibold tracking-tight text-white"
-        level={1}
-      >
-        Welcome back, Alex Sterling
-      </Typography.Heading>
+      <h1 className="mb-2 text-3xl font-semibold tracking-tight text-white">
+        Welcome back, {greeting}
+      </h1>
+      <p className="mb-8 text-muted-foreground">
+        Browse open roles and track your applications.
+      </p>
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
-          <StatCard key={stat.label} {...stat} />
-        ))}
-      </section>
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card className="rounded-2xl border border-default bg-content1 p-6">
+          <Typography.Heading className="text-lg font-semibold text-white" level={2}>
+            Browse Jobs
+          </Typography.Heading>
+          <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
+            See open roles from companies on HireSphere.
+          </Typography.Paragraph>
+          <ButtonLink href="/jobs" className="mt-4 w-fit">
+            Explore Jobs
+          </ButtonLink>
+        </Card>
 
-      <section className="mt-8 grid grid-cols-1 gap-4 xl:grid-cols-[1.6fr_1fr]">
-        <DataTable
-          title="Recent Applications"
-          columns={applicationColumns}
-          rows={applications}
-        />
-
-        <CompanyList title="My Top Companies" companies={companies} />
+        <Card className="rounded-2xl border border-default bg-content1 p-6">
+          <Typography.Heading className="text-lg font-semibold text-white" level={2}>
+            My Applications
+          </Typography.Heading>
+          <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
+            Track the status of every role you&apos;ve applied to.
+          </Typography.Paragraph>
+          <ButtonLink
+            href="/dashboard/applications"
+            variant="secondary"
+            className="mt-4 w-fit"
+          >
+            View Applications
+          </ButtonLink>
+        </Card>
       </section>
     </div>
   );
+}
+
+export default async function DashboardPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const user = session?.user;
+  if (!user) return null;
+
+  if (user.role === "recruiter") {
+    return <RecruiterHome user={user} />;
+  }
+  return <SeekerHome user={user} />;
 }

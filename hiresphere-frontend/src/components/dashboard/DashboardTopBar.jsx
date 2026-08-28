@@ -4,6 +4,7 @@ import { signOut, useSession } from "@/lib/auth-client";
 import {
   ArrowRightFromSquare,
   Bell,
+  Bookmark,
   Briefcase,
   ChevronDown,
   CircleQuestion,
@@ -13,9 +14,27 @@ import {
   House,
   Magnifier,
   OfficeBadge,
+  Person,
 } from "@gravity-ui/icons";
-import { Avatar, Dropdown, InputGroup, Label } from "@heroui/react";
+import { Avatar, Dropdown, InputGroup, Label, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
+
+const RECRUITER_DROPDOWN = [
+  { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: House },
+  { id: "my-company", label: "My Company", href: "/dashboard/mycompany", icon: OfficeBadge },
+  { id: "manage-jobs", label: "Manage Jobs", href: "/dashboard/recruiter/jobs", icon: Briefcase },
+  { id: "applications", label: "Applications", href: "/dashboard/applications", icon: FileCheck },
+  { id: "settings", label: "Settings", href: "/dashboard/settings", icon: Gear },
+];
+
+const SEEKER_DROPDOWN = [
+  { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: House },
+  { id: "browse-jobs", label: "Browse Jobs", href: "/jobs", icon: Magnifier },
+  { id: "my-applications", label: "My Applications", href: "/dashboard/applications", icon: FileCheck },
+  { id: "saved-jobs", label: "Saved Jobs", href: "/dashboard/saved-jobs", icon: Bookmark, comingSoon: true },
+  { id: "profile", label: "Profile", href: "/dashboard/profile", icon: Person, comingSoon: true },
+  { id: "settings", label: "Settings", href: "/dashboard/settings", icon: Gear },
+];
 
 function getInitials(name) {
   const parts = name?.trim().split(/\s+/) ?? [];
@@ -39,6 +58,8 @@ export default function DashboardTopBar() {
   const user = session?.user;
   const name = user?.name ?? "User";
   const initials = getInitials(name);
+
+  const dropdownItems = user?.role === "recruiter" ? RECRUITER_DROPDOWN : SEEKER_DROPDOWN;
 
   const handleSignOut = async () => {
     await signOut();
@@ -85,46 +106,37 @@ export default function DashboardTopBar() {
 
           <Dropdown.Popover>
             <Dropdown.Menu aria-label="Account actions">
-              <Dropdown.Item
-                id="dashboard"
-                href="/dashboard"
-                textValue="Dashboard"
-              >
-                <House className="size-4 shrink-0" />
-                <Label>Dashboard</Label>
-              </Dropdown.Item>
-              <Dropdown.Item
-                id="my-company"
-                href="/dashboard/mycompany"
-                textValue="My Company"
-              >
-                <OfficeBadge className="size-4 shrink-0" />
-                <Label>My Company</Label>
-              </Dropdown.Item>
-              <Dropdown.Item
-                id="manage-jobs"
-                href="/dashboard/recruiter/jobs"
-                textValue="Manage Jobs"
-              >
-                <Briefcase className="size-4 shrink-0" />
-                <Label>Manage Jobs</Label>
-              </Dropdown.Item>
-              <Dropdown.Item
-                id="applications"
-                href="/dashboard/applications"
-                textValue="Applications"
-              >
-                <FileCheck className="size-4 shrink-0" />
-                <Label>Applications</Label>
-              </Dropdown.Item>
-              <Dropdown.Item
-                id="settings"
-                href="/dashboard/settings"
-                textValue="Settings"
-              >
-                <Gear className="size-4 shrink-0" />
-                <Label>Settings</Label>
-              </Dropdown.Item>
+              {dropdownItems.map((item) => {
+                const Icon = item.icon;
+                if (item.comingSoon) {
+                  return (
+                    <Dropdown.Item
+                      key={item.id}
+                      id={item.id}
+                      textValue={item.label}
+                      onAction={() =>
+                        toast.info("Coming soon", {
+                          description: "This page is not ready yet",
+                        })
+                      }
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <Label>{item.label}</Label>
+                    </Dropdown.Item>
+                  );
+                }
+                return (
+                  <Dropdown.Item
+                    key={item.id}
+                    id={item.id}
+                    href={item.href}
+                    textValue={item.label}
+                  >
+                    <Icon className="size-4 shrink-0" />
+                    <Label>{item.label}</Label>
+                  </Dropdown.Item>
+                );
+              })}
               <Dropdown.Item
                 id="help"
                 href="/dashboard/help"
@@ -136,7 +148,7 @@ export default function DashboardTopBar() {
               <Dropdown.Item
                 id="signout"
                 variant="danger"
-                onPress={handleSignOut}
+                onAction={handleSignOut}
                 textValue="Log out"
               >
                 <ArrowRightFromSquare className="size-4 shrink-0" />

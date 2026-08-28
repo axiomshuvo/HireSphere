@@ -2,7 +2,7 @@
 
 import CompanyFormFields from "@/components/dashboard/company/CompanyFormFields";
 import ButtonLink from "@/components/shared/ButtonLink";
-import { fetchCompanies, updateCompany } from "@/lib/actions/company";
+import { getRecruiterCompanies, updateRecruiterCompany } from "@/lib/actions/company";
 import {
   generateCompanySlug,
   getCompanySlug,
@@ -54,10 +54,10 @@ export default function EditCompanyPage({ params }) {
   useEffect(() => {
     let cancelled = false;
 
-    fetchCompanies()
+    getRecruiterCompanies({ pageSize: 100 })
       .then((data) => {
         if (cancelled) return;
-        const list = Array.isArray(data) ? data : (data?.companies ?? []);
+        const list = Array.isArray(data) ? data : (data?.items ?? []);
         const found =
           list.map(normalizeCompany).find((c) => getCompanySlug(c) === id) ??
           null;
@@ -136,7 +136,7 @@ export default function EditCompanyPage({ params }) {
     };
 
     try {
-      await updateCompany(originalSlug, payload);
+      await updateRecruiterCompany(originalSlug, payload);
       toast.success("Company updated", {
         description: `${trimmedName} is saved.`,
       });

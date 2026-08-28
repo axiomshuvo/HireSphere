@@ -6,6 +6,7 @@ export const PLAN_LIMITS = {
 
 export const JOB_CATEGORIES = [
   "Technology",
+  "Engineering",
   "Finance",
   "Healthcare",
   "Education",
@@ -17,7 +18,6 @@ export const JOB_CATEGORIES = [
 export const JOB_TYPES = [
   "Full-time",
   "Part-time",
-  "Remote",
   "Contract",
   "Internship",
 ];

@@ -1,8 +1,7 @@
 import JobForm from "@/components/dashboard/jobs/JobForm";
 import ButtonLink from "@/components/shared/ButtonLink";
-import { fetchCompanies } from "@/lib/actions/company";
-import { fetchJobs } from "@/lib/actions/jobs";
-import { getActiveCount } from "@/lib/api/jobstruture";
+import { getRecruiterCompanies } from "@/lib/actions/company";
+import { getRecruiterJobStats } from "@/lib/actions/jobs";
 import { ArrowLeft } from "@gravity-ui/icons";
 
 export default async function NewJobPage() {
@@ -10,12 +9,14 @@ export default async function NewJobPage() {
   let companies = [];
 
   try {
-    const [jobs, companiesData] = await Promise.all([
-      fetchJobs(),
-      fetchCompanies(),
+    const [stats, companiesData] = await Promise.all([
+      getRecruiterJobStats(),
+      getRecruiterCompanies({ pageSize: 100 }),
     ]);
-    activeJobCount = getActiveCount(jobs);
-    companies = Array.isArray(companiesData) ? companiesData : [];
+    activeJobCount = stats?.active ?? 0;
+    companies = Array.isArray(companiesData)
+      ? companiesData
+      : (companiesData?.items ?? []);
   } catch (error) {
     console.error("Failed to load job form data:", error);
   }

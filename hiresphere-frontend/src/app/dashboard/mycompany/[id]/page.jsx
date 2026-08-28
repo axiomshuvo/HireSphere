@@ -10,9 +10,10 @@ import CompanyStats from "@/components/dashboard/company/CompanyStats";
 import HiringTeamCard from "@/components/dashboard/company/HiringTeamCard";
 import OpenRoles from "@/components/dashboard/company/OpenRoles";
 import ButtonLink from "@/components/shared/ButtonLink";
-import { deleteCompany, fetchCompanies } from "@/lib/actions/company";
-import { fetchJobs } from "@/lib/actions/jobs";
+import { deleteRecruiterCompany, getRecruiterCompanies } from "@/lib/actions/company";
+import { getRecruiterJobs } from "@/lib/actions/jobs";
 import { getCompanySlug, normalizeCompany } from "@/lib/api/companies";
+import { getActiveCount } from "@/lib/api/jobstruture";
 import { ArrowLeft, TrashBin } from "@gravity-ui/icons";
 import { Button, Typography, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -42,18 +43,18 @@ export default function CompanyDetailPage({ params }) {
   useEffect(() => {
     let cancelled = false;
 
-    Promise.all([fetchCompanies(), fetchJobs()])
+    Promise.all([getRecruiterCompanies({ pageSize: 100 }), getRecruiterJobs({ pageSize: 100 })])
       .then(([companiesData, jobsData]) => {
         if (cancelled) return;
         const list = Array.isArray(companiesData)
           ? companiesData
-          : (companiesData?.companies ?? []);
+          : (companiesData?.items ?? []);
         const found =
           list.map(normalizeCompany).find((c) => getCompanySlug(c) === id) ??
           null;
         setCompany(found);
 
-        const allJobs = Array.isArray(jobsData) ? jobsData : [];
+        const allJobs = Array.isArray(jobsData) ? jobsData : (jobsData?.items ?? []);
         setJobs(allJobs.filter((j) => j.companySlug === id));
       })
       .catch((error) => {
@@ -81,7 +82,7 @@ export default function CompanyDetailPage({ params }) {
     console.log("[CompanyDetailPage] Deleting company:", companySlug);
 
     try {
-      await deleteCompany(companySlug);
+      await deleteRecruiterCompany(companySlug);
       toast.success("Company deleted", {
         description: `${company.name} was removed.`,
       });
@@ -129,6 +130,7 @@ export default function CompanyDetailPage({ params }) {
     ...company,
     id: getCompanySlug(company),
     initials: getCompanyInitials(company),
+    activeJobs: getActiveCount(jobs),
   };
 
   return (

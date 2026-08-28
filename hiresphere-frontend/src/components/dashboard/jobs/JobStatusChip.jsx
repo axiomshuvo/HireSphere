@@ -1,11 +1,15 @@
 "use client";
 
-import { Ban, FileText, Play } from "@gravity-ui/icons";
+import {
+  Ban,
+  CircleCheckFill,
+  FileText,
+} from "@gravity-ui/icons";
 import { Chip } from "@heroui/react";
 
 const statusConfig = {
-  active: { label: "Active", icon: Ban, color: "success" },
-  closed: { label: "Closed", icon: Play, color: "danger" },
+  active: { label: "Active", icon: CircleCheckFill, color: "success" },
+  closed: { label: "Closed", icon: Ban, color: "danger" },
   draft: { label: "Draft", icon: FileText, color: "warning" },
 };
 

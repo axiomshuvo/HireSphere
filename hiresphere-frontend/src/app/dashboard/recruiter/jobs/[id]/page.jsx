@@ -1,8 +1,8 @@
 "use client";
 
 import ButtonLink from "@/components/shared/ButtonLink";
-import { fetchCompanies } from "@/lib/actions/company";
-import { fetchJob, updateJobStatus } from "@/lib/actions/jobs";
+import { getRecruiterCompanies } from "@/lib/actions/company";
+import { getRecruiterJob, updateRecruiterJobStatus } from "@/lib/actions/jobs";
 import { getCompanyName, getCompanySlug } from "@/lib/api/companies";
 import {
   formatJobDate,
@@ -23,7 +23,7 @@ import {
 } from "@gravity-ui/icons";
 import { Avatar, Button, Card, Chip, Typography, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { use, useCallback, useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 function statusMeta(status) {
   if (status === "active") {
@@ -83,36 +83,39 @@ export default function JobDetailPage({ params }) {
   const [hasError, setHasError] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
 
-  const loadJob = useCallback(() => {
-    return fetchJob(id)
+  const loadJobAndCompany = (jobId) => {
+    return getRecruiterJob(jobId)
       .then((data) => {
-        const jobId = getJobId(data);
-        if (!jobId) {
+        const resolvedJobId = getJobId(data);
+        if (!resolvedJobId) {
           setJob(null);
           setCompany(null);
           return;
         }
-        setJob({ ...data, id: jobId });
+        setJob({ ...data, id: resolvedJobId });
 
-        if (data?.companySlug) {
-          return fetchCompanies()
-            .then((companies) => {
-              const list = Array.isArray(companies) ? companies : [];
-              const found = list.find(
-                (c) => getCompanySlug(c) === data.companySlug,
-              );
-              setCompany(found ?? null);
-            })
-            .catch((innerError) => {
-              console.warn(
-                "[JobDetailPage] Failed to load company for job:",
-                innerError,
-              );
-              setCompany(null);
-            });
-        } else {
+        if (!data?.companySlug) {
           setCompany(null);
+          return;
         }
+
+        return getRecruiterCompanies({ pageSize: 100 })
+          .then((companiesData) => {
+            const list = Array.isArray(companiesData)
+              ? companiesData
+              : (companiesData?.items ?? []);
+            const found = list.find(
+              (c) => getCompanySlug(c) === data.companySlug,
+            );
+            setCompany(found ?? null);
+          })
+          .catch((innerError) => {
+            console.warn(
+              "[JobDetailPage] Failed to load company for job:",
+              innerError,
+            );
+            setCompany(null);
+          });
       })
       .catch((error) => {
         console.error("[JobDetailPage] Failed to load job:", error);
@@ -121,58 +124,14 @@ export default function JobDetailPage({ params }) {
           description: "Make sure the API server is running.",
         });
       });
-  }, [id]);
+  };
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchJob(id)
-      .then((data) => {
-        if (cancelled) return;
-        setIsLoading(true);
-        setHasError(false);
-        const jobId = getJobId(data);
-        if (!jobId) {
-          setJob(null);
-          setCompany(null);
-          return;
-        }
-        setJob({ ...data, id: jobId });
-
-        if (data?.companySlug) {
-          return fetchCompanies()
-            .then((companies) => {
-              if (cancelled) return;
-              const list = Array.isArray(companies) ? companies : [];
-              const found = list.find(
-                (c) => getCompanySlug(c) === data.companySlug,
-              );
-              setCompany(found ?? null);
-            })
-            .catch((innerError) => {
-              if (cancelled) return;
-              console.warn(
-                "[JobDetailPage] Failed to load company for job:",
-                innerError,
-              );
-              setCompany(null);
-            });
-        } else {
-          setCompany(null);
-        }
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        setIsLoading(true);
-        setHasError(true);
-        console.error("[JobDetailPage] Failed to load job:", error);
-        toast.warning("Could not load job", {
-          description: "Make sure the API server is running.",
-        });
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
+    loadJobAndCompany(id).finally(() => {
+      if (!cancelled) setIsLoading(false);
+    });
 
     return () => {
       cancelled = true;
@@ -198,7 +157,7 @@ export default function JobDetailPage({ params }) {
     setJob((prev) => (prev ? { ...prev, status: nextStatus } : prev));
 
     try {
-      await updateJobStatus(job.id, nextStatus);
+      await updateRecruiterJobStatus(job.id, nextStatus);
       toast.success(nextStatus === "active" ? "Job reopened" : "Job closed", {
         description: `${job.title} status updated.`,
       });

@@ -4,7 +4,8 @@ import CompanyFormFields, {
   EMPTY_COMPANY_FORM,
 } from "@/components/dashboard/company/CompanyFormFields";
 import ButtonLink from "@/components/shared/ButtonLink";
-import { createCompany } from "@/lib/actions/company";
+import { createRecruiterCompany } from "@/lib/actions/company";
+
 import { generateCompanySlug, getCompanySlug } from "@/lib/api/companies";
 import { ArrowLeft } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
@@ -56,7 +57,7 @@ export default function NewCompanyPage() {
     console.log("[NewCompanyPage] Payload:", payload);
 
     try {
-      const created = await createCompany(payload);
+      const created = await createRecruiterCompany(payload);
       console.log("[NewCompanyPage] Server response:", created);
       toast.success(`Company "${formData.name}" registered successfully!`);
       const createdCompany = created?.company ?? created;
@@ -66,7 +67,10 @@ export default function NewCompanyPage() {
       );
     } catch (error) {
       console.error("[NewCompanyPage] Error creating company:", error);
-      toast.warning("Could not register company. Please try again.");
+      const message = error?.message || "Unknown error";
+      toast.warning("Could not register company", {
+        description: message,
+      });
     } finally {
       setIsSubmitting(false);
     }

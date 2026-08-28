@@ -2,14 +2,17 @@
 
 import JobsTable from "@/components/dashboard/jobs/JobsTable";
 import PlanUsageCard from "@/components/dashboard/jobs/PlanUsageCard";
-import { fetchCompanies } from "@/lib/actions/company";
-import { deleteJob, fetchJobs, updateJobStatus } from "@/lib/actions/jobs";
+import ButtonLink from "@/components/shared/ButtonLink";
+import { deleteRecruiterJob, getRecruiterJobs, updateRecruiterJobStatus } from "@/lib/actions/jobs";
+import { getRecruiterCompanies } from "@/lib/actions/company";
 import { getCompanySlug, normalizeCompanies } from "@/lib/api/companies";
 import { getActiveCount, getJobId, getPlanUsage } from "@/lib/api/jobstruture";
 import { CirclePlus } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+const PAGE_SIZE = 10;
 
 function normalizeJob(job) {
   if (!job) return job;
@@ -20,30 +23,73 @@ function normalizeJob(job) {
   return job;
 }
 
+function PageStrip({ page, totalPages }) {
+  if (totalPages <= 1) return null;
+  const canPrev = page > 1;
+  const canNext = page < totalPages;
+  return (
+    <nav className="flex items-center justify-center gap-3 text-sm">
+      {canPrev ? (
+        <ButtonLink
+          href={`/dashboard/recruiter/jobs?page=${page - 1}`}
+          variant="secondary"
+          size="sm"
+        >
+          Previous
+        </ButtonLink>
+      ) : (
+        <span className="text-muted-foreground">Previous</span>
+      )}
+      <span className="text-muted-foreground">
+        Page {page} of {totalPages}
+      </span>
+      {canNext ? (
+        <ButtonLink
+          href={`/dashboard/recruiter/jobs?page=${page + 1}`}
+          variant="secondary"
+          size="sm"
+        >
+          Next
+        </ButtonLink>
+      ) : (
+        <span className="text-muted-foreground">Next</span>
+      )}
+    </nav>
+  );
+}
+
 export default function RecruiterJobsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const page = Math.max(1, Number(searchParams.get("page")) || 1);
+  const [totalPages, setTotalPages] = useState(1);
   const [jobs, setJobs] = useState([]);
   const [companyNameById, setCompanyNameById] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
-  const reloadJobs = useCallback(() => {
-    return fetchJobs().then((data) => {
-      const list = Array.isArray(data) ? data : [];
-      setJobs(list.map(normalizeJob));
-    });
-  }, []);
-
   useEffect(() => {
     let cancelled = false;
 
-    Promise.all([fetchJobs(), fetchCompanies()])
+    Promise.all([
+      getRecruiterJobs({ page, pageSize: PAGE_SIZE }),
+      getRecruiterCompanies({ pageSize: 100 }),
+    ])
       .then(([jobsData, companiesData]) => {
         if (cancelled) return;
 
-        const jobList = Array.isArray(jobsData) ? jobsData : [];
+        const jobList = Array.isArray(jobsData)
+          ? jobsData
+          : (jobsData?.items ?? []);
         setJobs(jobList.map(normalizeJob));
+        if (typeof jobsData?.totalPages === "number") {
+          setTotalPages(Math.max(1, jobsData.totalPages));
+        } else {
+          setTotalPages(1);
+        }
 
-        const companyList = Array.isArray(companiesData) ? companiesData : [];
+        const companyList = Array.isArray(companiesData)
+          ? companiesData
+          : (companiesData?.items ?? []);
         const lookup = {};
         for (const company of normalizeCompanies(companyList)) {
           const id = getCompanySlug(company);
@@ -67,7 +113,7 @@ export default function RecruiterJobsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [page]);
 
   const usage = getPlanUsage(getActiveCount(jobs));
 
@@ -94,7 +140,7 @@ export default function RecruiterJobsPage() {
     );
 
     try {
-      await updateJobStatus(jobId, nextStatus);
+      await updateRecruiterJobStatus(jobId, nextStatus);
       toast.success(nextStatus === "active" ? "Job reopened" : "Job closed", {
         description: `${job.title} status updated.`,
       });
@@ -117,9 +163,13 @@ export default function RecruiterJobsPage() {
 
     setJobs((prev) => prev.filter((item) => getJobId(item) !== jobId));
 
-    deleteJob(jobId).catch((error) => {
+    deleteRecruiterJob(jobId).catch((error) => {
       console.error("Failed to delete job:", error);
-      reloadJobs();
+      // Re-fetch the current page if the optimistic removal didn't work.
+      getRecruiterJobs({ page, pageSize: PAGE_SIZE }).then((data) => {
+        const list = Array.isArray(data) ? data : (data?.items ?? []);
+        setJobs(list.map(normalizeJob));
+      });
       toast.danger("Delete failed", {
         description: `${job.title} could not be deleted.`,
       });
@@ -164,6 +214,7 @@ export default function RecruiterJobsPage() {
           onToggleStatus={handleToggleStatus}
           onDelete={handleDelete}
         />
+        <PageStrip page={page} totalPages={totalPages} />
       </div>
     </div>
   );

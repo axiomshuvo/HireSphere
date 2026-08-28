@@ -1,41 +1,43 @@
 "use client";
 
-import { formatJobDate, getJobCreatedAt } from "@/lib/api/jobstruture";
+import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
+import {
+  formatJobDate,
+  getJobCreatedAt,
+} from "@/lib/api/jobstruture";
 import { ArrowRight } from "@gravity-ui/icons";
-import { Card, Chip, Typography } from "@heroui/react";
+import { Card, Typography } from "@heroui/react";
 import Link from "next/link";
+import JobStatusChip from "@/components/dashboard/jobs/JobStatusChip";
 
-function statusMeta(status) {
-  if (status === "active") {
-    return { color: "success", label: "Active" };
-  }
-  if (status === "closed") {
-    return { color: "danger", label: "Closed" };
-  }
-  return { color: "warning", label: "Draft" };
+function formatLocation(job) {
+  if (job.remote) return "Remote";
+  const parts = [job.city, job.country].filter(Boolean);
+  return parts.length ? parts.join(", ") : null;
 }
 
 function JobRow({ job }) {
-  const meta = statusMeta(job.status);
   const jobId = job.id ?? job._id;
+  const location = formatLocation(job);
 
   return (
     <Link
       href={`/dashboard/recruiter/jobs/${jobId}/edit`}
-      className="group flex items-center gap-4 rounded-xl border border-transparent px-3 py-2.5 transition-colors hover:border-default hover:bg-[#1b1c1e]"
+      className="group flex items-start gap-4 rounded-xl border border-transparent px-3 py-2.5 transition-colors hover:border-default hover:bg-[#1b1c1e]"
     >
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-white">{job.title}</p>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-          <span>{job.type ?? job.category ?? "—"}</span>
-          {job.location && <span>• {job.location}</span>}
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="truncate text-sm font-medium text-white">{job.title}</p>
+          <JobStatusChip status={job.status} />
+          <DeadlineCountdown deadline={job.deadline} />
+        </div>
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+          {job.type && <span>{job.type}</span>}
+          {location && <span>• {location}</span>}
           <span>• Posted {formatJobDate(getJobCreatedAt(job))}</span>
         </div>
       </div>
-      <Chip color={meta.color} size="sm" variant="soft">
-        {meta.label}
-      </Chip>
-      <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
+      <ArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
     </Link>
   );
 }

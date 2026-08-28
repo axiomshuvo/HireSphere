@@ -1,6 +1,6 @@
 "use client";
 
-import { createJob, updateJob } from "@/lib/actions/jobs";
+import { createRecruiterJob, updateRecruiterJob } from "@/lib/actions/jobs";
 import { getCompanyName, getCompanySlug } from "@/lib/api/companies";
 import {
   CURRENCIES,
@@ -111,12 +111,12 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
     try {
       if (isEditing) {
         const jobId = getJobId(job);
-        await updateJob(jobId, payload);
+        await updateRecruiterJob(jobId, payload);
         toast.success("Job updated", {
           description: `${formData.title} is saved.`,
         });
       } else {
-        await createJob(payload);
+        await createRecruiterJob(payload);
         toast.success("Job posted successfully", {
           description: `${formData.title} is saved.`,
         });

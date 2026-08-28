@@ -2,22 +2,48 @@
 
 import { useSession } from "@/lib/auth-client";
 import {
+  Bookmark,
   Briefcase,
   FileCheck,
   Gear,
   LayoutCells,
   LayoutSideContent,
+  Magnifier,
   OfficeBadge,
+  Person,
 } from "@gravity-ui/icons";
-import { Avatar, Button, Drawer } from "@heroui/react";
+import { Avatar, Button, Drawer, toast } from "@heroui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navItems = [
+const RECRUITER_NAV = [
   { icon: LayoutCells, label: "Dashboard", href: "/dashboard" },
   { icon: OfficeBadge, label: "My Company", href: "/dashboard/mycompany" },
   { icon: Briefcase, label: "Manage Jobs", href: "/dashboard/recruiter/jobs" },
   { icon: FileCheck, label: "Applications", href: "/dashboard/applications" },
+  { icon: Gear, label: "Settings", href: "/dashboard/settings" },
+];
+
+const SEEKER_NAV = [
+  { icon: LayoutCells, label: "Dashboard", href: "/dashboard" },
+  { icon: Magnifier, label: "Browse Jobs", href: "/jobs" },
+  {
+    icon: FileCheck,
+    label: "My Applications",
+    href: "/dashboard/applications",
+  },
+  {
+    icon: Bookmark,
+    label: "Saved Jobs",
+    href: "/dashboard/saved-jobs",
+    comingSoon: true,
+  },
+  {
+    icon: Person,
+    label: "Profile",
+    href: "/dashboard/profile",
+    comingSoon: true,
+  },
   { icon: Gear, label: "Settings", href: "/dashboard/settings" },
 ];
 
@@ -50,7 +76,9 @@ function ProfileCard({ user, compact = false }) {
   const initials = getInitials(name);
 
   return (
-    <div className={compact ? "flex items-center gap-3" : "flex flex-col gap-3"}>
+    <div
+      className={compact ? "flex items-center gap-3" : "flex flex-col gap-3"}
+    >
       <div className="flex items-center gap-3">
         <Avatar.Root className="size-10 shrink-0 rounded-full bg-default text-sm font-semibold text-default-foreground">
           {user?.image ? (
@@ -62,7 +90,7 @@ function ProfileCard({ user, compact = false }) {
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-white">{name}</p>
           <p className="truncate text-xs text-muted-foreground">
-            {compact ? user?.email ?? role : role}
+            {compact ? (user?.email ?? role) : role}
           </p>
         </div>
       </div>
@@ -76,33 +104,60 @@ function ProfileCard({ user, compact = false }) {
   );
 }
 
+function NavLink({ item, active }) {
+  const baseClass = `relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
+    active
+      ? "bg-default text-white"
+      : "text-muted-foreground hover:bg-default hover:text-white"
+  }`;
+
+  const iconEl = <item.icon className="size-5" />;
+  const labelEl = (
+    <>
+      {active && (
+        <span className="absolute right-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-l-full bg-white" />
+      )}
+      {iconEl}
+      {item.label}
+    </>
+  );
+
+  if (item.comingSoon) {
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          toast.info("Coming soon", {
+            description: "This page is not ready yet",
+          })
+        }
+        title="Coming soon"
+        className={`${baseClass} cursor-not-allowed opacity-60`}
+      >
+        {labelEl}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={item.href} className={baseClass}>
+      {labelEl}
+    </Link>
+  );
+}
+
 export function DashBoardSideBar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user;
 
+  const navItems = user?.role === "recruiter" ? RECRUITER_NAV : SEEKER_NAV;
+
   const navContent = (
     <nav className="flex flex-col gap-1">
       {navItems.map((item) => {
         const active = isActivePath(pathname, item.href);
-
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
-              active
-                ? "bg-default text-white"
-                : "text-muted-foreground hover:bg-default hover:text-white"
-            }`}
-          >
-            {active && (
-              <span className="absolute right-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-l-full bg-white" />
-            )}
-            <item.icon className="size-5" />
-            {item.label}
-          </Link>
-        );
+        return <NavLink key={item.href} item={item} active={active} />;
       })}
     </nav>
   );
@@ -110,7 +165,7 @@ export function DashBoardSideBar() {
   return (
     <>
       <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-default p-4">
-        <Link href="/dashboard" className="mb-6 px-3 text-xl font-bold text-white">
+        <Link href="/" className="mb-6 px-3 text-xl font-bold text-white">
           HireLoop
         </Link>
 

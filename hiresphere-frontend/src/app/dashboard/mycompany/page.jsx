@@ -1,41 +1,48 @@
-"use client";
-
 import CompanyCard from "@/components/dashboard/company/CompanyCard";
 import ButtonLink from "@/components/shared/ButtonLink";
-import { fetchCompanies } from "@/lib/actions/company";
+import { getRecruiterCompanies } from "@/lib/actions/company";
 import { normalizeCompanies } from "@/lib/api/companies";
 import { CirclePlus } from "@gravity-ui/icons";
-import { Typography, toast } from "@heroui/react";
-import { useEffect, useState } from "react";
 
-export default function MyCompanyPage() {
-  const [companies, setCompanies] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const PAGE_SIZE = 9;
 
-  useEffect(() => {
-    let cancelled = false;
+function PageStrip({ page, totalPages, basePath }) {
+  if (totalPages <= 1) return null;
+  const prev = page > 1 ? `${basePath}?page=${page - 1}` : null;
+  const next = page < totalPages ? `${basePath}?page=${page + 1}` : null;
+  return (
+    <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
+      {prev ? (
+        <ButtonLink href={prev} variant="secondary" size="sm">
+          Previous
+        </ButtonLink>
+      ) : (
+        <span className="text-muted-foreground">Previous</span>
+      )}
+      <span className="text-muted-foreground">
+        Page {page} of {totalPages}
+      </span>
+      {next ? (
+        <ButtonLink href={next} variant="secondary" size="sm">
+          Next
+        </ButtonLink>
+      ) : (
+        <span className="text-muted-foreground">Next</span>
+      )}
+    </nav>
+  );
+}
 
-    fetchCompanies()
-      .then((data) => {
-        if (cancelled) return;
-        const list = Array.isArray(data) ? data : (data?.companies ?? []);
-        setCompanies(normalizeCompanies(list));
-      })
-      .catch((error) => {
-        if (cancelled) return;
-        console.error("[MyCompanyPage] Failed to load companies:", error);
-        toast.warning("Could not load companies", {
-          description: "Make sure the API server is running.",
-        });
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+export default async function MyCompanyPage({ searchParams }) {
+  const params = await searchParams;
+  const page = Math.max(1, Number(params?.page) || 1);
+  const result = await getRecruiterCompanies({ page, pageSize: PAGE_SIZE });
+  const items = Array.isArray(result) ? result : result?.items ?? [];
+  const totalPages =
+    typeof result?.totalPages === "number"
+      ? Math.max(1, result.totalPages)
+      : 1;
+  const companies = normalizeCompanies(items);
 
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
@@ -55,13 +62,7 @@ export default function MyCompanyPage() {
         </ButtonLink>
       </div>
 
-      {isLoading ? (
-        <div className="flex flex-1 items-center justify-center py-16">
-          <Typography.Paragraph className="text-sm text-muted-foreground">
-            Loading companies…
-          </Typography.Paragraph>
-        </div>
-      ) : companies.length === 0 ? (
+      {companies.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
           <h2 className="text-lg font-semibold text-white">No companies yet</h2>
           <p className="max-w-sm text-sm text-muted-foreground">
@@ -78,14 +79,17 @@ export default function MyCompanyPage() {
           </ButtonLink>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {companies.map((company) => (
-            <CompanyCard
-              key={company.companySlug ?? company.id ?? company._id}
-              company={company}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {companies.map((company) => (
+              <CompanyCard
+                key={company.companySlug ?? company.id ?? company._id}
+                company={company}
+              />
+            ))}
+          </div>
+          <PageStrip page={page} totalPages={totalPages} basePath="/dashboard/mycompany" />
+        </>
       )}
     </div>
   );

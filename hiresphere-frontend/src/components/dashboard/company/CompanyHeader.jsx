@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Pencil, TrashBin } from "@gravity-ui/icons";
+import { Briefcase, MapPin, Pencil, TrashBin } from "@gravity-ui/icons";
 import { Avatar, Button, Chip } from "@heroui/react";
 
 const planLabels = {
@@ -57,6 +57,13 @@ export default function CompanyHeader({ company, onEdit, onDelete }) {
               >
                 {company.isApproved ? "Approved" : "Pending"}
               </Chip>
+              {typeof company.activeJobs === "number" && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-default px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-default-foreground">
+                  <Briefcase className="size-3" />
+                  {company.activeJobs} active{" "}
+                  {company.activeJobs === 1 ? "job" : "jobs"}
+                </span>
+              )}
             </div>
 
             {company.tagline && (
