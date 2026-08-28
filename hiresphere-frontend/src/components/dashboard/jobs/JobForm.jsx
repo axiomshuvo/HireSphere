@@ -1,7 +1,7 @@
 "use client";
 
 import { createJob, updateJob } from "@/lib/actions/jobs";
-import { getCompanyId, getCompanyName } from "@/lib/companies";
+import { getCompanyName, getCompanySlug } from "@/lib/api/companies";
 import {
   CURRENCIES,
   EMPTY_JOB_FORM,
@@ -10,7 +10,7 @@ import {
   getJobId,
   getPlanUsage,
   jobToFormValues,
-} from "@/lib/jobstruture";
+} from "@/lib/api/jobstruture";
 import { CircleCheckFill, CircleInfo } from "@gravity-ui/icons";
 import { ListBox, ListBoxItem, Select, toast } from "@heroui/react";
 import Link from "next/link";
@@ -47,7 +47,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
   const [errors, setErrors] = useState({});
 
   const selectedCompany = companies.find(
-    (c) => getCompanyId(c) === formData.companyId,
+    (c) => getCompanySlug(c) === formData.companySlug,
   );
 
   const handleChange = (e) => {
@@ -63,9 +63,9 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
   };
 
   const handleCompanyChange = (key) => {
-    setFormData((prev) => ({ ...prev, companyId: key ?? "" }));
-    if (errors.companyId) {
-      setErrors((prev) => ({ ...prev, companyId: "" }));
+    setFormData((prev) => ({ ...prev, companySlug: key ?? "" }));
+    if (errors.companySlug) {
+      setErrors((prev) => ({ ...prev, companySlug: "" }));
     }
   };
 
@@ -73,8 +73,8 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
     e.preventDefault();
     const newErrors = {};
 
-    if (!formData.companyId)
-      newErrors.companyId = "Please select a company.";
+    if (!formData.companySlug)
+      newErrors.companySlug = "Please select a company.";
     if (!formData.title.trim()) newErrors.title = "Job title is required.";
     if (!formData.salaryMin)
       newErrors.salaryMin = "Minimum salary is required.";
@@ -156,7 +156,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Field label="Company" error={errors.companyId}>
+            <Field label="Company" error={errors.companySlug}>
               {companies.length === 0 ? (
                 <p className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-200">
                   You don&apos;t have any companies yet.{" "}
@@ -170,9 +170,9 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
                 </p>
               ) : (
                 <Select
-                  selectedKey={formData.companyId || null}
+                  selectedKey={formData.companySlug || null}
                   onSelectionChange={handleCompanyChange}
-                  isInvalid={Boolean(errors.companyId)}
+                  isInvalid={Boolean(errors.companySlug)}
                   aria-label="Company"
                 >
                   <Select.Trigger>
@@ -182,7 +182,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
                   <Select.Popover>
                     <ListBox>
                       {companies.map((company) => {
-                        const id = getCompanyId(company);
+                        const id = getCompanySlug(company);
                         return (
                           <ListBoxItem
                             key={id}

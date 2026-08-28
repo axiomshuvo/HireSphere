@@ -1,9 +1,9 @@
-import ButtonLink from "@/components/shared/ButtonLink";
 import JobForm from "@/components/dashboard/jobs/JobForm";
+import ButtonLink from "@/components/shared/ButtonLink";
 import { fetchCompanies } from "@/lib/actions/company";
 import { fetchJobs } from "@/lib/actions/jobs";
+import { getActiveCount } from "@/lib/api/jobstruture";
 import { ArrowLeft } from "@gravity-ui/icons";
-import { getActiveCount } from "@/lib/jobstruture";
 
 export default async function NewJobPage() {
   let activeJobCount = 0;

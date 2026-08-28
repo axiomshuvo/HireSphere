@@ -1,9 +1,13 @@
 "use client";
 
-import ButtonLink from "@/components/shared/ButtonLink";
 import CompanyFormFields from "@/components/dashboard/company/CompanyFormFields";
+import ButtonLink from "@/components/shared/ButtonLink";
 import { fetchCompanies, updateCompany } from "@/lib/actions/company";
-import { getCompanyId, normalizeCompany } from "@/lib/companies";
+import {
+  generateCompanySlug,
+  getCompanySlug,
+  normalizeCompany,
+} from "@/lib/api/companies";
 import { ArrowLeft } from "@gravity-ui/icons";
 import { Button, Typography, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -17,6 +21,8 @@ const EMPTY_FORM = {
   location: "",
   employeeCount: "1-10 employees",
   description: "",
+  logo: "",
+  gallery: [],
 };
 
 function buildFormData(company) {
@@ -29,6 +35,8 @@ function buildFormData(company) {
     location: company.location ?? "",
     employeeCount: company.employeeCount ?? "1-10 employees",
     description: company.description ?? "",
+    logo: company.logo ?? "",
+    gallery: Array.isArray(company.gallery) ? company.gallery : [],
   };
 }
 
@@ -49,9 +57,9 @@ export default function EditCompanyPage({ params }) {
     fetchCompanies()
       .then((data) => {
         if (cancelled) return;
-        const list = Array.isArray(data) ? data : data?.companies ?? [];
+        const list = Array.isArray(data) ? data : (data?.companies ?? []);
         const found =
-          list.map(normalizeCompany).find((c) => getCompanyId(c) === id) ??
+          list.map(normalizeCompany).find((c) => getCompanySlug(c) === id) ??
           null;
         setCompany(found);
         setFormData(buildFormData(found));
@@ -106,25 +114,33 @@ export default function EditCompanyPage({ params }) {
 
     setIsSubmitting(true);
 
+    const trimmedName = formData.name.trim();
+    const originalSlug = getCompanySlug(company);
+    const originalName = company?.name ?? "";
+    const newSlug =
+      trimmedName !== originalName
+        ? generateCompanySlug(trimmedName)
+        : originalSlug;
+
     const payload = {
-      name: formData.name.trim(),
+      name: trimmedName,
       industry: formData.industry,
       tagline: formData.tagline.trim(),
       website: formData.website.trim(),
       location: formData.location.trim(),
       employeeCount: formData.employeeCount,
       description: formData.description.trim(),
+      logo: formData.logo,
+      gallery: formData.gallery,
+      companySlug: newSlug,
     };
 
-    console.log("[EditCompanyPage] Submitting payload:", payload, "for id:", id);
-
     try {
-      const result = await updateCompany(id, payload);
-      console.log("[EditCompanyPage] updateCompany result:", result);
+      await updateCompany(originalSlug, payload);
       toast.success("Company updated", {
-        description: `${formData.name} is saved.`,
+        description: `${trimmedName} is saved.`,
       });
-      router.push(`/dashboard/mycompany/${id}`);
+      router.push(`/dashboard/mycompany/${newSlug}`);
     } catch (error) {
       console.error("[EditCompanyPage] Error updating company:", error);
       toast.warning("Could not update company. Please try again.");
@@ -149,10 +165,7 @@ export default function EditCompanyPage({ params }) {
         <Typography.Paragraph className="text-sm text-muted-foreground">
           Could not load company.
         </Typography.Paragraph>
-        <Button
-          variant="primary"
-          onPress={() => window.location.reload()}
-        >
+        <Button variant="primary" onPress={() => window.location.reload()}>
           Try Again
         </Button>
       </div>
@@ -206,7 +219,8 @@ export default function EditCompanyPage({ params }) {
             Update company
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Update the details for <span className="text-white">{company.name}</span>.
+            Update the details for{" "}
+            <span className="text-white">{company.name}</span>.
           </p>
         </div>
 
@@ -222,10 +236,7 @@ export default function EditCompanyPage({ params }) {
           />
 
           <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-4">
-            <ButtonLink
-              href={`/dashboard/mycompany/${id}`}
-              variant="secondary"
-            >
+            <ButtonLink href={`/dashboard/mycompany/${id}`} variant="secondary">
               Cancel
             </ButtonLink>
             <Button type="submit" variant="primary" isDisabled={isSubmitting}>

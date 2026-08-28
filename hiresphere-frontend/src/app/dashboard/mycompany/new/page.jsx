@@ -1,24 +1,15 @@
 "use client";
 
-import ButtonLink from "@/components/shared/ButtonLink";
 import CompanyFormFields, {
   EMPTY_COMPANY_FORM,
 } from "@/components/dashboard/company/CompanyFormFields";
+import ButtonLink from "@/components/shared/ButtonLink";
 import { createCompany } from "@/lib/actions/company";
+import { generateCompanySlug, getCompanySlug } from "@/lib/api/companies";
 import { ArrowLeft } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-function generateCompanyId(name) {
-  const slug = name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  const random = Math.floor(100 + Math.random() * 900);
-  return `cmp-${slug || "company"}-${random}`;
-}
 
 export default function NewCompanyPage() {
   const router = useRouter();
@@ -59,7 +50,7 @@ export default function NewCompanyPage() {
 
     const payload = {
       ...formData,
-      companyId: generateCompanyId(formData.name),
+      companySlug: generateCompanySlug(formData.name),
     };
 
     console.log("[NewCompanyPage] Payload:", payload);
@@ -69,11 +60,7 @@ export default function NewCompanyPage() {
       console.log("[NewCompanyPage] Server response:", created);
       toast.success(`Company "${formData.name}" registered successfully!`);
       const createdCompany = created?.company ?? created;
-      const newId =
-        createdCompany?.companyId ??
-        createdCompany?.id ??
-        createdCompany?._id ??
-        null;
+      const newId = getCompanySlug(createdCompany);
       router.push(
         newId ? `/dashboard/mycompany/${newId}` : "/dashboard/mycompany",
       );

@@ -1,9 +1,9 @@
 "use client";
 
-import ButtonLink from "@/components/shared/ButtonLink";
 import CompanyCard from "@/components/dashboard/company/CompanyCard";
+import ButtonLink from "@/components/shared/ButtonLink";
 import { fetchCompanies } from "@/lib/actions/company";
-import { normalizeCompanies } from "@/lib/companies";
+import { normalizeCompanies } from "@/lib/api/companies";
 import { CirclePlus } from "@gravity-ui/icons";
 import { Typography, toast } from "@heroui/react";
 import { useEffect, useState } from "react";
@@ -18,7 +18,7 @@ export default function MyCompanyPage() {
     fetchCompanies()
       .then((data) => {
         if (cancelled) return;
-        const list = Array.isArray(data) ? data : data?.companies ?? [];
+        const list = Array.isArray(data) ? data : (data?.companies ?? []);
         setCompanies(normalizeCompanies(list));
       })
       .catch((error) => {
@@ -80,7 +80,10 @@ export default function MyCompanyPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {companies.map((company) => (
-            <CompanyCard key={company.id} company={company} />
+            <CompanyCard
+              key={company.companySlug ?? company.id ?? company._id}
+              company={company}
+            />
           ))}
         </div>
       )}

@@ -1,9 +1,9 @@
-import ButtonLink from "@/components/shared/ButtonLink";
 import JobForm from "@/components/dashboard/jobs/JobForm";
+import ButtonLink from "@/components/shared/ButtonLink";
 import { fetchCompanies } from "@/lib/actions/company";
 import { fetchJobs } from "@/lib/actions/jobs";
+import { getActiveCount, getJobId } from "@/lib/api/jobstruture";
 import { ArrowLeft } from "@gravity-ui/icons";
-import { getActiveCount, getJobId } from "@/lib/jobstruture";
 
 export default async function EditJobPage({ params }) {
   const { id } = await params;
@@ -38,7 +38,11 @@ export default async function EditJobPage({ params }) {
         </ButtonLink>
       </div>
 
-      <JobForm job={job} activeJobCount={activeJobCount} companies={companies} />
+      <JobForm
+        job={job}
+        activeJobCount={activeJobCount}
+        companies={companies}
+      />
     </div>
   );
 }

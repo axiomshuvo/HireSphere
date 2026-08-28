@@ -3,11 +3,14 @@
 import ButtonLink from "@/components/shared/ButtonLink";
 import { fetchCompanies } from "@/lib/actions/company";
 import { fetchJob, updateJobStatus } from "@/lib/actions/jobs";
-import { getCompanyId, getCompanyName } from "@/lib/companies";
-import { formatJobDate, getJobCreatedAt, getJobId } from "@/lib/jobstruture";
+import { getCompanyName, getCompanySlug } from "@/lib/api/companies";
+import {
+  formatJobDate,
+  getJobCreatedAt,
+  getJobId,
+} from "@/lib/api/jobstruture";
 import {
   ArrowLeft,
-  Wallet,
   Ban,
   Calendar,
   CircleCheck,
@@ -16,15 +19,9 @@ import {
   MapPin,
   Pencil,
   Play,
+  Wallet,
 } from "@gravity-ui/icons";
-import {
-  Avatar,
-  Button,
-  Card,
-  Chip,
-  Typography,
-  toast,
-} from "@heroui/react";
+import { Avatar, Button, Card, Chip, Typography, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useState } from "react";
 
@@ -97,12 +94,12 @@ export default function JobDetailPage({ params }) {
         }
         setJob({ ...data, id: jobId });
 
-        if (data?.companyId) {
+        if (data?.companySlug) {
           return fetchCompanies()
             .then((companies) => {
               const list = Array.isArray(companies) ? companies : [];
               const found = list.find(
-                (c) => getCompanyId(c) === data.companyId,
+                (c) => getCompanySlug(c) === data.companySlug,
               );
               setCompany(found ?? null);
             })
@@ -142,13 +139,13 @@ export default function JobDetailPage({ params }) {
         }
         setJob({ ...data, id: jobId });
 
-        if (data?.companyId) {
+        if (data?.companySlug) {
           return fetchCompanies()
             .then((companies) => {
               if (cancelled) return;
               const list = Array.isArray(companies) ? companies : [];
               const found = list.find(
-                (c) => getCompanyId(c) === data.companyId,
+                (c) => getCompanySlug(c) === data.companySlug,
               );
               setCompany(found ?? null);
             })
@@ -188,10 +185,7 @@ export default function JobDetailPage({ params }) {
 
     const nextStatus = job.status === "active" ? "closed" : "active";
 
-    if (
-      nextStatus === "active" &&
-      (!job.companyId || !company)
-    ) {
+    if (nextStatus === "active" && (!job.companySlug || !company)) {
       toast.warning("Cannot reopen job", {
         description:
           "This job has no company. Add a company to it before reopening.",
@@ -275,7 +269,7 @@ export default function JobDetailPage({ params }) {
 
   const companyName = company ? getCompanyName(company) : null;
   const companyHref = company
-    ? `/dashboard/mycompany/${getCompanyId(company)}`
+    ? `/dashboard/mycompany/${getCompanySlug(company)}`
     : null;
   const isRemote = Boolean(job.remote);
   const location = isRemote
@@ -383,7 +377,11 @@ export default function JobDetailPage({ params }) {
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              <Button variant="secondary" onPress={handleToggleStatus} isDisabled={isToggling}>
+              <Button
+                variant="secondary"
+                onPress={handleToggleStatus}
+                isDisabled={isToggling}
+              >
                 {isActive ? (
                   <Ban className="size-4" />
                 ) : (
@@ -468,7 +466,10 @@ export default function JobDetailPage({ params }) {
                   value={isRemote ? "Remote" : location || "—"}
                 />
                 <InfoRow label="Salary" value={salary} />
-                <InfoRow label="Visibility" value={job.isPublicVisible ? "Public" : "Private"} />
+                <InfoRow
+                  label="Visibility"
+                  value={job.isPublicVisible ? "Public" : "Private"}
+                />
                 <InfoRow label="Applicants" value={job.applicants ?? 0} />
               </div>
             </Card>
@@ -481,7 +482,11 @@ export default function JobDetailPage({ params }) {
                 <div className="flex items-center gap-3">
                   <Avatar.Root className="size-12 shrink-0 rounded-2xl bg-default text-sm font-semibold text-default-foreground">
                     <Avatar.Fallback>
-                      {(company.initials ?? company.name?.[0] ?? "?").toUpperCase()}
+                      {(
+                        company.initials ??
+                        company.name?.[0] ??
+                        "?"
+                      ).toUpperCase()}
                     </Avatar.Fallback>
                   </Avatar.Root>
                   <div className="min-w-0 flex-1">

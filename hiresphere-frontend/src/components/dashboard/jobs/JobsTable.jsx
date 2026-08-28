@@ -1,6 +1,10 @@
 "use client";
 
-import { formatJobDate, getJobCreatedAt, getJobId } from "@/lib/jobstruture";
+import {
+  formatJobDate,
+  getJobCreatedAt,
+  getJobId,
+} from "@/lib/api/jobstruture";
 import { Ban, Eye, Pencil, Play } from "@gravity-ui/icons";
 import { Button, Card, Table, Typography } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -34,7 +38,10 @@ export default function JobsTable({
     <Card className="rounded-2xl border border-default bg-content1 p-5">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Typography.Heading className="text-lg font-semibold text-white" level={2}>
+          <Typography.Heading
+            className="text-lg font-semibold text-white"
+            level={2}
+          >
             Manage Jobs
           </Typography.Heading>
           <Typography.Paragraph className="text-sm text-muted-foreground">
@@ -60,8 +67,8 @@ export default function JobsTable({
           <Table.Body>
             {jobs.map((job) => {
               const jobId = getJobId(job) ?? job.id ?? job._id;
-              const companyName = job.companyId
-                ? companyNameById[job.companyId] ?? "Unknown"
+              const companyName = job.companySlug
+                ? (companyNameById[job.companySlug] ?? "Unknown")
                 : "—";
 
               return (

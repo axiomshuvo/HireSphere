@@ -1,8 +1,8 @@
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-export const getCompanyJobs = async (companyId, status = "active") => {
+export const getCompanyJobs = async (companySlug, status = "active") => {
   const res = await fetch(
-    `${baseUrl}/api/jobs?companyId=${companyId}&status=${status}`,
+    `${baseUrl}/api/jobs?companySlug=${encodeURIComponent(companySlug)}&status=${status}`,
     {
       headers: { "Content-Type": "application/json" },
     },

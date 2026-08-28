@@ -41,7 +41,7 @@ export function getPlanUsage(activeCount, plan = "growth") {
 }
 
 export const EMPTY_JOB_FORM = {
-  companyId: "",
+  companySlug: "",
   title: "",
   category: "Technology",
   type: "Full-time",

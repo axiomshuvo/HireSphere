@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowUpToLine, MapPin } from "@gravity-ui/icons";
+import ImageUploader from "@/components/shared/ImageUploader";
+import { MapPin } from "@gravity-ui/icons";
 import {
   Input,
   InputGroup,
@@ -9,7 +10,6 @@ import {
   ListBoxItem,
   Select,
   TextArea,
-  Typography,
 } from "@heroui/react";
 
 export const COMPANY_INDUSTRIES = [
@@ -37,6 +37,8 @@ export const EMPTY_COMPANY_FORM = {
   location: "",
   employeeCount: "1-10 employees",
   description: "",
+  logo: "",
+  gallery: [],
 };
 
 const inputClass = (error) =>
@@ -167,15 +169,19 @@ export default function CompanyFormFields({
 
       <div className="flex flex-col gap-2 sm:col-span-2">
         <Label>Company Logo</Label>
-        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-default p-6 text-center">
-          <ArrowUpToLine className="size-6 text-muted-foreground" />
-          <Typography.Paragraph className="font-medium text-white">
-            Upload image
-          </Typography.Paragraph>
-          <Typography.Paragraph className="text-xs text-muted-foreground">
-            PNG, JPG up to 5MB
-          </Typography.Paragraph>
-        </div>
+        <ImageUploader
+          value={formData.logo}
+          onChange={(url) => handleChange("logo", url)}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2 sm:col-span-2">
+        <Label>Gallery</Label>
+        <ImageUploader
+          multiple
+          value={formData.gallery}
+          onChange={(urls) => handleChange("gallery", urls)}
+        />
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">

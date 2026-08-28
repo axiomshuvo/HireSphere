@@ -12,11 +12,23 @@ const planLabels = {
 
 export default function CompanyCard({ company }) {
   return (
-    <Link href={`/dashboard/mycompany/${company.id}`} className="group">
+    <Link
+      href={`/dashboard/mycompany/${company.companySlug}`}
+      className="group"
+    >
       <Card className="h-full rounded-2xl border border-default bg-content1 p-5 transition-colors group-hover:border-indigo-500/50">
         <div className="flex items-start gap-3">
-          <Avatar.Root className="size-12 shrink-0 rounded-xl bg-default text-base font-semibold text-default-foreground">
-            <Avatar.Fallback>{company.initials}</Avatar.Fallback>
+          <Avatar.Root className="size-12 shrink-0 overflow-hidden rounded-xl bg-default text-base font-semibold text-default-foreground">
+            {company.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={company.logo}
+                alt={company.name}
+                className="size-full object-cover"
+              />
+            ) : (
+              <Avatar.Fallback>{company.initials}</Avatar.Fallback>
+            )}
           </Avatar.Root>
           <div className="min-w-0 flex-1">
             <h2 className="truncate font-semibold text-white">
@@ -47,7 +59,7 @@ export default function CompanyCard({ company }) {
             {company.isApproved ? "Approved" : "Pending"}
           </Chip>
           <span className="ml-auto rounded-md border border-white/10 bg-[#1b1c1e] px-2 py-1 font-mono text-[10px] text-muted-foreground">
-            {company.id}
+            {company.companySlug}
           </span>
         </div>
       </Card>

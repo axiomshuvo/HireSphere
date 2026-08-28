@@ -4,8 +4,8 @@ import JobsTable from "@/components/dashboard/jobs/JobsTable";
 import PlanUsageCard from "@/components/dashboard/jobs/PlanUsageCard";
 import { fetchCompanies } from "@/lib/actions/company";
 import { deleteJob, fetchJobs, updateJobStatus } from "@/lib/actions/jobs";
-import { getCompanyId, normalizeCompanies } from "@/lib/companies";
-import { getActiveCount, getJobId, getPlanUsage } from "@/lib/jobstruture";
+import { getCompanySlug, normalizeCompanies } from "@/lib/api/companies";
+import { getActiveCount, getJobId, getPlanUsage } from "@/lib/api/jobstruture";
 import { CirclePlus } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -46,7 +46,7 @@ export default function RecruiterJobsPage() {
         const companyList = Array.isArray(companiesData) ? companiesData : [];
         const lookup = {};
         for (const company of normalizeCompanies(companyList)) {
-          const id = getCompanyId(company);
+          const id = getCompanySlug(company);
           if (id) {
             lookup[id] = company.name ?? company.shortName ?? "—";
           }
@@ -78,7 +78,7 @@ export default function RecruiterJobsPage() {
 
     if (
       nextStatus === "active" &&
-      (!job.companyId || !companyNameById[job.companyId])
+      (!job.companySlug || !companyNameById[job.companySlug])
     ) {
       toast.warning("Cannot reopen job", {
         description:

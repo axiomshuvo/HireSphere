@@ -1,7 +1,7 @@
 "use client";
 
-import ButtonLink from "@/components/shared/ButtonLink";
 import CompanyAbout from "@/components/dashboard/company/CompanyAbout";
+import CompanyGallery from "@/components/dashboard/company/CompanyGallery";
 import CompanyHeader from "@/components/dashboard/company/CompanyHeader";
 import CompanyJobsStrip from "@/components/dashboard/company/CompanyJobsStrip";
 import CompanyNotFound from "@/components/dashboard/company/CompanyNotFound";
@@ -9,12 +9,10 @@ import CompanyQuickInfo from "@/components/dashboard/company/CompanyQuickInfo";
 import CompanyStats from "@/components/dashboard/company/CompanyStats";
 import HiringTeamCard from "@/components/dashboard/company/HiringTeamCard";
 import OpenRoles from "@/components/dashboard/company/OpenRoles";
-import {
-  deleteCompany,
-  fetchCompanies,
-} from "@/lib/actions/company";
+import ButtonLink from "@/components/shared/ButtonLink";
+import { deleteCompany, fetchCompanies } from "@/lib/actions/company";
 import { fetchJobs } from "@/lib/actions/jobs";
-import { getCompanyId, normalizeCompany } from "@/lib/companies";
+import { getCompanySlug, normalizeCompany } from "@/lib/api/companies";
 import { ArrowLeft, TrashBin } from "@gravity-ui/icons";
 import { Button, Typography, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -49,14 +47,14 @@ export default function CompanyDetailPage({ params }) {
         if (cancelled) return;
         const list = Array.isArray(companiesData)
           ? companiesData
-          : companiesData?.companies ?? [];
+          : (companiesData?.companies ?? []);
         const found =
-          list.map(normalizeCompany).find((c) => getCompanyId(c) === id) ??
+          list.map(normalizeCompany).find((c) => getCompanySlug(c) === id) ??
           null;
         setCompany(found);
 
         const allJobs = Array.isArray(jobsData) ? jobsData : [];
-        setJobs(allJobs.filter((j) => j.companyId === id));
+        setJobs(allJobs.filter((j) => j.companySlug === id));
       })
       .catch((error) => {
         if (cancelled) return;
@@ -79,11 +77,11 @@ export default function CompanyDetailPage({ params }) {
     if (!company) return;
     setIsDeleting(true);
 
-    const companyId = getCompanyId(company);
-    console.log("[CompanyDetailPage] Deleting company:", companyId);
+    const companySlug = getCompanySlug(company);
+    console.log("[CompanyDetailPage] Deleting company:", companySlug);
 
     try {
-      await deleteCompany(companyId);
+      await deleteCompany(companySlug);
       toast.success("Company deleted", {
         description: `${company.name} was removed.`,
       });
@@ -124,12 +122,12 @@ export default function CompanyDetailPage({ params }) {
   }
 
   if (!company) {
-    return <CompanyNotFound companyId={id} />;
+    return <CompanyNotFound companySlug={id} />;
   }
 
   const normalizedCompany = {
     ...company,
-    id: getCompanyId(company),
+    id: getCompanySlug(company),
     initials: getCompanyInitials(company),
   };
 
@@ -160,8 +158,7 @@ export default function CompanyDetailPage({ params }) {
               <TrashBin className="size-5 shrink-0 text-red-400" />
               <div>
                 <p className="text-sm font-medium text-white">
-                  Delete{" "}
-                  <span className="font-semibold">{company.name}</span>?
+                  Delete <span className="font-semibold">{company.name}</span>?
                 </p>
                 <p className="text-xs text-muted-foreground">
                   This permanently removes the company and all of its data.
@@ -190,6 +187,8 @@ export default function CompanyDetailPage({ params }) {
         )}
 
         <CompanyStats company={normalizedCompany} />
+
+        <CompanyGallery images={company.gallery} />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="flex flex-col gap-6 lg:col-span-2">

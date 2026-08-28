@@ -25,10 +25,19 @@ export default function CompanyHeader({ company, onEdit, onDelete }) {
 
       <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <Avatar.Root className="size-20 shrink-0 rounded-2xl border border-white/10 bg-[#1b1c1e] text-2xl font-bold text-white shadow-lg">
-            <Avatar.Fallback>
-              {company.initials ?? company.name?.[0]?.toUpperCase() ?? "?"}
-            </Avatar.Fallback>
+          <Avatar.Root className="size-24 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#1b1c1e] text-3xl font-bold text-white shadow-lg ring-1 ring-white/5">
+            {company.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={company.logo}
+                alt={company.name}
+                className="size-full object-cover"
+              />
+            ) : (
+              <Avatar.Fallback>
+                {company.initials ?? company.name?.[0]?.toUpperCase() ?? "?"}
+              </Avatar.Fallback>
+            )}
           </Avatar.Root>
 
           <div className="min-w-0 flex-1">

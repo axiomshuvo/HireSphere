@@ -4,7 +4,7 @@ import ButtonLink from "@/components/shared/ButtonLink";
 import { ArrowLeft, Magnifier } from "@gravity-ui/icons";
 import { Card, Typography } from "@heroui/react";
 
-export default function CompanyNotFound({ companyId }) {
+export default function CompanyNotFound({ companySlug }) {
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-16">
       <Card className="w-full max-w-md rounded-2xl border border-default bg-content1 p-8 text-center">
@@ -21,7 +21,7 @@ export default function CompanyNotFound({ companyId }) {
 
         <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
           We couldn&apos;t find a company with the id{" "}
-          <span className="font-mono text-white">{companyId}</span>. It may
+          <span className="font-mono text-white">{companySlug}</span>. It may
           have been removed or the link is incorrect.
         </Typography.Paragraph>
 

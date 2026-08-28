@@ -34,8 +34,8 @@ export async function createCompany(companyData) {
   return result;
 }
 
-export async function updateCompany(companyId, companyData) {
-  const result = await request(`/api/companies/${companyId}`, {
+export async function updateCompany(companySlug, companyData) {
+  const result = await request(`/api/companies/${companySlug}`, {
     method: "PUT",
     body: JSON.stringify(companyData),
   });
@@ -43,8 +43,8 @@ export async function updateCompany(companyId, companyData) {
   return result;
 }
 
-export async function deleteCompany(companyId) {
-  const result = await request(`/api/companies/${companyId}`, {
+export async function deleteCompany(companySlug) {
+  const result = await request(`/api/companies/${companySlug}`, {
     method: "DELETE",
   });
   revalidateTag("companies");

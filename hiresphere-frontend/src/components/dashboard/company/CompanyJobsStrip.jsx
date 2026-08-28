@@ -1,7 +1,7 @@
 "use client";
 
-import { formatJobDate, getJobCreatedAt } from "@/lib/jobstruture";
-import { ArrowRight, CircleStop } from "@gravity-ui/icons";
+import { formatJobDate, getJobCreatedAt } from "@/lib/api/jobstruture";
+import { ArrowRight } from "@gravity-ui/icons";
 import { Card, Chip, Typography } from "@heroui/react";
 import Link from "next/link";
 

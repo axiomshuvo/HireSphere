@@ -30,12 +30,12 @@ async function run() {
     await client.connect();
 
     const database = client.db(process.env.MONGODB_DB_NAME);
+    // all database collections
+
+    const companiesCollection = database.collection("companies");
+    const jobsCollection = database.collection("jobs");
 
     // all companies collection
-    const companiesCollection = database.collection("companies");
-
-    // all jobs collection
-    const jobsCollection = database.collection("jobs");
 
     app.get("/api/companies", async (req, res) => {
       try {
@@ -71,7 +71,7 @@ async function run() {
     });
 
     function buildCompanyLookup(id) {
-      const or = [{ companyId: id }];
+      const or = [{ companySlug: id }, { companyId: id }];
       if (ObjectId.isValid(id) && String(new ObjectId(id)) === id) {
         or.push({ _id: new ObjectId(id) });
       }
@@ -80,17 +80,60 @@ async function run() {
 
     app.put("/api/companies/:id", async (req, res) => {
       const companyParam = req.params.id;
-      const { _id, id, companyId: incomingCompanyId, ...updatedCompany } =
-        req.body;
+      const {
+        _id,
+        id,
+        companySlug: incomingCompanySlug,
+        companyId: incomingCompanyId,
+        ...rest
+      } = req.body;
 
       try {
+        const updateDoc = { ...rest };
+        if (
+          typeof incomingCompanySlug === "string" &&
+          incomingCompanySlug.length > 0
+        ) {
+          updateDoc.companySlug = incomingCompanySlug;
+        } else if (
+          typeof incomingCompanyId === "string" &&
+          incomingCompanyId.length > 0
+        ) {
+          updateDoc.companySlug = incomingCompanyId;
+        }
+
         const result = await companiesCollection.updateOne(
           buildCompanyLookup(companyParam),
-          { $set: updatedCompany },
+          { $set: updateDoc },
         );
 
         if (result.matchedCount === 0) {
           return res.status(404).json({ message: "Company not found" });
+        }
+
+        const newSlug =
+          typeof incomingCompanySlug === "string" &&
+          incomingCompanySlug.length > 0
+            ? incomingCompanySlug
+            : typeof incomingCompanyId === "string" &&
+                incomingCompanyId.length > 0
+              ? incomingCompanyId
+              : null;
+
+        if (newSlug && newSlug !== companyParam) {
+          const cascade = await jobsCollection.updateMany(
+            {
+              $or: [{ companySlug: companyParam }, { companyId: companyParam }],
+            },
+            { $set: { companySlug: newSlug } },
+          );
+          console.log(
+            `[PUT /api/companies] cascade: ${cascade.modifiedCount} job(s) updated from "${companyParam}" to "${newSlug}"`,
+          );
+        } else {
+          console.log(
+            `[PUT /api/companies] no cascade needed (newSlug=${newSlug}, companyParam=${companyParam})`,
+          );
         }
 
         res.json({ message: "Company updated successfully" });
@@ -112,9 +155,12 @@ async function run() {
           return res.status(404).json({ message: "Company not found" });
         }
 
-        const companyId = companyParam;
+        const companySlug = companyParam;
         const jobsResult = await jobsCollection.updateMany(
-          { companyId, status: "active" },
+          {
+            $or: [{ companySlug }, { companyId: companySlug }],
+            status: "active",
+          },
           { $set: { status: "closed", closedAt: new Date().toISOString() } },
         );
 
@@ -130,14 +176,24 @@ async function run() {
     });
 
     // all jobs collection
+
     app.get("/api/jobs", async (req, res) => {
       try {
         const query = {};
         if (req.query.status) {
           query.status = req.query.status;
         }
+        const companyFilters = [];
+        if (req.query.companySlug) {
+          companyFilters.push({ companySlug: req.query.companySlug });
+        }
         if (req.query.companyId) {
-          query.companyId = req.query.companyId;
+          companyFilters.push({ companyId: req.query.companyId });
+        }
+        if (companyFilters.length === 1) {
+          Object.assign(query, companyFilters[0]);
+        } else if (companyFilters.length > 1) {
+          query.$and = companyFilters;
         }
 
         const jobs = await jobsCollection.find(query).toArray();
@@ -233,7 +289,8 @@ async function run() {
         }
 
         if (status === "active") {
-          if (!job.companyId) {
+          const companyRef = job.companySlug ?? job.companyId;
+          if (!companyRef) {
             return res.status(400).json({
               message:
                 "Cannot activate a job that has no company. Add a company first.",
@@ -241,7 +298,7 @@ async function run() {
           }
 
           const companyExists = await companiesCollection.findOne(
-            buildCompanyLookup(job.companyId),
+            buildCompanyLookup(companyRef),
           );
           if (!companyExists) {
             return res.status(400).json({
@@ -256,7 +313,9 @@ async function run() {
           {
             $set: {
               status,
-              ...(status === "active" ? { reopenedAt: new Date().toISOString() } : { closedAt: new Date().toISOString() }),
+              ...(status === "active"
+                ? { reopenedAt: new Date().toISOString() }
+                : { closedAt: new Date().toISOString() }),
             },
           },
         );
