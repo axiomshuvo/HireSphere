@@ -268,7 +268,7 @@ export default function ApplyJobModal({ jobId, jobTitle, companySlug, open, onCl
             </h3>
             <p className="max-w-md text-sm text-muted-foreground">
               Submitted on{" "}
-              {new Date(existingApp.appliedAt).toLocaleDateString(undefined, {
+              {new Date(existingApp.appliedAt).toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
                 year: "numeric",

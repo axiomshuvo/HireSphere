@@ -263,7 +263,9 @@
       "Shell(node -e \" const fs = require('fs'); const lines = fs.readFileSync('src/app/(auth)/auth/signin/page.jsx', 'utf8').split('\\n'); for (let i = 0; i < lines.length; i++) { const start = lines[i].match(/^import\\s*\\{\\s*(.*)\\$/); if (!start) continue; let j = i; while (!/^\\s*\\}\\s*from\\s*[\\\"']@gravity-ui\\/icons[\\\"']/.test(lines[j]) && j < lines.length - 1) { j += 1; } if (j >= lines.length) { console.log(i, 'no match'); continue; } console.log('start', i, 'end', j, ':', lines[j]); } \")",
       "Shell(node -e \" const fs = require('fs'); const lines = fs.readFileSync('src/app/(auth)/auth/signin/page.jsx', 'utf8').split('\\n'); console.log(JSON.stringify(lines[14])); const re = /^\\s*\\}\\s*from\\s*[\\\"']@gravity-ui\\/icons[\\\"']/; console.log('matches:', re.test(lines[14])); \")",
       "Shell(node -e \" const fs = require('fs'); const lines = fs.readFileSync('src/app/(public)/pricing/page.jsx', 'utf8').split('\\n'); for (let i = 0; i < 10; i++) console.log(i, JSON.stringify(lines[i])); \")",
-      "Shell(node -e \" const s = 'import { PLAN_LIMITS, SEEKER_PLAN_LIMITS } from \\\"@/lib/api/jobstruture\\\";'; const re = /^\\s*\\}\\s*from\\s*[\\\"\\\\'][^\\\"\\\\']+[\\\"\\\\']\\s*;?\\s*\\$/; console.log('matches:', re.test(s)); \")"
+      "Shell(node -e \" const s = 'import { PLAN_LIMITS, SEEKER_PLAN_LIMITS } from \\\"@/lib/api/jobstruture\\\";'; const re = /^\\s*\\}\\s*from\\s*[\\\"\\\\'][^\\\"\\\\']+[\\\"\\\\']\\s*;?\\s*\\$/; console.log('matches:', re.test(s)); \")",
+      "Shell(npx eslint src/components/shared/DeadlineCountdown.jsx src/components/shared/RelativeTime.jsx 2 >& 1)",
+      "Shell(npx eslint src/app/(public)/jobs/page.jsx src/app/(public)/jobs/[id]/page.jsx src/app/dashboard/page.jsx src/app/dashboard/profile/page.jsx src/app/dashboard/applications/page.jsx src/components/shared/DeadlineCountdown.jsx src/components/shared/RelativeTime.jsx src/components/dashboard/SavedJobCard.jsx src/components/public/ApplyJobModal.jsx 2 >& 1)"
     ],
     "deny": [],
     "defaultMode": "default"

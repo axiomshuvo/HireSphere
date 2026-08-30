@@ -30,7 +30,9 @@ function formatDate(deadline) {
   if (!deadline) return null;
   const d = new Date(deadline);
   if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString(undefined, {
+  // Pin the locale so server and client always render the same string
+  // (avoids hydration mismatches when the OS locales differ).
+  return d.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",

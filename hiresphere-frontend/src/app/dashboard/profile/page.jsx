@@ -48,7 +48,7 @@ export default async function ProfilePage() {
   const createdAt = user.createdAt ? new Date(user.createdAt) : null;
   const joined =
     createdAt && !Number.isNaN(createdAt.getTime())
-      ? createdAt.toLocaleDateString(undefined, {
+      ? createdAt.toLocaleDateString("en-US", {
           month: "long",
           year: "numeric",
         })

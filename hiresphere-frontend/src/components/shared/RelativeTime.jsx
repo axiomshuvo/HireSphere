@@ -36,7 +36,7 @@ function formatRelative(ms) {
 function formatAbsolute(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleString(undefined, {
+  return d.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -46,25 +46,32 @@ function formatAbsolute(iso) {
 }
 
 export default function RelativeTime({ iso, className = "", showAbsolute = true }) {
-  const [diff, setDiff] = useState(() => calcDiff(iso));
+  // Render a stable placeholder during SSR to avoid hydration mismatches.
+  // Real relative time appears after mount and updates every minute.
+  const [hydrated, setHydrated] = useState(false);
+  const [diff, setDiff] = useState(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHydrated(true);
     if (!iso) return undefined;
     const tick = () => setDiff(calcDiff(iso));
-    const id = setInterval(tick, TICK_MS);
     tick();
+    const id = setInterval(tick, TICK_MS);
     return () => clearInterval(id);
   }, [iso]);
 
   if (diff == null) return null;
-
+  // The <time> element + dateTime/title are SSR-stable; only the inner
+  // text is gated on `hydrated` so client and server agree before mount.
   return (
     <time
       dateTime={iso}
       title={showAbsolute ? formatAbsolute(iso) : undefined}
       className={className}
+      suppressHydrationWarning
     >
-      {formatRelative(diff)}
+      {hydrated ? formatRelative(diff) : ""}
     </time>
   );
 }

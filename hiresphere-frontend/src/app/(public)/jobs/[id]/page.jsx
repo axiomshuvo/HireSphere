@@ -163,7 +163,7 @@ export default async function PublicJobDetailPage({ params }) {
                 <span className="inline-flex items-center gap-1.5">
                   <Calendar className="size-3" />
                   Closes{" "}
-                  {new Date(job.deadline).toLocaleDateString(undefined, {
+                  {new Date(job.deadline).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",

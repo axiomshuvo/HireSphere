@@ -47,7 +47,7 @@ function formatSavedDate(iso) {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -130,7 +130,7 @@ export default function SavedJobCard({ saved, job }) {
             <span className="inline-flex items-center gap-1.5">
               • <Calendar className="size-3" />
               Closes{" "}
-              {new Date(job.deadline).toLocaleDateString(undefined, {
+              {new Date(job.deadline).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
               })}
