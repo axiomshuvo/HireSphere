@@ -45,6 +45,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
     job ? jobToFormValues(job) : { ...EMPTY_JOB_FORM },
   );
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedCompany = companies.find(
     (c) => getCompanySlug(c) === formData.companySlug,
@@ -71,6 +72,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     const newErrors = {};
 
     if (!formData.companySlug)
@@ -108,6 +110,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
 
     console.log("[JobForm] Payload:", payload);
 
+    setIsSubmitting(true);
     try {
       if (isEditing) {
         const jobId = getJobId(job);
@@ -125,6 +128,8 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
     } catch (error) {
       console.error("[JobForm] Error submitting job form:", error);
       toast.warning("An error occurred while saving the job.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -392,10 +397,16 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
           </button>
           <button
             type="submit"
-            disabled={!isEditing && !usage.hasAvailableSlots}
-            className="h-10 rounded-lg bg-white px-5 text-sm font-semibold text-black transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isSubmitting || (!isEditing && !usage.hasAvailableSlots)}
+            className="h-10 cursor-pointer rounded-lg bg-white px-5 text-sm font-semibold text-black transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isEditing ? "Save Changes" : "Post Job"}
+            {isSubmitting
+              ? isEditing
+                ? "Saving…"
+                : "Posting…"
+              : isEditing
+                ? "Save Changes"
+                : "Post Job"}
           </button>
         </div>
       </div>

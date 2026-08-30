@@ -1,36 +1,167 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# HireSphere Frontend 🌐
 
-## Getting Started
+This is the customer-facing layer of HireSphere — the polished, modern web app that powers the public job marketplace and the recruiter dashboard experience.
 
-First, run the development server:
+## 🚀 Live site
+
+- https://hire-sphere-two.vercel.app/
+
+## ✨ What this frontend is doing
+
+The frontend brings the whole HireSphere experience to life:
+
+- job seekers can browse and filter open roles
+- candidates can save jobs and submit applications
+- recruiters can manage companies and jobs from a dedicated dashboard
+- the interface balances modern design, product clarity, and real business workflow
+
+In short: it is the visible face of the platform, turning backend data into a smooth and useful hiring experience.
+
+## 🧱 Main app areas
+
+### Public side
+
+The public pages include:
+
+- landing page
+- company directory
+- role listings
+- job details
+- save/apply buttons
+- static marketing and content sections
+
+These routes live under `src/app/(public)` and connect to the server through the data-layer actions in `src/lib/actions`.
+
+### Recruiter dashboard
+
+The private dashboard lives under `src/app/dashboard` and includes:
+
+- overview page
+- company management
+- job creation and editing
+- applicant review
+- profile and settings
+
+This is where recruiters actually run their hiring operations.
+
+### Auth layer
+
+Authentication is managed with Better Auth, and the app uses a MongoDB-backed auth setup.
+
+Key files:
+
+- `src/lib/auth.js`
+- `src/lib/auth-client.js`
+- `src/app/api/auth/[...all]/route.js`
+
+## 🛠️ Tech stack
+
+- Next.js 16
+- React 19
+- Tailwind CSS
+- Better Auth
+- MongoDB integration
+- HeroUI / Framer Motion UI patterns
+
+## 📁 Project structure
+
+```text
+hiresphere-frontend/
+├── public/
+├── src/
+│   ├── app/
+│   ├── components/
+│   ├── lib/
+│   ├── providers/
+│   └── pages/
+├── eslint.config.mjs
+├── jsconfig.json
+├── next.config.mjs
+├── package.json
+├── postcss.config.mjs
+├── proxy.js
+└── README.md
+```
+
+## ⚙️ Environment variables
+
+Create a `.env.local` file in this folder:
+
+```env
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:5000
+MONGODB_URI=your_mongodb_connection_string
+MONGODB_DB_NAME=hiresphere
+```
+
+## ▶️ Local development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the local site:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📜 Available scripts
 
-## Learn More
+```bash
+npm run dev     # run the local Next.js app
+npm run build   # build for production
+npm run start   # start production build
+npm run lint    # run static checks
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🔗 API integration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The frontend talks to the backend through server actions and fetch wrappers. The action layer keeps the UI organized and centralizes requests for things like:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- company data
+- job data
+- saved jobs
+- applications
+- profile management
 
-## Deploy on Vercel
+Examples:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/lib/actions/company.js`
+- `src/lib/actions/jobs.js`
+- `src/lib/actions/saved-jobs.js`
+- `src/lib/actions/applications.js`
+- `src/lib/actions/profile.js`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ☁️ Deployment
+
+This app is built for Vercel deployment and expects the production backend URL to be passed through `NEXT_PUBLIC_API_URL`.
+
+Recommended setup:
+
+- deploy as a Next.js app
+- add production env vars in Vercel
+- connect frontend to the live API backend URL
+
+## � Credits
+
+Built with ❤️ by Pradipta Sarker
+
+- GitHub: https://github.com/axiomshuvo
+- Role: Frontend engineer and product builder
+
+## �📝 Notes
+
+This frontend is designed around a real product workflow rather than just static pages. A candidate can discover jobs, save them, and apply, while a recruiter can manage the full hiring lifecycle from a separate authenticated dashboard. That makes the app feel much closer to a real hiring platform than a basic job board.
+
+---
+
+HireSphere Frontend is where product design, hiring flow, and user experience come together in one clean interface. 💼✨

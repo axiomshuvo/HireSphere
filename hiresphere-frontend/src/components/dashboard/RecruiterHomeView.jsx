@@ -9,6 +9,7 @@ import {
 import CompanyList from "@/components/dashboard/CompanyList";
 import DataTable from "@/components/dashboard/DataTable";
 import StatCard from "@/components/dashboard/StatCard";
+import MarketJobsPanel from "@/components/dashboard/MarketJobsPanel";
 
 const ICONS = {
   jobs: FileText,
@@ -27,6 +28,7 @@ export default function RecruiterHomeView({
   recentJobs,
   recentJobsColumns,
   companyItems,
+  marketJobs = [],
 }) {
   const stats = [
     { key: "jobs", label: "Total Job Posts", value: String(totalJobs), icon: ICONS.jobs },
@@ -63,6 +65,12 @@ export default function RecruiterHomeView({
 
         <CompanyList title="My Companies" companies={companyItems} />
       </section>
+
+      {marketJobs.length > 0 && (
+        <section className="mt-8">
+          <MarketJobsPanel jobs={marketJobs} />
+        </section>
+      )}
     </div>
   );
 }

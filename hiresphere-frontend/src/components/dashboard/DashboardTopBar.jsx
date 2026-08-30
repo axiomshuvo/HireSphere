@@ -1,6 +1,7 @@
 "use client";
 
 import { signOut, useSession } from "@/lib/auth-client";
+import { clearUserJobState } from "@/lib/storage-keys";
 import {
   ArrowRightFromSquare,
   Bell,
@@ -16,14 +17,15 @@ import {
   OfficeBadge,
   Person,
 } from "@gravity-ui/icons";
-import { Avatar, Dropdown, InputGroup, Label, toast } from "@heroui/react";
+import { Avatar, Dropdown, InputGroup, Label } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 const RECRUITER_DROPDOWN = [
   { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: House },
-  { id: "my-company", label: "My Company", href: "/dashboard/mycompany", icon: OfficeBadge },
+  { id: "companies", label: "Companies", href: "/dashboard/mycompany", icon: OfficeBadge },
   { id: "manage-jobs", label: "Manage Jobs", href: "/dashboard/recruiter/jobs", icon: Briefcase },
-  { id: "applications", label: "Applications", href: "/dashboard/applications", icon: FileCheck },
+  { id: "applications", label: "Applications", href: "/dashboard/recruiter/applications", icon: FileCheck },
+  { id: "profile", label: "Profile", href: "/dashboard/profile", icon: Person },
   { id: "settings", label: "Settings", href: "/dashboard/settings", icon: Gear },
 ];
 
@@ -31,8 +33,8 @@ const SEEKER_DROPDOWN = [
   { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: House },
   { id: "browse-jobs", label: "Browse Jobs", href: "/jobs", icon: Magnifier },
   { id: "my-applications", label: "My Applications", href: "/dashboard/applications", icon: FileCheck },
-  { id: "saved-jobs", label: "Saved Jobs", href: "/dashboard/saved-jobs", icon: Bookmark, comingSoon: true },
-  { id: "profile", label: "Profile", href: "/dashboard/profile", icon: Person, comingSoon: true },
+  { id: "saved-jobs", label: "Saved Jobs", href: "/dashboard/saved-jobs", icon: Bookmark },
+  { id: "profile", label: "Profile", href: "/dashboard/profile", icon: Person },
   { id: "settings", label: "Settings", href: "/dashboard/settings", icon: Gear },
 ];
 
@@ -62,6 +64,9 @@ export default function DashboardTopBar() {
   const dropdownItems = user?.role === "recruiter" ? RECRUITER_DROPDOWN : SEEKER_DROPDOWN;
 
   const handleSignOut = async () => {
+    // Clear per-user saved/applied state so the next user on the same
+    // browser doesn't inherit this session's optimistic data.
+    clearUserJobState(user?.id);
     await signOut();
     router.push("/");
   };
@@ -108,23 +113,6 @@ export default function DashboardTopBar() {
             <Dropdown.Menu aria-label="Account actions">
               {dropdownItems.map((item) => {
                 const Icon = item.icon;
-                if (item.comingSoon) {
-                  return (
-                    <Dropdown.Item
-                      key={item.id}
-                      id={item.id}
-                      textValue={item.label}
-                      onAction={() =>
-                        toast.info("Coming soon", {
-                          description: "This page is not ready yet",
-                        })
-                      }
-                    >
-                      <Icon className="size-4 shrink-0" />
-                      <Label>{item.label}</Label>
-                    </Dropdown.Item>
-                  );
-                }
                 return (
                   <Dropdown.Item
                     key={item.id}

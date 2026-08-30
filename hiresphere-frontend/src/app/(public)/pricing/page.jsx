@@ -1,5 +1,5 @@
 import ButtonLink from "@/components/shared/ButtonLink";
-import { PLAN_LIMITS } from "@/lib/api/jobstruture";
+import { PLAN_LIMITS, SEEKER_PLAN_LIMITS } from "@/lib/api/jobstruture";
 import {
   ArrowRight,
   Check,
@@ -7,6 +7,7 @@ import {
   CrownDiamond,
   Rocket,
   Sparkles,
+  Star,
   Xmark,
 } from "@gravity-ui/icons";
 import { Card } from "@heroui/react";
@@ -69,6 +70,45 @@ const tiers = [
   },
 ];
 
+const seekerTiers = [
+  {
+    id: "seeker-free",
+    plan: "free",
+    name: "Free",
+    tagline: "Apply to roles and save your favorites.",
+    price: "$0",
+    cadence: "forever",
+    icon: Sparkles,
+    highlight: false,
+    features: [
+      { text: `${SEEKER_PLAN_LIMITS.free} active applications`, included: true },
+      { text: "Unlimited saved jobs", included: true },
+      { text: "Standard application visibility", included: true },
+      { text: "Basic profile", included: true },
+      { text: "Priority recruiter visibility", included: false },
+      { text: "Profile boost", included: false },
+    ],
+  },
+  {
+    id: "seeker-premium",
+    plan: "premium",
+    name: "Premium",
+    tagline: "Stand out and apply without limits.",
+    price: "$9",
+    cadence: "per month",
+    icon: Star,
+    highlight: true,
+    features: [
+      { text: "Unlimited active applications", included: true },
+      { text: "Unlimited saved jobs", included: true },
+      { text: "Priority recruiter visibility", included: true },
+      { text: "Profile boost in search", included: true },
+      { text: "Read receipts on applications", included: true },
+      { text: "Priority email support", included: true },
+    ],
+  },
+];
+
 const faqs = [
   {
     q: "Can I switch plans later?",
@@ -88,6 +128,82 @@ const faqs = [
   },
 ];
 
+function TierCard({ tier, planParam }) {
+  const Icon = tier.icon;
+  return (
+    <Card
+      className={
+        tier.highlight
+          ? "relative flex flex-col gap-4 rounded-2xl border border-indigo-500/60 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] p-6 shadow-[0_0_0_1px_rgba(99,102,241,0.2)]"
+          : "flex flex-col gap-4 rounded-2xl border border-default bg-content1 p-6"
+      }
+    >
+      {tier.highlight && (
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg">
+          Most popular
+        </span>
+      )}
+
+      <div className="flex items-center gap-3">
+        <div
+          className={
+            tier.highlight
+              ? "flex size-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-300"
+              : "flex size-10 items-center justify-center rounded-xl bg-default text-default-foreground"
+          }
+        >
+          <Icon className="size-5" />
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold text-white">{tier.name}</h2>
+          <p className="text-xs text-muted-foreground">{tier.tagline}</p>
+        </div>
+      </div>
+
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-3xl font-bold text-white">{tier.price}</span>
+        <span className="text-xs text-muted-foreground">/ {tier.cadence}</span>
+      </div>
+
+      <ul className="flex flex-col gap-2 text-sm">
+        {tier.features.map((feature) => (
+          <li key={feature.text} className="flex items-start gap-2">
+            {feature.included ? (
+              <Check className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+            ) : (
+              <Xmark className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+            )}
+            <span
+              className={
+                feature.included
+                  ? "text-white"
+                  : "text-muted-foreground line-through"
+              }
+            >
+              {feature.text}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-auto pt-2">
+        <ButtonLink
+          href={
+            tier.id === "free" || tier.plan === "free"
+              ? "/auth/signup"
+              : `/auth/signup?plan=${planParam ?? tier.id}`
+          }
+          variant={tier.highlight ? "primary" : "secondary"}
+          className="w-full"
+        >
+          Get started
+          <ArrowRight className="size-4" />
+        </ButtonLink>
+      </div>
+    </Card>
+  );
+}
+
 export default function PricingPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12 lg:px-8">
@@ -106,85 +222,30 @@ export default function PricingPage() {
       </header>
 
       <section className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {tiers.map((tier) => {
-          const Icon = tier.icon;
-          return (
-            <Card
-              key={tier.id}
-              className={
-                tier.highlight
-                  ? "relative flex flex-col gap-4 rounded-2xl border border-indigo-500/60 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] p-6 shadow-[0_0_0_1px_rgba(99,102,241,0.2)]"
-                  : "flex flex-col gap-4 rounded-2xl border border-default bg-content1 p-6"
-              }
-            >
-              {tier.highlight && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg">
-                  Most popular
-                </span>
-              )}
+        {tiers.map((tier) => (
+          <TierCard key={tier.id} tier={tier} planParam={tier.id} />
+        ))}
+      </section>
 
-              <div className="flex items-center gap-3">
-                <div
-                  className={
-                    tier.highlight
-                      ? "flex size-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-300"
-                      : "flex size-10 items-center justify-center rounded-xl bg-default text-default-foreground"
-                  }
-                >
-                  <Icon className="size-5" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-white">{tier.name}</h2>
-                  <p className="text-xs text-muted-foreground">{tier.tagline}</p>
-                </div>
-              </div>
-
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-3xl font-bold text-white">{tier.price}</span>
-                <span className="text-xs text-muted-foreground">/ {tier.cadence}</span>
-              </div>
-
-              <ul className="flex flex-col gap-2 text-sm">
-                {tier.features.map((feature) => (
-                  <li
-                    key={feature.text}
-                    className="flex items-start gap-2"
-                  >
-                    {feature.included ? (
-                      <Check className="mt-0.5 size-4 shrink-0 text-emerald-400" />
-                    ) : (
-                      <Xmark className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                    )}
-                    <span
-                      className={
-                        feature.included
-                          ? "text-white"
-                          : "text-muted-foreground line-through"
-                      }
-                    >
-                      {feature.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto pt-2">
-                <ButtonLink
-                  href={
-                    tier.id === "free"
-                      ? "/auth/signup"
-                      : `/auth/signup?plan=${tier.id}`
-                  }
-                  variant={tier.highlight ? "primary" : "secondary"}
-                  className="w-full"
-                >
-                  Get started
-                  <ArrowRight className="size-4" />
-                </ButtonLink>
-              </div>
-            </Card>
-          );
-        })}
+      <section className="mt-16">
+        <header className="mb-6 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-default bg-content1 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <Star className="size-3" />
+            For job seekers
+          </span>
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">
+            Plans for your job search
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Free for everyone, with a Premium tier for unlimited applications
+            and recruiter visibility.
+          </p>
+        </header>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {seekerTiers.map((tier) => (
+            <TierCard key={tier.id} tier={tier} planParam={tier.plan} />
+          ))}
+        </div>
       </section>
 
       <section className="mt-16">

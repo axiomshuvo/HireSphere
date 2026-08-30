@@ -99,6 +99,8 @@ async function attachStatsPublic(companiesCollection, jobsCollection, companies)
 function mountMyRoutes(app, database) {
   const companiesCollection = database.collection("companies");
   const jobsCollection = database.collection("jobs");
+  const applicationsCollection = database.collection("applications");
+  const savedJobsCollection = database.collection("savedJobs");
   const router = express.Router();
 
   router.use(requireRecruiter);
@@ -186,6 +188,18 @@ function mountMyRoutes(app, database) {
         createdAt: _created,
         ...rest
       } = req.body ?? {};
+      const existing = await companiesCollection.findOne({
+        ...buildCompanyLookup(req.params.id),
+        recruiterId: req.recruiterId,
+      });
+      if (!existing) return res.status(404).json({ message: "Company not found" });
+
+      const oldRef = existing.companySlug ?? existing.companyId;
+      const newRef = rest.companySlug ?? existing.companySlug;
+      const slugChanged = Boolean(
+        oldRef && newRef && oldRef !== newRef,
+      );
+
       const updateDoc = { ...rest, updatedAt: new Date().toISOString() };
       const result = await companiesCollection.findOneAndUpdate(
         { ...buildCompanyLookup(req.params.id), recruiterId: req.recruiterId },
@@ -193,7 +207,33 @@ function mountMyRoutes(app, database) {
         { returnDocument: "after" },
       );
       if (!result) return res.status(404).json({ message: "Company not found" });
-      res.json({ company: result });
+
+      let closedJobs = 0;
+      if (slugChanged) {
+        const close = await jobsCollection.updateMany(
+          {
+            $or: [
+              { companySlug: oldRef },
+              { companyId: oldRef },
+            ],
+            status: "active",
+            recruiterId: req.recruiterId,
+          },
+          {
+            $set: {
+              status: "closed",
+              isPublicVisible: false,
+              closedAt: new Date().toISOString(),
+              closedReason: "company-renamed",
+              previousCompanySlug: oldRef,
+              updatedAt: new Date().toISOString(),
+            },
+          },
+        );
+        closedJobs = close.modifiedCount ?? 0;
+      }
+
+      res.json({ company: result, closedJobs });
     } catch (error) {
       res.status(500).json({ message: "Error updating company", error: error.message });
     }
@@ -275,6 +315,67 @@ function mountMyRoutes(app, database) {
       });
     } catch (error) {
       res.status(500).json({ message: "Error fetching stats", error: error.message });
+    }
+  });
+
+  router.get("/applicants", async (req, res) => {
+    try {
+      const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+      const pageSize = Math.min(
+        100,
+        Math.max(1, parseInt(req.query.pageSize, 10) || 20),
+      );
+
+      const myJobs = await jobsCollection
+        .find(
+          { recruiterId: req.recruiterId },
+          { projection: { jobId: 1, slug: 1, _id: 1 } },
+        )
+        .toArray();
+      const allowedIds = new Set();
+      for (const job of myJobs) {
+        if (job.jobId) allowedIds.add(job.jobId);
+        if (job.slug) allowedIds.add(job.slug);
+        if (job._id) allowedIds.add(String(job._id));
+      }
+      if (allowedIds.size === 0) {
+        return res.json({
+          items: [],
+          total: 0,
+          totalPages: 0,
+          page,
+          pageSize,
+        });
+      }
+
+      const filter = { jobId: { $in: Array.from(allowedIds) } };
+      if (req.query.jobId) {
+        if (!allowedIds.has(req.query.jobId)) {
+          return res.status(404).json({ message: "Job not found" });
+        }
+        filter.jobId = req.query.jobId;
+      }
+
+      const [items, total] = await Promise.all([
+        applicationsCollection
+          .find(filter)
+          .sort({ appliedAt: -1 })
+          .skip((page - 1) * pageSize)
+          .limit(pageSize)
+          .toArray(),
+        applicationsCollection.countDocuments(filter),
+      ]);
+      res.json({
+        items,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / pageSize)),
+        page,
+        pageSize,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching applicants", error: error.message });
     }
   });
 
@@ -400,6 +501,75 @@ function mountMyRoutes(app, database) {
       res.json({ message: "Job deleted" });
     } catch (error) {
       res.status(500).json({ message: "Error deleting job", error: error.message });
+    }
+  });
+
+  // GET /api/my/saved-jobs — paginated list of the user's saved jobs.
+  router.get("/saved-jobs", async (req, res) => {
+    try {
+      const { page, pageSize, skip } = paginate(req);
+      const filter = { userId: req.recruiterId };
+      const [items, total] = await Promise.all([
+        savedJobsCollection
+          .find(filter)
+          .sort({ savedAt: -1 })
+          .skip(skip)
+          .limit(pageSize)
+          .toArray(),
+        savedJobsCollection.countDocuments(filter),
+      ]);
+      res.json({
+        items,
+        page,
+        pageSize,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / pageSize)),
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching saved jobs", error: error.message });
+    }
+  });
+
+  // POST /api/my/saved-jobs — save a job.
+  router.post("/saved-jobs", async (req, res) => {
+    try {
+      const { jobId, title, companySlug } = req.body ?? {};
+      if (!jobId) return res.status(400).json({ message: "jobId is required" });
+      if (!req.recruiterId) {
+        return res.status(401).json({ message: "Missing authentication" });
+      }
+
+      const existing = await savedJobsCollection.findOne({ userId: req.recruiterId, jobId });
+      if (existing) {
+        return res.status(200).json({ alreadySaved: true, savedJob: existing });
+      }
+
+      const doc = {
+        userId: req.recruiterId,
+        jobId,
+        title: title || null,
+        companySlug: companySlug || null,
+        savedAt: new Date().toISOString(),
+      };
+      const result = await savedJobsCollection.insertOne(doc);
+      const savedJob = await savedJobsCollection.findOne({ _id: result.insertedId });
+      res.status(201).json({ savedJob });
+    } catch (error) {
+      res.status(500).json({ message: "Error saving job", error: error.message });
+    }
+  });
+
+  // DELETE /api/my/saved-jobs/:jobId — remove a saved job.
+  router.delete("/saved-jobs/:jobId", async (req, res) => {
+    try {
+      const result = await savedJobsCollection.findOneAndDelete({
+        userId: req.recruiterId,
+        jobId: req.params.jobId,
+      });
+      if (!result) return res.status(404).json({ message: "Saved job not found" });
+      res.json({ message: "Saved job removed" });
+    } catch (error) {
+      res.status(500).json({ message: "Error removing saved job", error: error.message });
     }
   });
 

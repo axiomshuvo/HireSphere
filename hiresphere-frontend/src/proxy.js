@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
 const RECRUITER_PREFIXES = ["/dashboard/mycompany", "/dashboard/recruiter"];
-const SEEKER_PREFIXES = ["/dashboard/profile", "/dashboard/saved-jobs"];
+const SEEKER_PREFIXES = ["/dashboard/saved-jobs", "/dashboard/applications"];
 
 export async function proxy(request) {
   const { pathname } = request.nextUrl;

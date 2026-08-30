@@ -1,4 +1,14 @@
 import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
+import SaveJobButton from "@/components/public/SaveJobButton";
+import ApplyButton from "@/components/public/ApplyButton";
+import ApplyInterestCta from "@/components/public/ApplyInterestCta";
+import JobUnavailableNotice from "@/components/public/JobUnavailableNotice";
+import {
+  JobCategoryBadge,
+  JobHiringBadge,
+  JobRemoteBadge,
+  JobTypeBadge,
+} from "@/components/jobs/JobBadge";
 import { fetchPublicCompanyById } from "@/lib/actions/company";
 import { fetchPublicJobById, fetchPublicJobs } from "@/lib/actions/jobs";
 import {
@@ -6,13 +16,11 @@ import {
   ArrowUpRightFromSquare,
   Briefcase,
   Calendar,
-  CircleCheckFill,
-  Clock,
-  Globe,
+  CircleCheck,
   MapPin,
   Wallet,
 } from "@gravity-ui/icons";
-import { Avatar, Card, Chip, Typography } from "@heroui/react";
+import { Avatar, Card, Typography } from "@heroui/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -87,31 +95,9 @@ export default async function PublicJobDetailPage({ params }) {
     }
   }
 
-  if (!isPublicVisible) {
+  if (!isPublicVisible || job.status === "closed") {
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 py-16 lg:px-8">
-        <Link
-          href="/jobs"
-          className="text-sm text-muted-foreground transition-colors hover:text-white"
-        >
-          ← Back to jobs
-        </Link>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
-          <h1 className="text-2xl font-semibold text-white">
-            This role is no longer accepting public applications
-          </h1>
-          <p className="max-w-md text-sm text-muted-foreground">
-            The company has made this job private. Browse other open roles on
-            HireSphere.
-          </p>
-          <Link
-            href="/jobs"
-            className="mt-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-gray-200"
-          >
-            Browse Jobs
-          </Link>
-        </div>
-      </div>
+      <JobUnavailableNotice reason={job.closedReason} />
     );
   }
 
@@ -136,20 +122,10 @@ export default async function PublicJobDetailPage({ params }) {
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              {job.type && (
-                <Chip color="primary" size="sm" variant="soft">
-                  {job.type}
-                </Chip>
-              )}
-              {job.category && (
-                <Chip color="default" size="sm" variant="soft">
-                  {job.category}
-                </Chip>
-              )}
-              <Chip color="success" size="sm" variant="soft">
-                <CircleCheckFill className="size-3" />
-                Actively hiring
-              </Chip>
+              <JobTypeBadge type={job.type} />
+              <JobCategoryBadge category={job.category} />
+              <JobRemoteBadge remote={job.remote} />
+              <JobHiringBadge />
             </div>
 
             <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
@@ -202,21 +178,25 @@ export default async function PublicJobDetailPage({ params }) {
           </div>
 
           <div className="flex shrink-0 flex-col gap-2 lg:items-end">
-            <button
-              type="button"
-              disabled
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black/60 lg:w-auto"
-            >
-              Apply (coming soon)
-              <ArrowRight className="size-4" />
-            </button>
-            <button
-              type="button"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1b1c1e] px-4 py-2 text-xs text-muted-foreground transition-colors hover:border-indigo-500/50 hover:text-white"
-            >
-              <ArrowUpRightFromSquare className="size-3.5" />
-              Share
-            </button>
+            <ApplyButton
+              jobId={id}
+              jobTitle={job.title}
+              companySlug={job.companySlug ?? job.companyId}
+            />
+            <SaveJobButton
+              jobId={id}
+              title={job.title}
+              companySlug={job.companySlug ?? job.companyId}
+            />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1b1c1e] px-4 py-2 text-xs text-muted-foreground transition-colors hover:border-indigo-500/50 hover:text-white"
+              >
+                <ArrowUpRightFromSquare className="size-3.5" />
+                Share
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -227,17 +207,17 @@ export default async function PublicJobDetailPage({ params }) {
           <LongBlock
             label="Responsibilities"
             value={job.responsibilities}
-            icon={CircleCheckFill}
+            icon={CircleCheck}
           />
           <LongBlock
             label="Requirements"
             value={job.requirements}
-            icon={CircleCheckFill}
+            icon={CircleCheck}
           />
           <LongBlock
             label="Benefits"
             value={job.benefits}
-            icon={CircleCheckFill}
+            icon={CircleCheck}
           />
         </div>
 
@@ -300,16 +280,24 @@ export default async function PublicJobDetailPage({ params }) {
             <dl className="flex flex-col gap-2 text-sm">
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Type</dt>
-                <dd className="font-medium text-white">{job.type ?? "—"}</dd>
+                <dd className="font-medium text-white">
+                  <JobTypeBadge type={job.type} />
+                </dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Category</dt>
-                <dd className="font-medium text-white">{job.category ?? "—"}</dd>
+                <dd className="font-medium text-white">
+                  <JobCategoryBadge category={job.category} />
+                </dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Work mode</dt>
                 <dd className="font-medium text-white">
-                  {job.remote ? "Fully remote" : "On-site / Hybrid"}
+                  {job.remote ? (
+                    <JobRemoteBadge remote />
+                  ) : (
+                    "On-site / Hybrid"
+                  )}
                 </dd>
               </div>
               <div className="flex items-center justify-between">
@@ -332,32 +320,11 @@ export default async function PublicJobDetailPage({ params }) {
       </div>
 
       {/* Bottom CTA */}
-      <Card className="mt-8 rounded-2xl border border-default bg-[radial-gradient(circle_at_30%_50%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#16181c,#0f1013)] p-6 text-center">
-        <Clock className="mx-auto size-8 text-indigo-300" />
-        <h2 className="mt-3 text-xl font-semibold text-white">
-          Interested in this role?
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Applications open soon. Save this job and check back.
-        </p>
-        <div className="mt-4 flex flex-wrap justify-center gap-2">
-          <button
-            type="button"
-            disabled
-            className="inline-flex items-center gap-2 rounded-xl bg-white/50 px-5 py-2.5 text-sm font-semibold text-black/50"
-          >
-            <Globe className="size-4" />
-            Apply (coming soon)
-          </button>
-          <Link
-            href="/jobs"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#1b1c1e] px-5 py-2.5 text-sm text-white transition-colors hover:border-indigo-500/50"
-          >
-            Browse more roles
-            <ArrowRight className="size-4" />
-          </Link>
-        </div>
-      </Card>
+      <ApplyInterestCta
+        jobId={id}
+        jobTitle={job.title}
+        companySlug={job.companySlug ?? job.companyId}
+      />
 
       <span className="sr-only">{job.title}</span>
     </div>

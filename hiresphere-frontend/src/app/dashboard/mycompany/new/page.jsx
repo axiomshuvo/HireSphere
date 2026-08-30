@@ -28,6 +28,8 @@ export default function NewCompanyPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Company name is required.";
@@ -44,10 +46,9 @@ export default function NewCompanyPage() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      setIsSubmitting(false);
       return;
     }
-
-    setIsSubmitting(true);
 
     const payload = {
       ...formData,

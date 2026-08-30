@@ -1,18 +1,24 @@
 "use client";
 
 import JobsTable from "@/components/dashboard/jobs/JobsTable";
-import PlanUsageCard from "@/components/dashboard/jobs/PlanUsageCard";
+import JobsOverview from "@/components/dashboard/jobs/JobsOverview";
+import JobsFilters from "@/components/dashboard/jobs/JobsFilters";
 import ButtonLink from "@/components/shared/ButtonLink";
-import { deleteRecruiterJob, getRecruiterJobs, updateRecruiterJobStatus } from "@/lib/actions/jobs";
+import {
+  deleteRecruiterJob,
+  getRecruiterJobStats,
+  getRecruiterJobs,
+  updateRecruiterJobStatus,
+} from "@/lib/actions/jobs";
 import { getRecruiterCompanies } from "@/lib/actions/company";
 import { getCompanySlug, normalizeCompanies } from "@/lib/api/companies";
-import { getActiveCount, getJobId, getPlanUsage } from "@/lib/api/jobstruture";
+import { getJobId, getPlanUsage } from "@/lib/api/jobstruture";
 import { CirclePlus } from "@gravity-ui/icons";
-import { Button, toast } from "@heroui/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Button, Card, Typography, toast } from "@heroui/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-const PAGE_SIZE = 10;
+const FETCH_PAGE_SIZE = 100;
 
 function normalizeJob(job) {
   if (!job) return job;
@@ -23,75 +29,65 @@ function normalizeJob(job) {
   return job;
 }
 
-function PageStrip({ page, totalPages }) {
-  if (totalPages <= 1) return null;
-  const canPrev = page > 1;
-  const canNext = page < totalPages;
-  return (
-    <nav className="flex items-center justify-center gap-3 text-sm">
-      {canPrev ? (
-        <ButtonLink
-          href={`/dashboard/recruiter/jobs?page=${page - 1}`}
-          variant="secondary"
-          size="sm"
-        >
-          Previous
-        </ButtonLink>
-      ) : (
-        <span className="text-muted-foreground">Previous</span>
-      )}
-      <span className="text-muted-foreground">
-        Page {page} of {totalPages}
-      </span>
-      {canNext ? (
-        <ButtonLink
-          href={`/dashboard/recruiter/jobs?page=${page + 1}`}
-          variant="secondary"
-          size="sm"
-        >
-          Next
-        </ButtonLink>
-      ) : (
-        <span className="text-muted-foreground">Next</span>
-      )}
-    </nav>
-  );
+function jobMatches(job, { status, companyId, query }) {
+  if (status !== "all" && (job.status ?? "draft") !== status) return false;
+  if (companyId !== "all" && (job.companySlug ?? job.companyId) !== companyId) {
+    return false;
+  }
+  if (query) {
+    const haystack = [
+      job.title,
+      job.companySlug,
+      job.city,
+      job.country,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    if (!haystack.includes(query.toLowerCase())) return false;
+  }
+  return true;
 }
 
 export default function RecruiterJobsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const page = Math.max(1, Number(searchParams.get("page")) || 1);
-  const [totalPages, setTotalPages] = useState(1);
   const [jobs, setJobs] = useState([]);
+  const [stats, setStats] = useState({ total: 0, active: 0, closed: 0, applicantsTotal: 0 });
+  const [companies, setCompanies] = useState([]);
   const [companyNameById, setCompanyNameById] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [companyFilter, setCompanyFilter] = useState("all");
+  const [query, setQuery] = useState("");
+
+  const refresh = () => setRefreshKey((k) => k + 1);
 
   useEffect(() => {
     let cancelled = false;
-
+    setIsLoading(true);
     Promise.all([
-      getRecruiterJobs({ page, pageSize: PAGE_SIZE }),
+      getRecruiterJobs({ page: 1, pageSize: FETCH_PAGE_SIZE }),
+      getRecruiterJobStats(),
       getRecruiterCompanies({ pageSize: 100 }),
     ])
-      .then(([jobsData, companiesData]) => {
+      .then(([jobsData, statsData, companiesData]) => {
         if (cancelled) return;
 
         const jobList = Array.isArray(jobsData)
           ? jobsData
           : (jobsData?.items ?? []);
         setJobs(jobList.map(normalizeJob));
-        if (typeof jobsData?.totalPages === "number") {
-          setTotalPages(Math.max(1, jobsData.totalPages));
-        } else {
-          setTotalPages(1);
-        }
+        setStats(statsData ?? {});
 
         const companyList = Array.isArray(companiesData)
           ? companiesData
           : (companiesData?.items ?? []);
+        const normalized = normalizeCompanies(companyList);
+        setCompanies(normalized);
         const lookup = {};
-        for (const company of normalizeCompanies(companyList)) {
+        for (const company of normalized) {
           const id = getCompanySlug(company);
           if (id) {
             lookup[id] = company.name ?? company.shortName ?? "—";
@@ -113,9 +109,31 @@ export default function RecruiterJobsPage() {
     return () => {
       cancelled = true;
     };
-  }, [page]);
+  }, [refreshKey]);
 
-  const usage = getPlanUsage(getActiveCount(jobs));
+  const counts = useMemo(() => {
+    const draft = Math.max(
+      0,
+      (stats.total ?? 0) - (stats.active ?? 0) - (stats.closed ?? 0),
+    );
+    return {
+      all: jobs.length,
+      active: jobs.filter((j) => (j.status ?? "draft") === "active").length,
+      draft,
+      closed: jobs.filter((j) => (j.status ?? "draft") === "closed").length,
+    };
+  }, [jobs, stats]);
+
+  const filteredJobs = useMemo(
+    () => jobs.filter((job) => jobMatches(job, {
+      status: statusFilter,
+      companyId: companyFilter,
+      query,
+    })),
+    [jobs, statusFilter, companyFilter, query],
+  );
+
+  const usage = getPlanUsage(stats.active ?? 0);
 
   const handleToggleStatus = async (job) => {
     const jobId = getJobId(job);
@@ -144,6 +162,7 @@ export default function RecruiterJobsPage() {
       toast.success(nextStatus === "active" ? "Job reopened" : "Job closed", {
         description: `${job.title} status updated.`,
       });
+      refresh();
     } catch (error) {
       console.error("Failed to update status:", error);
       setJobs((prev) =>
@@ -163,18 +182,29 @@ export default function RecruiterJobsPage() {
 
     setJobs((prev) => prev.filter((item) => getJobId(item) !== jobId));
 
-    deleteRecruiterJob(jobId).catch((error) => {
-      console.error("Failed to delete job:", error);
-      // Re-fetch the current page if the optimistic removal didn't work.
-      getRecruiterJobs({ page, pageSize: PAGE_SIZE }).then((data) => {
-        const list = Array.isArray(data) ? data : (data?.items ?? []);
-        setJobs(list.map(normalizeJob));
+    deleteRecruiterJob(jobId)
+      .then(() => {
+        refresh();
+      })
+      .catch((error) => {
+        console.error("Failed to delete job:", error);
+        refresh();
+        toast.danger("Delete failed", {
+          description: `${job.title} could not be deleted.`,
+        });
       });
-      toast.danger("Delete failed", {
-        description: `${job.title} could not be deleted.`,
-      });
-    });
   };
+
+  const resetFilters = () => {
+    setStatusFilter("all");
+    setCompanyFilter("all");
+    setQuery("");
+  };
+
+  const companyOptions = companies.map((c) => ({
+    id: getCompanySlug(c),
+    name: c.name ?? c.shortName ?? "—",
+  }));
 
   if (isLoading) {
     return (
@@ -186,35 +216,83 @@ export default function RecruiterJobsPage() {
 
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
-            Manage Jobs
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Track and manage every job post from your recruiter dashboard.
-          </p>
+      <div className="mx-auto max-w-7xl space-y-8">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight text-white">
+              Manage Jobs
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Track and manage every job post from your recruiter dashboard.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <ButtonLink
+              href="/jobs"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-white"
+            >
+              View public board
+            </ButtonLink>
+            <Button
+              variant="primary"
+              isDisabled={!usage.hasAvailableSlots}
+              onPress={() => router.push("/dashboard/recruiter/jobs/new")}
+              className="cursor-pointer"
+            >
+              <CirclePlus className="size-4" />
+              Post New Job
+            </Button>
+          </div>
+        </header>
+
+        <JobsOverview stats={stats} activeJobCount={stats.active ?? 0} />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[260px_1fr]">
+          <JobsFilters
+            counts={counts}
+            companies={companyOptions}
+            currentStatus={statusFilter}
+            currentCompanyId={companyFilter}
+            query={query}
+            onChangeStatus={setStatusFilter}
+            onChangeCompany={setCompanyFilter}
+            onChangeQuery={setQuery}
+            onReset={resetFilters}
+          />
+
+          <div className="space-y-4">
+            {filteredJobs.length === 0 ? (
+              <Card className="rounded-2xl border border-dashed border-default bg-content1 p-8 text-center">
+                <Typography.Heading
+                  className="text-base font-semibold text-white"
+                  level={2}
+                >
+                  No jobs match these filters
+                </Typography.Heading>
+                <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
+                  Try a different status, pick a different company, or clear
+                  your search.
+                </Typography.Paragraph>
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="mt-4 cursor-pointer rounded-lg border border-white/10 bg-default px-4 py-2 text-sm font-medium text-white transition-colors hover:border-indigo-500/50"
+                >
+                  Reset filters
+                </button>
+              </Card>
+            ) : (
+              <JobsTable
+                jobs={filteredJobs}
+                companyNameById={companyNameById}
+                onToggleStatus={handleToggleStatus}
+                onDelete={handleDelete}
+              />
+            )}
+          </div>
         </div>
-
-        <Button
-          variant="primary"
-          isDisabled={!usage.hasAvailableSlots}
-          onPress={() => router.push("/dashboard/recruiter/jobs/new")}
-        >
-          <CirclePlus className="size-4" />
-          Post New Job
-        </Button>
-      </div>
-
-      <div className="space-y-6">
-        <PlanUsageCard usage={usage} />
-        <JobsTable
-          jobs={jobs}
-          companyNameById={companyNameById}
-          onToggleStatus={handleToggleStatus}
-          onDelete={handleDelete}
-        />
-        <PageStrip page={page} totalPages={totalPages} />
       </div>
     </div>
   );

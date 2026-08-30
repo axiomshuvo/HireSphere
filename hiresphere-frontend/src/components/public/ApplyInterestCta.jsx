@@ -1,0 +1,34 @@
+"use client";
+
+import { Clock, Globe, ArrowRight } from "@gravity-ui/icons";
+import Link from "next/link";
+import ApplyButton from "./ApplyButton";
+
+export default function ApplyInterestCta({ jobId, jobTitle, companySlug }) {
+  return (
+    <div className="mt-8 rounded-2xl border border-default bg-[radial-gradient(circle_at_30%_50%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#16181c,#0f1013)] p-6 text-center">
+      <Clock className="mx-auto size-8 text-indigo-300" />
+      <h2 className="mt-3 text-xl font-semibold text-white">
+        Interested in this role?
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Apply in under a minute. We&apos;ll send your profile to the recruiter.
+      </p>
+      <div className="mt-4 flex flex-wrap justify-center gap-2">
+        <ApplyButton
+          jobId={jobId}
+          jobTitle={jobTitle}
+          companySlug={companySlug}
+          className="px-5 py-2.5"
+        />
+        <Link
+          href="/jobs"
+          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#1b1c1e] px-5 py-2.5 text-sm text-white transition-colors hover:border-indigo-500/50"
+        >
+          Browse more roles
+          <ArrowRight className="size-4" />
+        </Link>
+      </div>
+    </div>
+  );
+}

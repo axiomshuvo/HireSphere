@@ -91,6 +91,8 @@ export default function EditCompanyPage({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     console.log("[EditCompanyPage] handleSubmit fired, id=", id);
 
     const newErrors = {};
@@ -109,10 +111,9 @@ export default function EditCompanyPage({ params }) {
     if (Object.keys(newErrors).length > 0) {
       console.log("[EditCompanyPage] validation failed:", newErrors);
       setErrors(newErrors);
+      setIsSubmitting(false);
       return;
     }
-
-    setIsSubmitting(true);
 
     const trimmedName = formData.name.trim();
     const originalSlug = getCompanySlug(company);
@@ -136,10 +137,20 @@ export default function EditCompanyPage({ params }) {
     };
 
     try {
-      await updateRecruiterCompany(originalSlug, payload);
-      toast.success("Company updated", {
-        description: `${trimmedName} is saved.`,
-      });
+      const result = await updateRecruiterCompany(originalSlug, payload);
+      const closedJobs = result?.closedJobs ?? 0;
+      if (closedJobs > 0) {
+        toast.warning(
+          "Company renamed",
+          {
+            description: `${closedJobs} active job${closedJobs === 1 ? "" : "s"} were closed and hidden from the public board because they were indexed under the old company URL.`,
+          },
+        );
+      } else {
+        toast.success("Company updated", {
+          description: `${trimmedName} is saved.`,
+        });
+      }
       router.push(`/dashboard/mycompany/${newSlug}`);
     } catch (error) {
       console.error("[EditCompanyPage] Error updating company:", error);

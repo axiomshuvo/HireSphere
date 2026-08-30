@@ -12,15 +12,20 @@ import {
   OfficeBadge,
   Person,
 } from "@gravity-ui/icons";
-import { Avatar, Button, Drawer, toast } from "@heroui/react";
+import { Avatar, Button, Drawer } from "@heroui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const RECRUITER_NAV = [
   { icon: LayoutCells, label: "Dashboard", href: "/dashboard" },
-  { icon: OfficeBadge, label: "My Company", href: "/dashboard/mycompany" },
+  { icon: OfficeBadge, label: "Companies", href: "/dashboard/mycompany" },
   { icon: Briefcase, label: "Manage Jobs", href: "/dashboard/recruiter/jobs" },
-  { icon: FileCheck, label: "Applications", href: "/dashboard/applications" },
+  {
+    icon: FileCheck,
+    label: "Applications",
+    href: "/dashboard/recruiter/applications",
+  },
+  { icon: Person, label: "Profile", href: "/dashboard/profile" },
   { icon: Gear, label: "Settings", href: "/dashboard/settings" },
 ];
 
@@ -36,13 +41,11 @@ const SEEKER_NAV = [
     icon: Bookmark,
     label: "Saved Jobs",
     href: "/dashboard/saved-jobs",
-    comingSoon: true,
   },
   {
     icon: Person,
     label: "Profile",
     href: "/dashboard/profile",
-    comingSoon: true,
   },
   { icon: Gear, label: "Settings", href: "/dashboard/settings" },
 ];
@@ -112,36 +115,14 @@ function NavLink({ item, active }) {
   }`;
 
   const iconEl = <item.icon className="size-5" />;
-  const labelEl = (
-    <>
+
+  return (
+    <Link href={item.href} className={baseClass}>
       {active && (
         <span className="absolute right-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-l-full bg-white" />
       )}
       {iconEl}
       {item.label}
-    </>
-  );
-
-  if (item.comingSoon) {
-    return (
-      <button
-        type="button"
-        onClick={() =>
-          toast.info("Coming soon", {
-            description: "This page is not ready yet",
-          })
-        }
-        title="Coming soon"
-        className={`${baseClass} cursor-not-allowed opacity-60`}
-      >
-        {labelEl}
-      </button>
-    );
-  }
-
-  return (
-    <Link href={item.href} className={baseClass}>
-      {labelEl}
     </Link>
   );
 }

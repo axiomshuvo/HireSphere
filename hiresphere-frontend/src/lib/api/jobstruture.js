@@ -4,6 +4,22 @@ export const PLAN_LIMITS = {
   enterprise: 50,
 };
 
+export const SEEKER_PLAN_LIMITS = {
+  free: 10,
+  premium: Infinity,
+};
+
+export function getSeekerPlanUsage(activeApplications, plan = "free") {
+  const normalized = SEEKER_PLAN_LIMITS[plan] ? plan : "free";
+  const limit = SEEKER_PLAN_LIMITS[normalized];
+  return {
+    plan: normalized,
+    limit,
+    used: activeApplications,
+    isUnlimited: !Number.isFinite(limit),
+  };
+}
+
 export const JOB_CATEGORIES = [
   "Technology",
   "Engineering",
