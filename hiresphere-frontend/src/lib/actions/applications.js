@@ -34,7 +34,6 @@ export async function fetchMyApplications({ page = 1, pageSize = 12 } = {}) {
   try {
     return await request(`/api/my/applications?${params.toString()}`, {
       tags: ["applications"],
-      recruiterId: user.id,
     });
   } catch (error) {
     console.warn(
@@ -51,7 +50,7 @@ export async function fetchApplicationForJob(jobId) {
   try {
     const result = await request(
       `/api/my/applications/${encodeURIComponent(jobId)}`,
-      { tags: ["applications"], recruiterId: user.id },
+      { tags: ["applications"] },
     );
     return result?.application ?? null;
   } catch (error) {
@@ -90,7 +89,6 @@ export async function applyToJob({
       resumeUrl,
       expectedSalary,
     }),
-    recruiterId: user.id,
   });
   revalidateTag("applications");
   revalidatePath("/dashboard/applications");
@@ -109,7 +107,6 @@ export async function withdrawApplication(jobId) {
     `/api/my/applications/${encodeURIComponent(jobId)}`,
     {
       method: "DELETE",
-      recruiterId: user.id,
     },
   );
   revalidateTag("applications");
