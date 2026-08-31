@@ -18,7 +18,7 @@ export default function MarketJobsPanel({ jobs = [] }) {
     return (
       <Card className="rounded-2xl border border-default bg-content1 p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          What's hiring on HireSphere
+          What&rsquo;s hiring on HireSphere
         </h2>
         <p className="mt-3 text-sm text-muted-foreground">
           No public roles to show right now. Check back soon.
@@ -28,10 +28,14 @@ export default function MarketJobsPanel({ jobs = [] }) {
   }
 
   return (
-    <Card className="rounded-2xl border border-default bg-content1 p-6">
+    <Card className="relative overflow-hidden rounded-2xl border border-default bg-content1 p-6">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/0 via-amber-500/60 to-amber-500/0"
+      />
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          What's hiring on HireSphere
+          What&rsquo;s hiring on HireSphere
         </h2>
         <Link
           href="/jobs"
@@ -50,7 +54,7 @@ export default function MarketJobsPanel({ jobs = [] }) {
             <li key={id}>
               <Link
                 href={`/jobs/${id}`}
-                className="group block rounded-xl border border-default bg-[#1b1c1e] p-3 transition-colors hover:border-indigo-500/50"
+                className="group block rounded-xl border border-default bg-[#1b1c1e] p-3 transition-all hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
@@ -63,7 +67,9 @@ export default function MarketJobsPanel({ jobs = [] }) {
                       </p>
                     )}
                   </div>
-                  <Briefcase className="size-3.5 shrink-0 text-muted-foreground" />
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 text-indigo-300 ring-1 ring-indigo-500/30 transition-colors group-hover:text-indigo-200">
+                    <Briefcase className="size-3.5" />
+                  </span>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
                   {job.type && <span>{job.type}</span>}

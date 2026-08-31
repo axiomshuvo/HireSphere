@@ -11,14 +11,21 @@ export default function CompanyList({
   actionLabel = "View All Companies",
 }) {
   return (
-    <Card className="rounded-2xl border border-default bg-content1 p-5">
+    <Card className="relative overflow-hidden rounded-2xl border border-default bg-content1 p-5">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-500/0 via-emerald-500/60 to-emerald-500/0"
+      />
       <div className="mb-4 flex items-center justify-between">
         <Typography.Heading className="text-lg font-semibold text-white" level={2}>
           {title}
         </Typography.Heading>
-        <Button className="text-sm text-muted-foreground" variant="light">
+        <Button
+          className="text-sm text-emerald-300 hover:text-emerald-200"
+          variant="light"
+          endContent={<ArrowRight className="size-4" />}
+        >
           {viewAllLabel}
-          <ArrowRight className="size-4" />
         </Button>
       </div>
 
@@ -28,7 +35,7 @@ export default function CompanyList({
         ))}
       </ul>
 
-      <Button className="mt-6 w-full rounded-xl bg-default text-white" variant="flat">
+      <Button className="mt-6 w-full rounded-xl bg-gradient-to-r from-emerald-500/90 to-teal-500/90 font-semibold text-white shadow-lg shadow-emerald-500/20" variant="flat">
         {actionLabel}
       </Button>
     </Card>

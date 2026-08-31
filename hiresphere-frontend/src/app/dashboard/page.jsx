@@ -25,6 +25,7 @@ import {
   MapPin,
   Wallet,
 } from "@gravity-ui/icons";
+import StatCard from "@/components/dashboard/StatCard";
 import Link from "next/link";
 
 function getInitials(name) {
@@ -105,7 +106,15 @@ async function RecruiterHome({ user }) {
         </h1>
         <p className="mb-8 text-muted-foreground">{subtitle}</p>
 
-        <Card className="mb-8 rounded-2xl border border-default bg-content1 p-6">
+        <Card className="relative mb-8 overflow-hidden rounded-2xl border border-default bg-content1 p-6">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -right-12 -top-12 size-48 rounded-full bg-indigo-500/10 blur-3xl"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-indigo-500/0 via-indigo-500/60 to-indigo-500/0"
+          />
           <Typography.Heading className="text-lg font-semibold text-white" level={2}>
             Create your first company
           </Typography.Heading>
@@ -114,7 +123,7 @@ async function RecruiterHome({ user }) {
           </Typography.Paragraph>
           <ButtonLink
             href="/dashboard/mycompany/new"
-            className="mt-4 w-fit"
+            className="mt-4 w-fit bg-gradient-to-r from-indigo-500 to-blue-500 font-semibold text-white shadow-lg shadow-indigo-500/20"
           >
             Add Company
           </ButtonLink>
@@ -206,6 +215,29 @@ async function SeekerHome({ user }) {
   const enrichedSaved = await enrichJobs(saved);
 
   const greeting = user.name ?? "there";
+  const seekerStats = [
+    {
+      key: "applications",
+      label: "Applications",
+      value: applications.length,
+      icon: "file",
+      tone: "indigo",
+    },
+    {
+      key: "saved",
+      label: "Saved Jobs",
+      value: saved.length,
+      icon: "bookmark",
+      tone: "amber",
+    },
+    {
+      key: "recommended",
+      label: "New Matches",
+      value: recommended.length,
+      icon: "magnifier",
+      tone: "emerald",
+    },
+  ];
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
@@ -227,6 +259,18 @@ async function SeekerHome({ user }) {
         </Link>
       </header>
 
+      <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {seekerStats.map((stat) => (
+          <StatCard
+            key={stat.key}
+            label={stat.label}
+            value={stat.value.toLocaleString()}
+            icon={stat.icon}
+            tone={stat.tone}
+          />
+        ))}
+      </section>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Recommended jobs */}
         <section className="rounded-2xl border border-default bg-content1 p-5 lg:col-span-1">
@@ -236,7 +280,9 @@ async function SeekerHome({ user }) {
                 className="flex items-center gap-2 text-lg font-semibold text-white"
                 level={2}
               >
-                <Magnifier className="size-4 text-indigo-300" />
+                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 text-emerald-300 ring-1 ring-emerald-500/30">
+                  <Magnifier className="size-4" />
+                </span>
                 Recommended for you
               </Typography.Heading>
               <Typography.Paragraph className="text-xs text-muted-foreground">
@@ -302,7 +348,9 @@ async function SeekerHome({ user }) {
                 className="flex items-center gap-2 text-lg font-semibold text-white"
                 level={2}
               >
-                <FileText className="size-4 text-indigo-300" />
+                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 text-indigo-300 ring-1 ring-indigo-500/30">
+                  <FileText className="size-4" />
+                </span>
                 Recent applications
               </Typography.Heading>
               <Typography.Paragraph className="text-xs text-muted-foreground">
@@ -363,7 +411,9 @@ async function SeekerHome({ user }) {
                 className="flex items-center gap-2 text-lg font-semibold text-white"
                 level={2}
               >
-                <Bookmark className="size-4 text-indigo-300" />
+                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-500/5 text-amber-300 ring-1 ring-amber-500/30">
+                  <Bookmark className="size-4" />
+                </span>
                 Saved jobs
               </Typography.Heading>
               <Typography.Paragraph className="text-xs text-muted-foreground">

@@ -1,21 +1,15 @@
 "use client";
 
-import {
-  FaceSmile,
-  FileText,
-  Persons,
-  Thunderbolt,
-} from "@gravity-ui/icons";
 import CompanyList from "@/components/dashboard/CompanyList";
 import DataTable from "@/components/dashboard/DataTable";
 import StatCard from "@/components/dashboard/StatCard";
 import MarketJobsPanel from "@/components/dashboard/MarketJobsPanel";
 
 const ICONS = {
-  jobs: FileText,
-  applicants: Persons,
-  active: Thunderbolt,
-  closed: FaceSmile,
+  jobs: "file",
+  applicants: "persons",
+  active: "lightning",
+  closed: "smile",
 };
 
 export default function RecruiterHomeView({
@@ -31,10 +25,34 @@ export default function RecruiterHomeView({
   marketJobs = [],
 }) {
   const stats = [
-    { key: "jobs", label: "Total Job Posts", value: String(totalJobs), icon: ICONS.jobs },
-    { key: "applicants", label: "Total Applicants", value: totalApplicants.toLocaleString(), icon: ICONS.applicants },
-    { key: "active", label: "Active Jobs", value: String(activeJobs), icon: ICONS.active },
-    { key: "closed", label: "Jobs Closed", value: String(closedJobs), icon: ICONS.closed },
+    {
+      key: "jobs",
+      label: "Total Job Posts",
+      value: String(totalJobs),
+      icon: ICONS.jobs,
+      tone: "indigo",
+    },
+    {
+      key: "applicants",
+      label: "Total Applicants",
+      value: totalApplicants.toLocaleString(),
+      icon: ICONS.applicants,
+      tone: "emerald",
+    },
+    {
+      key: "active",
+      label: "Active Jobs",
+      value: String(activeJobs),
+      icon: ICONS.active,
+      tone: "amber",
+    },
+    {
+      key: "closed",
+      label: "Jobs Closed",
+      value: String(closedJobs),
+      icon: ICONS.closed,
+      tone: "rose",
+    },
   ];
 
   return (
@@ -51,6 +69,7 @@ export default function RecruiterHomeView({
             label={stat.label}
             value={stat.value}
             icon={stat.icon}
+            tone={stat.tone}
           />
         ))}
       </section>

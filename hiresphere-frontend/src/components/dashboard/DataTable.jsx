@@ -8,14 +8,21 @@ const columnClassName =
 
 export default function DataTable({ title, columns, rows, viewAllLabel = "View all" }) {
   return (
-    <Card className="rounded-2xl border border-default bg-content1 p-5">
+    <Card className="relative overflow-hidden rounded-2xl border border-default bg-content1 p-5">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-indigo-500/0 via-indigo-500/60 to-indigo-500/0"
+      />
       <div className="mb-4 flex items-center justify-between">
         <Typography.Heading className="text-lg font-semibold text-white" level={2}>
           {title}
         </Typography.Heading>
-        <Button className="text-sm text-muted-foreground" variant="light">
+        <Button
+          className="text-sm text-indigo-300 hover:text-indigo-200"
+          variant="light"
+          endContent={<ArrowRight className="size-4" />}
+        >
           {viewAllLabel}
-          <ArrowRight className="size-4" />
         </Button>
       </div>
 
@@ -36,7 +43,7 @@ export default function DataTable({ title, columns, rows, viewAllLabel = "View a
             {rows.map((row, rowIndex) => (
               <Table.Row
                 key={row.id ?? rowIndex}
-                className="border-b border-default last:border-b-0"
+                className="border-b border-default transition-colors last:border-b-0 hover:bg-white/[0.02]"
               >
                 {columns.map((column) => (
                   <Table.Cell

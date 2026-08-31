@@ -147,7 +147,7 @@ export default function Navbar() {
         <Dropdown.Menu aria-label="Account actions">
           {/* 3. DropdownItem changed to Dropdown.Item with Label for text */}
           <Dropdown.Item id="dashboard" href="/dashboard" textValue="Dashboard">
-            <House className="w-4 h-4 shrink-0" />
+            <House className="w-4 h-4 shrink-0 text-[#0072FF] drop-shadow-[0_0_6px_rgba(0,114,255,0.45)]" />
             <Label>Dashboard</Label>
           </Dropdown.Item>
 
