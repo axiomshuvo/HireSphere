@@ -7,7 +7,7 @@ import ButtonLink from "@/components/shared/ButtonLink";
 import { createRecruiterCompany } from "@/lib/actions/company";
 
 import { generateCompanySlug, getCompanySlug } from "@/lib/api/companies";
-import { ArrowLeft } from "@gravity-ui/icons";
+import { ArrowLeft, OfficeBadge } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -91,20 +91,31 @@ export default function NewCompanyPage() {
         </ButtonLink>
       </div>
 
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
-            Add a new company
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enter your business details to start hiring on HireSphere.
-          </p>
+      <div className="mx-auto max-w-4xl">
+        <div className="relative mb-6 overflow-hidden rounded-2xl border border-emerald-500/20 bg-content1 p-6 sm:p-8">
+          <div className="absolute -right-10 -top-20 size-56 rounded-full bg-emerald-500/10 blur-3xl" />
+          <div className="relative flex items-start gap-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/25">
+              <OfficeBadge className="size-6" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
+                Company profile
+              </p>
+              <h1 className="text-3xl font-semibold tracking-tight text-white">
+                Add a new company
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Enter your business details to start hiring on HireSphere.
+              </p>
+            </div>
+          </div>
         </div>
 
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="rounded-2xl border border-white/10 bg-[#121316] p-5 sm:p-6"
+          className="rounded-2xl border border-default bg-content1 p-6 shadow-2xl shadow-black/10 sm:p-8"
         >
           <CompanyFormFields
             formData={formData}
@@ -113,10 +124,19 @@ export default function NewCompanyPage() {
           />
 
           <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-4">
-            <ButtonLink href="/dashboard/mycompany" variant="secondary">
+            <ButtonLink
+              href="/dashboard/mycompany"
+              variant="secondary"
+              className="h-11 rounded-xl px-5"
+            >
               Cancel
             </ButtonLink>
-            <Button type="submit" variant="primary" isDisabled={isSubmitting}>
+            <Button
+              type="submit"
+              variant="primary"
+              isDisabled={isSubmitting}
+              className="h-11 cursor-pointer rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 font-semibold text-white shadow-lg shadow-emerald-500/20"
+            >
               {isSubmitting ? "Registering…" : "Register Company"}
             </Button>
           </div>

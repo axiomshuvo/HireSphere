@@ -18,13 +18,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const inputClass = (error) =>
-  `w-full rounded-lg border bg-[#1b1c1e] px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none ${
+  `h-11 w-full rounded-xl border bg-[#17191d] px-3 text-sm text-white placeholder-gray-500 shadow-inner shadow-black/10 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
     error
       ? "border-red-500 focus:border-red-500"
       : "border-white/10 focus:border-indigo-500"
   }`;
 
-const labelClass = "mb-1 block text-xs font-medium text-gray-400";
+const labelClass =
+  "mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground";
 
 function Field({ label, error, children }) {
   return (
@@ -134,8 +135,8 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-      <div className="rounded-2xl border border-white/10 bg-[#121316] p-5 sm:p-6">
+    <form onSubmit={handleSubmit} className="mx-auto max-w-4xl">
+      <div className="rounded-2xl border border-default bg-content1 p-6 shadow-2xl shadow-black/10 sm:p-8">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div>
             <h2 className="text-base font-semibold text-white">
@@ -159,7 +160,14 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mb-5 flex items-center gap-3 rounded-xl border border-indigo-500/15 bg-indigo-500/[0.04] px-4 py-3">
+          <div className="size-2 rounded-full bg-indigo-400 shadow-[0_0_12px_rgba(129,140,248,0.8)]" />
+          <p className="text-xs font-medium text-indigo-100">
+            Required details are marked by validation when you submit.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <Field label="Company" error={errors.companySlug}>
               {companies.length === 0 ? (
@@ -391,14 +399,14 @@ export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
           <button
             type="button"
             onClick={() => router.push("/dashboard/recruiter/jobs")}
-            className="h-10 rounded-lg bg-default px-5 text-sm font-medium text-white transition-colors hover:bg-default-foreground/10"
+            className="h-11 rounded-xl border border-white/10 bg-default px-5 text-sm font-medium text-white transition-colors hover:border-indigo-500/40 hover:bg-default-foreground/10"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting || (!isEditing && !usage.hasAvailableSlots)}
-            className="h-10 cursor-pointer rounded-lg bg-white px-5 text-sm font-semibold text-black transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-11 cursor-pointer rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 px-5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-colors hover:from-indigo-400 hover:to-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting
               ? isEditing

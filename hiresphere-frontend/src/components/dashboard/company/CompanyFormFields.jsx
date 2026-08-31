@@ -1,7 +1,7 @@
 "use client";
 
 import ImageUploader from "@/components/shared/ImageUploader";
-import { MapPin } from "@gravity-ui/icons";
+import { MapPin, Picture } from "@gravity-ui/icons";
 import {
   Input,
   InputGroup,
@@ -42,30 +42,35 @@ export const EMPTY_COMPANY_FORM = {
 };
 
 const inputClass = (error) =>
-  `w-full rounded-lg border bg-[#1b1c1e] px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none ${
+  `h-11 w-full rounded-xl border bg-[#17191d] px-3 text-sm text-white placeholder-gray-500 shadow-inner shadow-black/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
     error
       ? "border-red-500 focus:border-red-500"
       : "border-white/10 focus:border-indigo-500"
   }`;
 
-const labelClass = "mb-1 block text-xs font-medium text-gray-400";
+const labelClass =
+  "mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground";
 
 function FieldError({ message }) {
   if (!message) return null;
   return <p className="mt-1 text-xs text-red-500">{message}</p>;
 }
 
-export default function CompanyFormFields({
-  formData,
-  errors = {},
-  onChange,
-}) {
+export default function CompanyFormFields({ formData, errors = {}, onChange }) {
   const handleChange = (name, value) => onChange(name, value);
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div className="sm:col-span-2 border-b border-white/10 pb-3">
+        <p className="text-sm font-semibold text-white">Company identity</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Give candidates a clear first impression of your business.
+        </p>
+      </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="company-name">Company Name</Label>
+        <Label className={labelClass} htmlFor="company-name">
+          Company Name
+        </Label>
         <Input
           id="company-name"
           placeholder="e.g. Acme Corp"
@@ -77,7 +82,9 @@ export default function CompanyFormFields({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="industry">Industry / Category</Label>
+        <Label className={labelClass} htmlFor="industry">
+          Industry / Category
+        </Label>
         <Select
           id="industry"
           selectedKey={formData.industry}
@@ -100,7 +107,9 @@ export default function CompanyFormFields({
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">
-        <Label htmlFor="company-tagline">Tagline</Label>
+        <Label className={labelClass} htmlFor="company-tagline">
+          Tagline
+        </Label>
         <Input
           id="company-tagline"
           placeholder="One line about what your company does"
@@ -112,7 +121,9 @@ export default function CompanyFormFields({
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">
-        <Label htmlFor="website-url">Website URL</Label>
+        <Label className={labelClass} htmlFor="website-url">
+          Website URL
+        </Label>
         <InputGroup>
           <InputGroup.Prefix>https://</InputGroup.Prefix>
           <InputGroup.Input
@@ -127,7 +138,9 @@ export default function CompanyFormFields({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="location">Location</Label>
+        <Label className={labelClass} htmlFor="location">
+          Location
+        </Label>
         <InputGroup>
           <InputGroup.Prefix>
             <MapPin className="size-4" />
@@ -144,7 +157,9 @@ export default function CompanyFormFields({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="employee-count">Employee Count Range</Label>
+        <Label className={labelClass} htmlFor="employee-count">
+          Employee Count Range
+        </Label>
         <Select
           id="employee-count"
           selectedKey={formData.employeeCount}
@@ -168,7 +183,12 @@ export default function CompanyFormFields({
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">
-        <Label>Company Logo</Label>
+        <Label className={labelClass}>
+          <span className="inline-flex items-center gap-1.5">
+            <Picture className="size-3.5 text-emerald-300" />
+            Company Logo
+          </span>
+        </Label>
         <ImageUploader
           value={formData.logo}
           onChange={(url) => handleChange("logo", url)}
@@ -176,7 +196,7 @@ export default function CompanyFormFields({
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">
-        <Label>Gallery</Label>
+        <Label className={labelClass}>Gallery</Label>
         <ImageUploader
           multiple
           value={formData.gallery}
@@ -185,7 +205,9 @@ export default function CompanyFormFields({
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">
-        <Label htmlFor="description">Brief Description</Label>
+        <Label className={labelClass} htmlFor="description">
+          Brief Description
+        </Label>
         <TextArea
           id="description"
           placeholder="Tell us about your company's mission and culture..."

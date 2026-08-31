@@ -42,7 +42,6 @@ async function run() {
     const { mountMyRoutes, mountPublicEnhancements } = require("./routes");
     mountMyRoutes(app, database);
     mountPublicEnhancements(app, database);
-    mountSavedJobsRoutes(app, database);
     mountApplicationsRoutes(app, database);
 
     await client.db("admin").command({ ping: 1 });
@@ -57,111 +56,43 @@ async function run() {
 }
 run().catch(console.dir);
 
-function mountSavedJobsRoutes(app, database) {
-  const collection = database.collection("savedJobs");
-
-  function requireSeeker(req, res, next) {
-    const userId = req.headers["x-recruiter-id"];
-    if (!userId || typeof userId !== "string" || userId === "null" || userId === "undefined" || userId.length < 1) {
-      return res.status(401).json({ message: "Missing or invalid x-recruiter-id header" });
-    }
-    req.userId = userId;
-    next();
-  }
-
-  app.get("/api/my/saved-jobs", requireSeeker, async (req, res) => {
-    try {
-      const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-      const pageSize = Math.min(
-        100,
-        Math.max(1, parseInt(req.query.pageSize, 10) || 12),
-      );
-      const filter = { userId: req.userId };
-      const [items, total] = await Promise.all([
-        collection
-          .find(filter)
-          .sort({ savedAt: -1 })
-          .skip((page - 1) * pageSize)
-          .limit(pageSize)
-          .toArray(),
-        collection.countDocuments(filter),
-      ]);
-      res.json({
-        items,
-        page,
-        pageSize,
-        total,
-        totalPages: Math.max(1, Math.ceil(total / pageSize)),
-      });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error fetching saved jobs", error: error.message });
-    }
-  });
-
-  app.post("/api/my/saved-jobs", requireSeeker, async (req, res) => {
-    try {
-      const { jobId, title, companySlug } = req.body ?? {};
-      if (!jobId) {
-        return res.status(400).json({ message: "jobId is required" });
-      }
-      const existing = await collection.findOne({ userId: req.userId, jobId });
-      if (existing) {
-        return res
-          .status(200)
-          .json({ savedJob: existing, alreadySaved: true });
-      }
-      const doc = {
-        userId: req.userId,
-        jobId,
-        title: title || null,
-        companySlug: companySlug || null,
-        savedAt: new Date().toISOString(),
-      };
-      const result = await collection.insertOne(doc);
-      const savedJob = await collection.findOne({ _id: result.insertedId });
-      res.status(201).json({ savedJob });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error saving job", error: error.message });
-    }
-  });
-
-  app.delete(
-    "/api/my/saved-jobs/:jobId",
-    requireSeeker,
-    async (req, res) => {
-      try {
-        const result = await collection.findOneAndDelete({
-          userId: req.userId,
-          jobId: req.params.jobId,
-        });
-        if (!result) {
-          return res.status(404).json({ message: "Saved job not found" });
-        }
-        res.json({ message: "Saved job removed" });
-      } catch (error) {
-        res
-          .status(500)
-          .json({ message: "Error removing saved job", error: error.message });
-      }
-    },
-  );
-}
-
 function mountApplicationsRoutes(app, database) {
   const applications = database.collection("applications");
   const jobs = database.collection("jobs");
+  const users = database.collection("user");
 
-  function requireSeeker(req, res, next) {
+  async function requireSeeker(req, res, next) {
     const userId = req.headers["x-recruiter-id"];
-    if (!userId || typeof userId !== "string" || userId === "null" || userId === "undefined" || userId.length < 1) {
-      return res.status(401).json({ message: "Missing or invalid x-recruiter-id header" });
+    if (
+      !userId ||
+      typeof userId !== "string" ||
+      userId === "null" ||
+      userId === "undefined" ||
+      userId.length < 1 ||
+      !ObjectId.isValid(userId)
+    ) {
+      return res
+        .status(401)
+        .json({ message: "Missing or invalid x-recruiter-id header" });
     }
-    req.userId = userId;
-    next();
+
+    try {
+      const user = await users.findOne({ _id: new ObjectId(userId) });
+      if (!user) {
+        return res.status(401).json({ message: "Unknown user" });
+      }
+      if (user.role !== "seeker") {
+        return res
+          .status(403)
+          .json({ message: "Only job seekers can access applications" });
+      }
+      req.userId = userId;
+      return next();
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Unable to validate user", error: error.message });
+    }
   }
 
   app.get("/api/my/applications", requireSeeker, async (req, res) => {
@@ -224,12 +155,18 @@ function mountApplicationsRoutes(app, database) {
         return res.status(400).json({ message: "jobId is required" });
       }
       if (!name || !email) {
-        return res
-          .status(400)
-          .json({ message: "name and email are required" });
+        return res.status(400).json({ message: "name and email are required" });
       }
       const job = await jobs.findOne({
-        $or: [{ jobId }, { slug: jobId }, { _id: require("mongodb").ObjectId.isValid(jobId) ? new (require("mongodb").ObjectId)(jobId) : null }].filter(Boolean),
+        $or: [
+          { jobId },
+          { slug: jobId },
+          {
+            _id: require("mongodb").ObjectId.isValid(jobId)
+              ? new (require("mongodb").ObjectId)(jobId)
+              : null,
+          },
+        ].filter(Boolean),
       });
       if (!job) {
         return res.status(404).json({ message: "Job not found" });
@@ -286,17 +223,27 @@ function mountApplicationsRoutes(app, database) {
       if (!application) {
         return res.status(404).json({ message: "Application not found" });
       }
+      const job = await jobs.findOne({
+        $or: [
+          { jobId },
+          { slug: jobId },
+          ...(ObjectId.isValid(jobId) ? [{ _id: new ObjectId(jobId) }] : []),
+        ],
+      });
       await applications.deleteOne({ _id: application._id });
       // Decrement the job's applicant counter so it stays consistent.
-      await jobs.updateOne(
-        { _id: application.jobId },
-        { $inc: { applicants: -1 } },
-      );
+      if (job) {
+        await jobs.updateOne(
+          { _id: job._id, applicants: { $gt: 0 } },
+          { $inc: { applicants: -1 } },
+        );
+      }
       res.json({ ok: true, withdrawn: true });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error withdrawing application", error: error.message });
+      res.status(500).json({
+        message: "Error withdrawing application",
+        error: error.message,
+      });
     }
   });
 }

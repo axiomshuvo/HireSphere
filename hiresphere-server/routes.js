@@ -106,9 +106,61 @@ function mountMyRoutes(app, database) {
   const jobsCollection = database.collection("jobs");
   const applicationsCollection = database.collection("applications");
   const savedJobsCollection = database.collection("savedJobs");
+  const usersCollection = database.collection("user");
   const router = express.Router();
 
+  async function attachApplicantCounts(jobs) {
+    return Promise.all(
+      jobs.map(async (job) => {
+        const jobIds = [
+          job.jobId,
+          job.slug,
+          job._id ? String(job._id) : null,
+        ].filter(Boolean);
+        const applicants = jobIds.length
+          ? await applicationsCollection.countDocuments({
+              jobId: { $in: jobIds },
+            })
+          : 0;
+        return { ...job, applicants };
+      }),
+    );
+  }
+
+  function requireRole(role, message) {
+    return async (req, res, next) => {
+      if (!ObjectId.isValid(req.recruiterId)) {
+        return res.status(401).json({ message: "Invalid user identity" });
+      }
+      try {
+        const user = await usersCollection.findOne({
+          _id: new ObjectId(req.recruiterId),
+        });
+        if (!user) return res.status(401).json({ message: "Unknown user" });
+        if (user.role !== role) return res.status(403).json({ message });
+        return next();
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ message: "Unable to validate user", error: error.message });
+      }
+    };
+  }
+
+  const requireRecruiterRole = requireRole(
+    "recruiter",
+    "Only recruiters can access this resource",
+  );
+  const requireSeekerRole = requireRole(
+    "seeker",
+    "Only job seekers can access saved jobs",
+  );
+
   router.use(requireRecruiter);
+  router.use("/companies", requireRecruiterRole);
+  router.use("/jobs", requireRecruiterRole);
+  router.use("/applicants", requireRecruiterRole);
+  router.use("/saved-jobs", requireSeekerRole);
 
   // ─── Companies ──────────────────────────────────────────────────────
 
@@ -274,6 +326,7 @@ function mountMyRoutes(app, database) {
         {
           $or: [{ companySlug: companyRef }, { companyId: companyRef }],
           status: "active",
+          recruiterId: req.recruiterId,
         },
         { $set: { status: "closed", closedAt: new Date().toISOString() } },
       );
@@ -297,7 +350,7 @@ function mountMyRoutes(app, database) {
       const filter = { recruiterId: req.recruiterId };
       if (req.query.status) filter.status = req.query.status;
 
-      const [items, total] = await Promise.all([
+      const [rawItems, total] = await Promise.all([
         jobsCollection
           .find(filter)
           .sort({ createdAt: -1 })
@@ -306,6 +359,7 @@ function mountMyRoutes(app, database) {
           .toArray(),
         jobsCollection.countDocuments(filter),
       ]);
+      const items = await attachApplicantCounts(rawItems);
       res.json({
         items,
         page,
@@ -449,7 +503,12 @@ function mountMyRoutes(app, database) {
         recruiterId: req.recruiterId,
       });
       if (!job) return res.status(404).json({ message: "Job not found" });
-      res.json(job);
+      const applicants = await applicationsCollection.countDocuments({
+        jobId: {
+          $in: [job.jobId, job.slug, String(job._id)].filter(Boolean),
+        },
+      });
+      res.json({ ...job, applicants });
     } catch (error) {
       res
         .status(500)
@@ -750,9 +809,7 @@ function mountPublicEnhancements(app, database) {
         Math.max(1, parseInt(req.query.pageSize, 10) || 12),
       );
 
-      const filter = {};
-      if (req.query.status) filter.status = req.query.status;
-      if (req.query.isPublicVisible === "true") filter.isPublicVisible = true;
+      const filter = { status: "active", isPublicVisible: { $ne: false } };
       if (req.query.category) filter.category = req.query.category;
       if (req.query.type) filter.type = req.query.type;
       if (req.query.remote === "true") filter.remote = true;
@@ -808,7 +865,11 @@ function mountPublicEnhancements(app, database) {
   // GET /api/jobs/:id — accept slug, jobId, or _id.
   app.get("/api/jobs/:id", async (req, res) => {
     try {
-      const job = await jobsCollection.findOne(buildJobLookup(req.params.id));
+      const job = await jobsCollection.findOne({
+        ...buildJobLookup(req.params.id),
+        status: "active",
+        isPublicVisible: { $ne: false },
+      });
       if (!job) return res.status(404).json({ message: "Job not found" });
       res.json(job);
     } catch (error) {

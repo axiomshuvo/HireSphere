@@ -1,16 +1,16 @@
 "use client";
 
-import JobsTable from "@/components/dashboard/jobs/JobsTable";
-import JobsOverview from "@/components/dashboard/jobs/JobsOverview";
 import JobsFilters from "@/components/dashboard/jobs/JobsFilters";
+import JobsOverview from "@/components/dashboard/jobs/JobsOverview";
+import JobsTable from "@/components/dashboard/jobs/JobsTable";
 import ButtonLink from "@/components/shared/ButtonLink";
+import { getRecruiterCompanies } from "@/lib/actions/company";
 import {
   deleteRecruiterJob,
   getRecruiterJobStats,
   getRecruiterJobs,
   updateRecruiterJobStatus,
 } from "@/lib/actions/jobs";
-import { getRecruiterCompanies } from "@/lib/actions/company";
 import { getCompanySlug, normalizeCompanies } from "@/lib/api/companies";
 import { getJobId, getPlanUsage } from "@/lib/api/jobstruture";
 import { CirclePlus } from "@gravity-ui/icons";
@@ -35,12 +35,7 @@ function jobMatches(job, { status, companyId, query }) {
     return false;
   }
   if (query) {
-    const haystack = [
-      job.title,
-      job.companySlug,
-      job.city,
-      job.country,
-    ]
+    const haystack = [job.title, job.companySlug, job.city, job.country]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
@@ -52,7 +47,12 @@ function jobMatches(job, { status, companyId, query }) {
 export default function RecruiterJobsPage() {
   const router = useRouter();
   const [jobs, setJobs] = useState([]);
-  const [stats, setStats] = useState({ total: 0, active: 0, closed: 0, applicantsTotal: 0 });
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    closed: 0,
+    applicantsTotal: 0,
+  });
   const [companies, setCompanies] = useState([]);
   const [companyNameById, setCompanyNameById] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -62,11 +62,13 @@ export default function RecruiterJobsPage() {
   const [companyFilter, setCompanyFilter] = useState("all");
   const [query, setQuery] = useState("");
 
-  const refresh = () => setRefreshKey((k) => k + 1);
+  const refresh = () => {
+    setIsLoading(true);
+    setRefreshKey((k) => k + 1);
+  };
 
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
     Promise.all([
       getRecruiterJobs({ page: 1, pageSize: FETCH_PAGE_SIZE }),
       getRecruiterJobStats(),
@@ -125,11 +127,14 @@ export default function RecruiterJobsPage() {
   }, [jobs, stats]);
 
   const filteredJobs = useMemo(
-    () => jobs.filter((job) => jobMatches(job, {
-      status: statusFilter,
-      companyId: companyFilter,
-      query,
-    })),
+    () =>
+      jobs.filter((job) =>
+        jobMatches(job, {
+          status: statusFilter,
+          companyId: companyFilter,
+          query,
+        }),
+      ),
     [jobs, statusFilter, companyFilter, query],
   );
 

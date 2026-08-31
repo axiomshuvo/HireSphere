@@ -2,7 +2,7 @@ import CompanyCard from "@/components/dashboard/company/CompanyCard";
 import ButtonLink from "@/components/shared/ButtonLink";
 import { getRecruiterCompanies } from "@/lib/actions/company";
 import { normalizeCompanies } from "@/lib/api/companies";
-import { CirclePlus } from "@gravity-ui/icons";
+import { CirclePlus, OfficeBadge } from "@gravity-ui/icons";
 
 const PAGE_SIZE = 9;
 
@@ -37,22 +37,27 @@ export default async function MyCompanyPage({ searchParams }) {
   const params = await searchParams;
   const page = Math.max(1, Number(params?.page) || 1);
   const result = await getRecruiterCompanies({ page, pageSize: PAGE_SIZE });
-  const items = Array.isArray(result) ? result : result?.items ?? [];
+  const items = Array.isArray(result) ? result : (result?.items ?? []);
   const totalPages =
-    typeof result?.totalPages === "number"
-      ? Math.max(1, result.totalPages)
-      : 1;
+    typeof result?.totalPages === "number" ? Math.max(1, result.totalPages) : 1;
   const companies = normalizeCompanies(items);
+  const total =
+    typeof result?.total === "number" ? result.total : companies.length;
 
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
+          <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
+            <OfficeBadge className="size-4" />
+            Recruiter workspace
+          </div>
+          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             My Companies
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Every company you manage on HireSphere, in one place.
+            {total} {total === 1 ? "company" : "companies"} managed on
+            HireSphere.
           </p>
         </div>
 
@@ -80,7 +85,7 @@ export default async function MyCompanyPage({ searchParams }) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {companies.map((company) => (
               <CompanyCard
                 key={company.companySlug ?? company.id ?? company._id}
@@ -88,7 +93,11 @@ export default async function MyCompanyPage({ searchParams }) {
               />
             ))}
           </div>
-          <PageStrip page={page} totalPages={totalPages} basePath="/dashboard/mycompany" />
+          <PageStrip
+            page={page}
+            totalPages={totalPages}
+            basePath="/dashboard/mycompany"
+          />
         </>
       )}
     </div>
