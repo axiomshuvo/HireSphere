@@ -1,7 +1,6 @@
 "use client";
 
 import { signOut, useSession } from "@/lib/auth-client";
-import { clearUserJobState } from "@/lib/storage-keys";
 import {
   ArrowRightFromSquare,
   Bell,
@@ -64,9 +63,6 @@ export default function DashboardTopBar() {
   const dropdownItems = user?.role === "recruiter" ? RECRUITER_DROPDOWN : SEEKER_DROPDOWN;
 
   const handleSignOut = async () => {
-    // Clear per-user saved/applied state so the next user on the same
-    // browser doesn't inherit this session's optimistic data.
-    clearUserJobState(user?.id);
     await signOut();
     router.push("/");
   };

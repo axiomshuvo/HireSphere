@@ -1,10 +1,9 @@
 "use client";
 
-import { Check, Pencil } from "@gravity-ui/icons";
-import { Button, Input } from "@heroui/react";
-import { useState, useTransition } from "react";
 import { updateProfileName } from "@/lib/actions/profile";
-import { toast } from "@heroui/react";
+import { Check, Pencil } from "@gravity-ui/icons";
+import { Button, Input, toast } from "@heroui/react";
+import { useState, useTransition } from "react";
 
 export default function ProfileForm({ initialName, email, role }) {
   const [name, setName] = useState(String(initialName ?? ""));
@@ -43,46 +42,46 @@ export default function ProfileForm({ initialName, email, role }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <div>
-        <label
-          htmlFor="profile-name"
-          className="mb-1 block text-xs font-medium text-muted-foreground"
-        >
-          Display name
-        </label>
-        <Input
-          id="profile-name"
-          name="name"
-          value={String(name)}
-          onChange={(e) => {
-            setName(String(e.target.value));
-            setError("");
-          }}
-          placeholder="Your name"
-          autoComplete="name"
-          className="w-full"
-        />
-        {error ? (
-          <p className="mt-1 text-xs text-danger">{error}</p>
-        ) : null}
-      </div>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <label
+            htmlFor="profile-name"
+            className="mb-1 block text-xs font-medium text-muted-foreground"
+          >
+            Display name
+          </label>
+          <Input
+            id="profile-name"
+            name="name"
+            value={String(name)}
+            onChange={(e) => {
+              setName(String(e.target.value));
+              setError("");
+            }}
+            placeholder="Your name"
+            autoComplete="name"
+            className="w-full"
+          />
+          {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
+        </div>
 
-      <div>
-        <label
-          htmlFor="profile-email"
-          className="mb-1 block text-xs font-medium text-muted-foreground"
-        >
-          Email
-        </label>
-        <Input
-          id="profile-email"
-          value={String(email)}
-          readOnly
-          className="w-full"
-        />
-        <p className="mt-1 text-xs text-muted-foreground">
-          Email is tied to your login and cannot be changed from here.
-        </p>
+        <div>
+          <label
+            htmlFor="profile-email"
+            className="mb-1 block text-xs font-medium text-muted-foreground"
+          >
+            Email
+          </label>
+          <Input
+            id="profile-email"
+            value={String(email)}
+            readOnly
+            className="w-full"
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Email is tied to your login and cannot be changed from here.
+          </p>
+        </div>
       </div>
 
       <div>

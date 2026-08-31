@@ -1,14 +1,10 @@
 "use client";
 
-import { Card, Chip } from "@heroui/react";
-import {
-  Calendar,
-  Envelope,
-  Smartphone,
-  Wallet,
-} from "@gravity-ui/icons";
-import { useMemo, useState } from "react";
 import RelativeTime from "@/components/shared/RelativeTime";
+import { Calendar, Envelope, Smartphone, Wallet } from "@gravity-ui/icons";
+import { Card, Chip } from "@heroui/react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
 const SORT_OPTIONS = [
   { id: "newest", label: "Newest first" },
@@ -75,17 +71,20 @@ export default function ApplicantsList({ applicants, total }) {
         return (
           <Card
             key={applicant._id ?? applicant.id}
-            className="rounded-2xl border border-default bg-content1 p-5"
+            className="rounded-2xl border border-default bg-content1 p-5 transition-colors hover:border-indigo-500/40"
           >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-default text-sm font-semibold text-default-foreground">
                 {initials || "?"}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-base font-semibold text-white">
-                    {applicant.name}
-                  </p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Link
+                    href={`/dashboard/recruiter/applications/${applicant._id ?? applicant.id}`}
+                    className="text-base font-semibold text-white transition-colors hover:text-indigo-200"
+                  >
+                    {applicant.name || "Unnamed candidate"}
+                  </Link>
                   <Chip color="primary" size="sm" variant="soft">
                     {applicant.status === "submitted"
                       ? "Submitted"
@@ -124,8 +123,7 @@ export default function ApplicantsList({ applicants, total }) {
                   {applicant.appliedAt && (
                     <span className="inline-flex items-center gap-1.5">
                       <Calendar className="size-3" />
-                      Applied{" "}
-                      <RelativeTime iso={applicant.appliedAt} />
+                      Applied <RelativeTime iso={applicant.appliedAt} />
                     </span>
                   )}
                 </div>
@@ -134,16 +132,12 @@ export default function ApplicantsList({ applicants, total }) {
                     Role: {applicant.jobTitle}
                   </p>
                 )}
-                {applicant.coverLetter && (
-                  <details className="mt-2 text-xs text-muted-foreground">
-                    <summary className="cursor-pointer text-white">
-                      Cover letter
-                    </summary>
-                    <p className="mt-1 whitespace-pre-line">
-                      {applicant.coverLetter}
-                    </p>
-                  </details>
-                )}
+                <Link
+                  href={`/dashboard/recruiter/applications/${applicant._id ?? applicant.id}`}
+                  className="mt-3 inline-flex text-xs font-semibold text-indigo-300 transition-colors hover:text-indigo-200"
+                >
+                  View full application →
+                </Link>
               </div>
             </div>
           </Card>

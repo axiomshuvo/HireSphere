@@ -11,6 +11,9 @@ import {
 } from "@/components/jobs/JobBadge";
 import { fetchPublicCompanyById } from "@/lib/actions/company";
 import { fetchPublicJobById, fetchPublicJobs } from "@/lib/actions/jobs";
+import { fetchApplicationForJob } from "@/lib/actions/applications";
+import { fetchSavedJobs } from "@/lib/actions/saved-jobs";
+import { getCurrentUser } from "@/lib/core/session";
 import {
   ArrowRight,
   ArrowUpRightFromSquare,
@@ -93,6 +96,22 @@ export default async function PublicJobDetailPage({ params }) {
     } catch {
       company = null;
     }
+  }
+
+  // For a signed-in seeker, ask the server whether they already
+  // saved / applied to this job. The DB is the source of truth — the
+  // button state is computed from it on every render.
+  const user = await getCurrentUser();
+  let initialSaved = false;
+  let initialApplied = false;
+  if (user?.role === "seeker") {
+    const [savedResult, appliedResult] = await Promise.all([
+      fetchSavedJobs({ pageSize: 100 }).catch(() => ({ items: [] })),
+      fetchApplicationForJob(id).catch(() => null),
+    ]);
+    const savedItems = Array.isArray(savedResult) ? savedResult : (savedResult?.items ?? []);
+    initialSaved = savedItems.some((s) => (s.jobId ?? s._id) === id);
+    initialApplied = !!appliedResult;
   }
 
   if (!isPublicVisible || job.status === "closed") {
@@ -182,11 +201,15 @@ export default async function PublicJobDetailPage({ params }) {
               jobId={id}
               jobTitle={job.title}
               companySlug={job.companySlug ?? job.companyId}
+              recruiterId={job.recruiterId ?? null}
+              initialApplied={initialApplied}
             />
             <SaveJobButton
               jobId={id}
               title={job.title}
               companySlug={job.companySlug ?? job.companyId}
+              recruiterId={job.recruiterId ?? null}
+              initialSaved={initialSaved}
             />
             <div className="flex items-center gap-2">
               <button
@@ -324,6 +347,8 @@ export default async function PublicJobDetailPage({ params }) {
         jobId={id}
         jobTitle={job.title}
         companySlug={job.companySlug ?? job.companyId}
+        recruiterId={job.recruiterId ?? null}
+        initialApplied={initialApplied}
       />
 
       <span className="sr-only">{job.title}</span>

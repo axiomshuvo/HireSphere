@@ -1,14 +1,15 @@
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { Card } from "@heroui/react";
 import ProfileForm from "@/components/dashboard/ProfileForm";
-import ProfileImageField from "@/components/dashboard/profile/ProfileImageField";
 import PlanUsageCard from "@/components/dashboard/jobs/PlanUsageCard";
+import ProfileImageField from "@/components/dashboard/profile/ProfileImageField";
 import SeekerPlanCard from "@/components/dashboard/profile/SeekerPlanCard";
-import { redirect } from "next/navigation";
 import { fetchMyApplications } from "@/lib/actions/applications";
 import { getRecruiterJobStats } from "@/lib/actions/jobs";
 import { getPlanUsage } from "@/lib/api/jobstruture";
+import { auth } from "@/lib/auth";
+import { Calendar, Envelope, Person } from "@gravity-ui/icons";
+import { Card, Chip } from "@heroui/react";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 function formatRole(role) {
   if (role === "seeker") return "Job Seeker";
@@ -64,16 +65,75 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex-1 px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-3xl flex-col gap-8">
+      <div className="mx-auto flex max-w-5xl flex-col gap-8">
         <header>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
-            Profile
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">
+            Account workspace
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            Your profile
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Update your display name and profile photo. Email and role are
-            managed by your account.
+            Keep your identity and account details current across HireSphere.
           </p>
         </header>
+
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
+          <Card className="overflow-hidden rounded-2xl border border-default bg-content1">
+            <div className="h-24 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.45),transparent_55%),linear-gradient(110deg,#17191d,#20242d)]" />
+            <div className="-mt-10 px-6 pb-6 sm:px-8">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <ProfileImageField name={name} image={image} />
+                <Chip color="primary" size="sm" variant="soft">
+                  {formatRole(role)}
+                </Chip>
+              </div>
+              <div className="mt-4">
+                <h2 className="text-2xl font-semibold tracking-tight text-white">
+                  {name || "Complete your profile"}
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">{email}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="rounded-2xl border border-default bg-content1 p-6 sm:p-8">
+            <h2 className="text-lg font-semibold text-white">
+              Account snapshot
+            </h2>
+            <div className="mt-5 flex flex-col divide-y divide-default">
+              <div className="flex items-center gap-3 py-3 first:pt-0">
+                <Envelope className="size-4 text-indigo-300" />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Email
+                  </p>
+                  <p className="truncate text-sm text-white">{email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 py-3">
+                <Person className="size-4 text-indigo-300" />
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Account type
+                  </p>
+                  <p className="text-sm text-white">{formatRole(role)}</p>
+                </div>
+              </div>
+              {joined && (
+                <div className="flex items-center gap-3 py-3 last:pb-0">
+                  <Calendar className="size-4 text-indigo-300" />
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      Member since
+                    </p>
+                    <p className="text-sm text-white">{joined}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+        </section>
 
         {isRecruiter ? (
           <PlanUsageCard usage={getPlanUsage(activeJobCount, plan)} />
@@ -82,24 +142,15 @@ export default async function ProfilePage() {
         )}
 
         <Card className="rounded-2xl border border-default bg-content1 p-6 sm:p-8">
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 className="text-lg font-semibold text-white">
-              {name || "—"}
+          <div className="mb-6 border-b border-default pb-5">
+            <h2 className="text-xl font-semibold text-white">
+              Personal details
             </h2>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-default bg-default px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-default-foreground">
-              {formatRole(role)}
-            </span>
-            {joined && (
-              <span className="text-xs text-muted-foreground">
-                · Joined {joined}
-              </span>
-            )}
+            <p className="mt-1 text-sm text-muted-foreground">
+              Update the name shown on your profile and dashboard.
+            </p>
           </div>
-
-          <div className="mt-6 space-y-6 border-t border-default pt-6">
-            <ProfileImageField name={name} image={image} />
-            <ProfileForm initialName={name} email={email} role={role} />
-          </div>
+          <ProfileForm initialName={name} email={email} role={role} />
         </Card>
       </div>
     </div>

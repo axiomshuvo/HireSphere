@@ -11,9 +11,17 @@ async function request(path, { tags, revalidate, recruiterId, ...options } = {})
   const headers = { "Content-Type": "application/json" };
   if (recruiterId) headers["x-recruiter-id"] = recruiterId;
 
+  // Per-user endpoints must bypass Next's data cache: the cache key is
+  // URL-only and does NOT include x-recruiter-id, so a cached response
+  // for one user would be served to another. The /api/my/* routes are
+  // always per-user; everything else is public.
+  const cacheDirective = path.startsWith("/api/my/")
+    ? { cache: "no-store" }
+    : { next: { revalidate: revalidate ?? REVALIDATE_SECONDS, tags } };
+
   const res = await fetch(`${baseUrl}${path}`, {
     headers,
-    next: { revalidate: revalidate ?? REVALIDATE_SECONDS, tags },
+    ...cacheDirective,
     ...options,
   });
 

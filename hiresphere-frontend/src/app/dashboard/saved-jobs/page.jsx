@@ -1,12 +1,7 @@
-import { fetchSavedJobs } from "@/lib/actions/saved-jobs";
-import { fetchPublicJobById } from "@/lib/actions/jobs";
-import LocalStateBridge from "@/components/dashboard/LocalStateBridge";
-import OptimisticSavedJobs from "@/components/dashboard/OptimisticSavedJobs";
 import SavedJobCard from "@/components/dashboard/SavedJobCard";
-import {
-  Bookmark,
-  Briefcase,
-} from "@gravity-ui/icons";
+import { fetchPublicJobById } from "@/lib/actions/jobs";
+import { fetchSavedJobs } from "@/lib/actions/saved-jobs";
+import { Bookmark, Briefcase } from "@gravity-ui/icons";
 import { Typography } from "@heroui/react";
 import Link from "next/link";
 
@@ -28,7 +23,8 @@ async function loadJobDetails(savedJobs) {
 function PageStrip({ page, totalPages }) {
   if (totalPages <= 1) return null;
   const prev = page > 1 ? `/dashboard/saved-jobs?page=${page - 1}` : null;
-  const next = page < totalPages ? `/dashboard/saved-jobs?page=${page + 1}` : null;
+  const next =
+    page < totalPages ? `/dashboard/saved-jobs?page=${page + 1}` : null;
   return (
     <nav className="mt-8 flex items-center justify-center gap-3 text-sm">
       {prev ? (
@@ -65,25 +61,25 @@ export default async function SavedJobsPage({ searchParams }) {
   const page = Math.max(1, Number(params?.page) || 1);
 
   const result = await fetchSavedJobs({ page, pageSize: PAGE_SIZE });
-  const savedJobs = Array.isArray(result) ? result : result?.items ?? [];
+  const savedJobs = Array.isArray(result) ? result : (result?.items ?? []);
   const totalPages =
     typeof result?.totalPages === "number" ? Math.max(1, result.totalPages) : 1;
+  const total =
+    typeof result?.total === "number" ? result.total : savedJobs.length;
 
   const enriched = await loadJobDetails(savedJobs);
-  const serverJobIds = new Set(savedJobs.map((s) => s.jobId));
 
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
-      <LocalStateBridge />
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-white">
             Saved Jobs
           </h1>
           <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
-            {savedJobs.length === 0
+            {total === 0
               ? "Bookmark roles to come back to them later."
-              : `${savedJobs.length} ${savedJobs.length === 1 ? "role" : "roles"} saved on this page.`}
+              : `${total} ${total === 1 ? "role" : "roles"} saved.`}
           </Typography.Paragraph>
         </div>
         <Link
@@ -96,21 +92,20 @@ export default async function SavedJobsPage({ searchParams }) {
       </div>
 
       {enriched.length === 0 ? (
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
-            <Bookmark className="size-8 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-white">No saved jobs yet</h2>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              Save a role from any job listing and it will show up here.
-            </p>
-            <Link
-              href="/jobs"
-              className="mt-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-gray-200"
-            >
-              Find your first role
-            </Link>
-          </div>
-          <OptimisticSavedJobs serverJobIds={serverJobIds} />
+        <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
+          <Bookmark className="size-8 text-muted-foreground" />
+          <h2 className="text-lg font-semibold text-white">
+            No saved jobs yet
+          </h2>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            Save a role from any job listing and it will show up here.
+          </p>
+          <Link
+            href="/jobs"
+            className="mt-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-gray-200"
+          >
+            Find your first role
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -121,7 +116,6 @@ export default async function SavedJobsPage({ searchParams }) {
               job={job}
             />
           ))}
-          <OptimisticSavedJobs serverJobIds={serverJobIds} />
         </div>
       )}
 

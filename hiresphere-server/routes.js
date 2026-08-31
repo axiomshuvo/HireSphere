@@ -20,7 +20,11 @@ const { ObjectId } = require("mongodb");
 
 function requireRecruiter(req, res, next) {
   const recruiterId = req.headers["x-recruiter-id"];
-  if (!recruiterId || typeof recruiterId !== "string" || recruiterId.length < 1) {
+  if (
+    !recruiterId ||
+    typeof recruiterId !== "string" ||
+    recruiterId.length < 1
+  ) {
     return res.status(401).json({ message: "Missing x-recruiter-id header" });
   }
   req.recruiterId = recruiterId;
@@ -69,10 +73,7 @@ async function attachStats(companiesCollection, jobsCollection, companies) {
     .aggregate([
       {
         $match: {
-          $or: [
-            { companySlug: { $in: slugs } },
-            { companyId: { $in: slugs } },
-          ],
+          $or: [{ companySlug: { $in: slugs } }, { companyId: { $in: slugs } }],
           status: "active",
         },
       },
@@ -92,7 +93,11 @@ async function attachStats(companiesCollection, jobsCollection, companies) {
 
 // Top-level alias so the public list endpoint can join the same per-company
 // active-job counts without re-implementing the aggregation.
-async function attachStatsPublic(companiesCollection, jobsCollection, companies) {
+async function attachStatsPublic(
+  companiesCollection,
+  jobsCollection,
+  companies,
+) {
   return attachStats(companiesCollection, jobsCollection, companies);
 }
 
@@ -121,7 +126,11 @@ function mountMyRoutes(app, database) {
           .toArray(),
         companiesCollection.countDocuments(filter),
       ]);
-      const withStats = await attachStats(companiesCollection, jobsCollection, items);
+      const withStats = await attachStats(
+        companiesCollection,
+        jobsCollection,
+        items,
+      );
       res.json({
         items: withStats,
         page,
@@ -130,7 +139,9 @@ function mountMyRoutes(app, database) {
         totalPages: Math.max(1, Math.ceil(total / pageSize)),
       });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching companies", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching companies", error: error.message });
     }
   });
 
@@ -142,7 +153,9 @@ function mountMyRoutes(app, database) {
       });
       res.json({ total });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching stats", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching stats", error: error.message });
     }
   });
 
@@ -153,10 +166,13 @@ function mountMyRoutes(app, database) {
         ...buildCompanyLookup(req.params.id),
         recruiterId: req.recruiterId,
       });
-      if (!company) return res.status(404).json({ message: "Company not found" });
+      if (!company)
+        return res.status(404).json({ message: "Company not found" });
       res.json(company);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching company", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching company", error: error.message });
     }
   });
 
@@ -171,10 +187,14 @@ function mountMyRoutes(app, database) {
         updatedAt: new Date().toISOString(),
       };
       const result = await companiesCollection.insertOne(doc);
-      const inserted = await companiesCollection.findOne({ _id: result.insertedId });
+      const inserted = await companiesCollection.findOne({
+        _id: result.insertedId,
+      });
       res.status(201).json({ company: inserted });
     } catch (error) {
-      res.status(500).json({ message: "Error creating company", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error creating company", error: error.message });
     }
   });
 
@@ -192,13 +212,12 @@ function mountMyRoutes(app, database) {
         ...buildCompanyLookup(req.params.id),
         recruiterId: req.recruiterId,
       });
-      if (!existing) return res.status(404).json({ message: "Company not found" });
+      if (!existing)
+        return res.status(404).json({ message: "Company not found" });
 
       const oldRef = existing.companySlug ?? existing.companyId;
       const newRef = rest.companySlug ?? existing.companySlug;
-      const slugChanged = Boolean(
-        oldRef && newRef && oldRef !== newRef,
-      );
+      const slugChanged = Boolean(oldRef && newRef && oldRef !== newRef);
 
       const updateDoc = { ...rest, updatedAt: new Date().toISOString() };
       const result = await companiesCollection.findOneAndUpdate(
@@ -206,16 +225,14 @@ function mountMyRoutes(app, database) {
         { $set: updateDoc },
         { returnDocument: "after" },
       );
-      if (!result) return res.status(404).json({ message: "Company not found" });
+      if (!result)
+        return res.status(404).json({ message: "Company not found" });
 
       let closedJobs = 0;
       if (slugChanged) {
         const close = await jobsCollection.updateMany(
           {
-            $or: [
-              { companySlug: oldRef },
-              { companyId: oldRef },
-            ],
+            $or: [{ companySlug: oldRef }, { companyId: oldRef }],
             status: "active",
             recruiterId: req.recruiterId,
           },
@@ -235,7 +252,9 @@ function mountMyRoutes(app, database) {
 
       res.json({ company: result, closedJobs });
     } catch (error) {
-      res.status(500).json({ message: "Error updating company", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error updating company", error: error.message });
     }
   });
 
@@ -246,9 +265,11 @@ function mountMyRoutes(app, database) {
         ...buildCompanyLookup(req.params.id),
         recruiterId: req.recruiterId,
       });
-      if (!result) return res.status(404).json({ message: "Company not found" });
+      if (!result)
+        return res.status(404).json({ message: "Company not found" });
 
-      const companyRef = result.companySlug ?? result.companyId ?? req.params.id;
+      const companyRef =
+        result.companySlug ?? result.companyId ?? req.params.id;
       const jobsResult = await jobsCollection.updateMany(
         {
           $or: [{ companySlug: companyRef }, { companyId: companyRef }],
@@ -256,9 +277,14 @@ function mountMyRoutes(app, database) {
         },
         { $set: { status: "closed", closedAt: new Date().toISOString() } },
       );
-      res.json({ message: "Company deleted", closedJobs: jobsResult.modifiedCount });
+      res.json({
+        message: "Company deleted",
+        closedJobs: jobsResult.modifiedCount,
+      });
     } catch (error) {
-      res.status(500).json({ message: "Error deleting company", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error deleting company", error: error.message });
     }
   });
 
@@ -288,7 +314,9 @@ function mountMyRoutes(app, database) {
         totalPages: Math.max(1, Math.ceil(total / pageSize)),
       });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching jobs", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching jobs", error: error.message });
     }
   });
 
@@ -296,25 +324,32 @@ function mountMyRoutes(app, database) {
   router.get("/jobs/stats", async (req, res) => {
     try {
       const filter = { recruiterId: req.recruiterId };
-      const [total, active, closed, applicantsAgg] = await Promise.all([
+      const [total, active, closed, myJobs] = await Promise.all([
         jobsCollection.countDocuments(filter),
         jobsCollection.countDocuments({ ...filter, status: "active" }),
         jobsCollection.countDocuments({ ...filter, status: "closed" }),
         jobsCollection
-          .aggregate([
-            { $match: filter },
-            { $group: { _id: null, total: { $sum: "$applicants" } } },
-          ])
+          .find(filter, { projection: { jobId: 1, slug: 1, _id: 1 } })
           .toArray(),
       ]);
+      const jobIds = myJobs.flatMap((job) =>
+        [job.jobId, job.slug, job._id ? String(job._id) : null].filter(Boolean),
+      );
+      const applicantsTotal = jobIds.length
+        ? await applicationsCollection.countDocuments({
+            jobId: { $in: jobIds },
+          })
+        : 0;
       res.json({
         total,
         active,
         closed,
-        applicantsTotal: applicantsAgg[0]?.total ?? 0,
+        applicantsTotal,
       });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching stats", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching stats", error: error.message });
     }
   });
 
@@ -379,6 +414,33 @@ function mountMyRoutes(app, database) {
     }
   });
 
+  // GET /api/my/applicants/:id — fetch one applicant owned by this recruiter.
+  router.get("/applicants/:id", async (req, res) => {
+    try {
+      if (!ObjectId.isValid(req.params.id)) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      const application = await applicationsCollection.findOne({
+        _id: new ObjectId(req.params.id),
+      });
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      const job = await jobsCollection.findOne({
+        ...buildJobLookup(application.jobId),
+        recruiterId: req.recruiterId,
+      });
+      if (!job) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      res.json({ application });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching application", error: error.message });
+    }
+  });
+
   // GET /api/my/jobs/:id
   router.get("/jobs/:id", async (req, res) => {
     try {
@@ -389,7 +451,9 @@ function mountMyRoutes(app, database) {
       if (!job) return res.status(404).json({ message: "Job not found" });
       res.json(job);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching job", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching job", error: error.message });
     }
   });
 
@@ -421,14 +485,22 @@ function mountMyRoutes(app, database) {
       const inserted = await jobsCollection.findOne({ _id: result.insertedId });
       res.status(201).json({ job: inserted });
     } catch (error) {
-      res.status(500).json({ message: "Error creating job", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error creating job", error: error.message });
     }
   });
 
   // PUT /api/my/jobs/:id
   router.put("/jobs/:id", async (req, res) => {
     try {
-      const { _id, id, recruiterId: _stripped, createdAt: _created, ...rest } = req.body ?? {};
+      const {
+        _id,
+        id,
+        recruiterId: _stripped,
+        createdAt: _created,
+        ...rest
+      } = req.body ?? {};
       const result = await jobsCollection.findOneAndUpdate(
         { ...buildJobLookup(req.params.id), recruiterId: req.recruiterId },
         { $set: { ...rest, updatedAt: new Date().toISOString() } },
@@ -437,7 +509,9 @@ function mountMyRoutes(app, database) {
       if (!result) return res.status(404).json({ message: "Job not found" });
       res.json({ job: result });
     } catch (error) {
-      res.status(500).json({ message: "Error updating job", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error updating job", error: error.message });
     }
   });
 
@@ -486,7 +560,9 @@ function mountMyRoutes(app, database) {
       );
       res.json({ job: result });
     } catch (error) {
-      res.status(500).json({ message: "Error updating status", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error updating status", error: error.message });
     }
   });
 
@@ -500,7 +576,9 @@ function mountMyRoutes(app, database) {
       if (!result) return res.status(404).json({ message: "Job not found" });
       res.json({ message: "Job deleted" });
     } catch (error) {
-      res.status(500).json({ message: "Error deleting job", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error deleting job", error: error.message });
     }
   });
 
@@ -526,7 +604,9 @@ function mountMyRoutes(app, database) {
         totalPages: Math.max(1, Math.ceil(total / pageSize)),
       });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching saved jobs", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching saved jobs", error: error.message });
     }
   });
 
@@ -539,7 +619,10 @@ function mountMyRoutes(app, database) {
         return res.status(401).json({ message: "Missing authentication" });
       }
 
-      const existing = await savedJobsCollection.findOne({ userId: req.recruiterId, jobId });
+      const existing = await savedJobsCollection.findOne({
+        userId: req.recruiterId,
+        jobId,
+      });
       if (existing) {
         return res.status(200).json({ alreadySaved: true, savedJob: existing });
       }
@@ -552,10 +635,14 @@ function mountMyRoutes(app, database) {
         savedAt: new Date().toISOString(),
       };
       const result = await savedJobsCollection.insertOne(doc);
-      const savedJob = await savedJobsCollection.findOne({ _id: result.insertedId });
+      const savedJob = await savedJobsCollection.findOne({
+        _id: result.insertedId,
+      });
       res.status(201).json({ savedJob });
     } catch (error) {
-      res.status(500).json({ message: "Error saving job", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error saving job", error: error.message });
     }
   });
 
@@ -566,10 +653,13 @@ function mountMyRoutes(app, database) {
         userId: req.recruiterId,
         jobId: req.params.jobId,
       });
-      if (!result) return res.status(404).json({ message: "Saved job not found" });
+      if (!result)
+        return res.status(404).json({ message: "Saved job not found" });
       res.json({ message: "Saved job removed" });
     } catch (error) {
-      res.status(500).json({ message: "Error removing saved job", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error removing saved job", error: error.message });
     }
   });
 
@@ -604,7 +694,11 @@ function mountPublicEnhancements(app, database) {
           .toArray(),
         companiesCollection.countDocuments(filter),
       ]);
-      const items = await attachStatsPublic(companiesCollection, jobsCollection, rawItems);
+      const items = await attachStatsPublic(
+        companiesCollection,
+        jobsCollection,
+        rawItems,
+      );
       res.json({
         items,
         page,
@@ -613,7 +707,9 @@ function mountPublicEnhancements(app, database) {
         totalPages: Math.max(1, Math.ceil(total / pageSize)),
       });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching companies", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching companies", error: error.message });
     }
   });
 
@@ -623,9 +719,11 @@ function mountPublicEnhancements(app, database) {
       const company = await companiesCollection.findOne(
         buildCompanyLookup(req.params.id),
       );
-      if (!company) return res.status(404).json({ message: "Company not found" });
+      if (!company)
+        return res.status(404).json({ message: "Company not found" });
 
-      const companyRef = company.companySlug ?? company.companyId ?? req.params.id;
+      const companyRef =
+        company.companySlug ?? company.companyId ?? req.params.id;
       const activeJobs = await jobsCollection
         .find({
           $or: [{ companySlug: companyRef }, { companyId: companyRef }],
@@ -637,7 +735,9 @@ function mountPublicEnhancements(app, database) {
 
       res.json({ ...company, activeJobs });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching company", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching company", error: error.message });
     }
   });
 
@@ -658,10 +758,7 @@ function mountPublicEnhancements(app, database) {
       if (req.query.remote === "true") filter.remote = true;
       if (req.query.location) {
         const re = new RegExp(escapeRegex(req.query.location), "i");
-        filter.$or = [
-          { city: re },
-          { country: re },
-        ];
+        filter.$or = [{ city: re }, { country: re }];
       }
       if (req.query.search) {
         const re = new RegExp(escapeRegex(req.query.search), "i");
@@ -674,8 +771,10 @@ function mountPublicEnhancements(app, database) {
         }
       }
       const companyFilters = [];
-      if (req.query.companySlug) companyFilters.push({ companySlug: req.query.companySlug });
-      if (req.query.companyId) companyFilters.push({ companyId: req.query.companyId });
+      if (req.query.companySlug)
+        companyFilters.push({ companySlug: req.query.companySlug });
+      if (req.query.companyId)
+        companyFilters.push({ companyId: req.query.companyId });
       if (companyFilters.length === 1) Object.assign(filter, companyFilters[0]);
       else if (companyFilters.length > 1) {
         filter.$and = filter.$and
@@ -700,7 +799,9 @@ function mountPublicEnhancements(app, database) {
         totalPages: Math.max(1, Math.ceil(total / pageSize)),
       });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching jobs", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching jobs", error: error.message });
     }
   });
 
@@ -711,7 +812,9 @@ function mountPublicEnhancements(app, database) {
       if (!job) return res.status(404).json({ message: "Job not found" });
       res.json(job);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching job", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error fetching job", error: error.message });
     }
   });
 }

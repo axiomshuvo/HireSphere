@@ -5,41 +5,16 @@ import { useRouter } from "next/navigation";
 import { Button, toast } from "@heroui/react";
 import { Xmark } from "@gravity-ui/icons";
 import { withdrawApplication } from "@/lib/actions/applications";
-import { useSession } from "@/lib/auth-client";
-import { appliedJobsKey, migrateLegacyKeys } from "@/lib/storage-keys";
-
-function removeLocalApplied(key, jobId) {
-  if (typeof window === "undefined" || !key) return;
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return;
-    const arr = JSON.parse(raw);
-    if (!Array.isArray(arr)) return;
-    const next = arr.filter((id) => id !== jobId);
-    window.localStorage.setItem(key, JSON.stringify(next));
-    window.dispatchEvent(new Event("hiresphere:appliedJobs-changed"));
-  } catch {
-    // ignore
-  }
-}
 
 export default function WithdrawApplicationButton({ jobId, jobTitle, className = "" }) {
   const router = useRouter();
-  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [confirming, setConfirming] = useState(false);
-
-  const userId = session?.user?.id;
-  const lsKey = userId ? appliedJobsKey(userId) : null;
 
   const handleWithdraw = async () => {
     setLoading(true);
     try {
       await withdrawApplication(jobId);
-      if (lsKey) {
-        migrateLegacyKeys(userId);
-        removeLocalApplied(lsKey, jobId);
-      }
       toast.success("Application withdrawn", {
         description: `Your application for ${jobTitle ?? "this role"} has been removed.`,
       });

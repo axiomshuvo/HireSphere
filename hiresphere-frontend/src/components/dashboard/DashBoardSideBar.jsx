@@ -127,10 +127,10 @@ function NavLink({ item, active }) {
   );
 }
 
-export function DashBoardSideBar() {
+export function DashBoardSideBar({ initialUser }) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const user = session?.user;
+  const user = session?.user ?? initialUser;
 
   const navItems = user?.role === "recruiter" ? RECRUITER_NAV : SEEKER_NAV;
 
@@ -145,7 +145,7 @@ export function DashBoardSideBar() {
 
   return (
     <>
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-default p-4">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-default p-4 lg:flex">
         <Link href="/" className="mb-6 px-3 text-xl font-bold text-white">
           HireLoop
         </Link>
@@ -161,28 +161,32 @@ export function DashBoardSideBar() {
         </div>
       </aside>
 
-      <Drawer>
-        <Button className="lg:hidden" variant="secondary">
-          <LayoutSideContent />
-          Menu
-        </Button>
-        <Drawer.Backdrop>
-          <Drawer.Content placement="left">
-            <Drawer.Dialog>
-              <Drawer.CloseTrigger />
-              <Drawer.Header>
-                <Drawer.Heading>HireLoop</Drawer.Heading>
-              </Drawer.Header>
-              <Drawer.Body>
-                <div className="mb-6">
-                  <ProfileCard user={user} />
-                </div>
-                {navContent}
-              </Drawer.Body>
-            </Drawer.Dialog>
-          </Drawer.Content>
-        </Drawer.Backdrop>
-      </Drawer>
+      <div className="border-b border-default px-4 py-3 lg:hidden">
+        <Drawer>
+          <Drawer.Trigger>
+            <Button className="w-full justify-start" variant="secondary">
+              <LayoutSideContent />
+              Dashboard menu
+            </Button>
+          </Drawer.Trigger>
+          <Drawer.Backdrop>
+            <Drawer.Content placement="left">
+              <Drawer.Dialog>
+                <Drawer.CloseTrigger />
+                <Drawer.Header>
+                  <Drawer.Heading>HireLoop</Drawer.Heading>
+                </Drawer.Header>
+                <Drawer.Body>
+                  <div className="mb-6">
+                    <ProfileCard user={user} />
+                  </div>
+                  {navContent}
+                </Drawer.Body>
+              </Drawer.Dialog>
+            </Drawer.Content>
+          </Drawer.Backdrop>
+        </Drawer>
+      </div>
     </>
   );
 }

@@ -1,23 +1,21 @@
-import { headers } from "next/headers";
-import { Card, Typography } from "@heroui/react";
-import { auth } from "@/lib/auth";
+import RecruiterHomeView from "@/components/dashboard/RecruiterHomeView";
+import StatCard from "@/components/dashboard/StatCard";
+import ButtonLink from "@/components/shared/ButtonLink";
+import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
+import { fetchMyApplications } from "@/lib/actions/applications";
 import {
   getRecruiterCompanies,
   getRecruiterCompanyStats,
 } from "@/lib/actions/company";
 import {
+  fetchPublicJobById,
+  fetchPublicJobs,
   getRecruiterJobs,
   getRecruiterJobStats,
-  fetchPublicJobs,
 } from "@/lib/actions/jobs";
-import { fetchMyApplications } from "@/lib/actions/applications";
 import { fetchSavedJobs } from "@/lib/actions/saved-jobs";
-import { fetchPublicJobById } from "@/lib/actions/jobs";
 import { getActiveCount } from "@/lib/api/jobstruture";
-import ButtonLink from "@/components/shared/ButtonLink";
-import RecruiterHomeView from "@/components/dashboard/RecruiterHomeView";
-import MarketJobsPanel from "@/components/dashboard/MarketJobsPanel";
-import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
+import { auth } from "@/lib/auth";
 import {
   Bookmark,
   FileText,
@@ -25,7 +23,8 @@ import {
   MapPin,
   Wallet,
 } from "@gravity-ui/icons";
-import StatCard from "@/components/dashboard/StatCard";
+import { Card, Typography } from "@heroui/react";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 function getInitials(name) {
@@ -53,11 +52,23 @@ async function safeCall(label, fallback, fn) {
 async function RecruiterHome({ user }) {
   const [companyStats, jobStats, companiesPage, jobsPage, marketJobsPage] =
     await Promise.all([
-      safeCall("getRecruiterCompanyStats", { total: 0 }, () => getRecruiterCompanyStats()),
-      safeCall("getRecruiterJobStats", { total: 0, active: 0, closed: 0, applicantsTotal: 0 }, () => getRecruiterJobStats()),
-      safeCall("getRecruiterCompanies", { items: [] }, () => getRecruiterCompanies({ page: 1, pageSize: 4 })),
-      safeCall("getRecruiterJobs", { items: [] }, () => getRecruiterJobs({ page: 1, pageSize: 5 })),
-      safeCall("fetchPublicJobs", { items: [] }, () => fetchPublicJobs({ page: 1, pageSize: 6 })),
+      safeCall("getRecruiterCompanyStats", { total: 0 }, () =>
+        getRecruiterCompanyStats(),
+      ),
+      safeCall(
+        "getRecruiterJobStats",
+        { total: 0, active: 0, closed: 0, applicantsTotal: 0 },
+        () => getRecruiterJobStats(),
+      ),
+      safeCall("getRecruiterCompanies", { items: [] }, () =>
+        getRecruiterCompanies({ page: 1, pageSize: 4 }),
+      ),
+      safeCall("getRecruiterJobs", { items: [] }, () =>
+        getRecruiterJobs({ page: 1, pageSize: 5 }),
+      ),
+      safeCall("fetchPublicJobs", { items: [] }, () =>
+        fetchPublicJobs({ page: 1, pageSize: 6 }),
+      ),
     ]);
 
   const companies = extractItems(companiesPage);
@@ -93,7 +104,9 @@ async function RecruiterHome({ user }) {
     field: company.industry ?? "—",
     location: company.location ?? "—",
     activeJobs: getActiveCount(
-      jobs.filter((job) => job.companySlug === (company.companySlug ?? company.id)),
+      jobs.filter(
+        (job) => job.companySlug === (company.companySlug ?? company.id),
+      ),
     ),
     initials: getInitials(company.name ?? ""),
   }));
@@ -115,7 +128,10 @@ async function RecruiterHome({ user }) {
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-indigo-500/0 via-indigo-500/60 to-indigo-500/0"
           />
-          <Typography.Heading className="text-lg font-semibold text-white" level={2}>
+          <Typography.Heading
+            className="text-lg font-semibold text-white"
+            level={2}
+          >
             Create your first company
           </Typography.Heading>
           <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
@@ -176,10 +192,7 @@ function formatAppliedDate(iso) {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 async function enrichJobs(apps) {
@@ -197,19 +210,32 @@ async function enrichJobs(apps) {
 }
 
 async function SeekerHome({ user }) {
-  const [applicationsResult, savedResult, publicJobsResult] = await Promise.all([
-    fetchMyApplications({ page: 1, pageSize: 3 }),
-    fetchSavedJobs({ page: 1, pageSize: 3 }),
-    fetchPublicJobs({ page: 1, pageSize: 5 }),
-  ]);
+  const [applicationsResult, savedResult, publicJobsResult] = await Promise.all(
+    [
+      fetchMyApplications({ page: 1, pageSize: 3 }),
+      fetchSavedJobs({ page: 1, pageSize: 3 }),
+      fetchPublicJobs({ page: 1, pageSize: 5 }),
+    ],
+  );
 
   const applications = Array.isArray(applicationsResult)
     ? applicationsResult
     : (applicationsResult?.items ?? []);
-  const saved = Array.isArray(savedResult) ? savedResult : (savedResult?.items ?? []);
+  const saved = Array.isArray(savedResult)
+    ? savedResult
+    : (savedResult?.items ?? []);
   const recommended = Array.isArray(publicJobsResult)
     ? publicJobsResult
     : (publicJobsResult?.items ?? []);
+  const applicationTotal = Array.isArray(applicationsResult)
+    ? applicationsResult.length
+    : (applicationsResult?.total ?? applications.length);
+  const savedTotal = Array.isArray(savedResult)
+    ? savedResult.length
+    : (savedResult?.total ?? saved.length);
+  const recommendedTotal = Array.isArray(publicJobsResult)
+    ? publicJobsResult.length
+    : (publicJobsResult?.total ?? recommended.length);
 
   const enrichedApplications = await enrichJobs(applications);
   const enrichedSaved = await enrichJobs(saved);
@@ -219,21 +245,21 @@ async function SeekerHome({ user }) {
     {
       key: "applications",
       label: "Applications",
-      value: applications.length,
+      value: applicationTotal,
       icon: "file",
       tone: "indigo",
     },
     {
       key: "saved",
       label: "Saved Jobs",
-      value: saved.length,
+      value: savedTotal,
       icon: "bookmark",
       tone: "amber",
     },
     {
       key: "recommended",
       label: "New Matches",
-      value: recommended.length,
+      value: recommendedTotal,
       icon: "magnifier",
       tone: "emerald",
     },
@@ -372,7 +398,8 @@ async function SeekerHome({ user }) {
           ) : (
             <ul className="flex flex-col gap-2">
               {enrichedApplications.map(({ application, job }) => {
-                const title = job?.title ?? application.jobTitle ?? "Untitled role";
+                const title =
+                  job?.title ?? application.jobTitle ?? "Untitled role";
                 const company =
                   job?.companySlug ?? application.companySlug ?? "—";
                 const date = formatAppliedDate(application.appliedAt);
@@ -436,8 +463,7 @@ async function SeekerHome({ user }) {
             <ul className="flex flex-col gap-2">
               {enrichedSaved.map(({ application: savedJob, job }) => {
                 const title = job?.title ?? savedJob.title ?? "Untitled role";
-                const company =
-                  job?.companySlug ?? savedJob.companySlug ?? "—";
+                const company = job?.companySlug ?? savedJob.companySlug ?? "—";
                 return (
                   <li key={savedJob._id ?? savedJob.jobId}>
                     <Link

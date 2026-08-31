@@ -4,7 +4,7 @@ import { Clock, Globe, ArrowRight } from "@gravity-ui/icons";
 import Link from "next/link";
 import ApplyButton from "./ApplyButton";
 
-export default function ApplyInterestCta({ jobId, jobTitle, companySlug }) {
+export default function ApplyInterestCta({ jobId, jobTitle, companySlug, recruiterId, initialApplied = false }) {
   return (
     <div className="mt-8 rounded-2xl border border-default bg-[radial-gradient(circle_at_30%_50%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#16181c,#0f1013)] p-6 text-center">
       <Clock className="mx-auto size-8 text-indigo-300" />
@@ -19,6 +19,8 @@ export default function ApplyInterestCta({ jobId, jobTitle, companySlug }) {
           jobId={jobId}
           jobTitle={jobTitle}
           companySlug={companySlug}
+          recruiterId={recruiterId}
+          initialApplied={initialApplied}
           className="px-5 py-2.5"
         />
         <Link

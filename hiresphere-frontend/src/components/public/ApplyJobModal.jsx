@@ -1,47 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  Ban,
-  Briefcase,
-  Check,
-  Xmark,
-} from "@gravity-ui/icons";
-import { Button, Input, Textarea } from "@heroui/react";
-import { applyToJob, fetchApplicationForJob } from "@/lib/actions/applications";
+import { ArrowRight, Ban, Briefcase, Check, Xmark } from "@gravity-ui/icons";
+import { Button } from "@heroui/react";
+import { applyToJob } from "@/lib/actions/applications";
 import { toast } from "@heroui/react";
-import { appliedJobsKey, migrateLegacyKeys } from "@/lib/storage-keys";
-
-function readLocalApplied(key) {
-  if (typeof window === "undefined" || !key) return new Set();
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return new Set();
-    const arr = JSON.parse(raw);
-    return new Set(Array.isArray(arr) ? arr : []);
-  } catch {
-    return new Set();
-  }
-}
-
-function writeLocalApplied(key, set) {
-  if (typeof window === "undefined" || !key) return;
-  try {
-    window.localStorage.setItem(key, JSON.stringify(Array.from(set)));
-    window.dispatchEvent(new Event("hiresphere:appliedJobs-changed"));
-  } catch {
-    // ignore
-  }
-}
 
 const inputClass = (error) =>
   `w-full rounded-lg border bg-[#1b1c1e] px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none ${
-    error
-      ? "border-red-500 focus:border-red-500"
-      : "border-white/10 focus:border-indigo-500"
+    error ? "border-red-500 focus:border-red-500" : "border-white/10 focus:border-indigo-500"
   }`;
 
 const labelClass = "mb-1 block text-xs font-medium text-gray-400";
@@ -63,16 +32,19 @@ function Field({ label, error, children, optional = false }) {
   );
 }
 
-export default function ApplyJobModal({ jobId, jobTitle, companySlug, open, onClose, onApplied }) {
-  const { data: session, isPending: sessionLoading } = useSession();
+export default function ApplyJobModal({
+  jobId,
+  jobTitle,
+  companySlug,
+  recruiterId,
+  open,
+  onClose,
+  onApplied,
+}) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [existingApp, setExistingApp] = useState(null);
-  const [loadingStatus, setLoadingStatus] = useState(false);
-
-  const userId = session?.user?.id;
-  const lsKey = userId ? appliedJobsKey(userId) : null;
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -83,41 +55,19 @@ export default function ApplyJobModal({ jobId, jobTitle, companySlug, open, onCl
   });
   const [fieldErrors, setFieldErrors] = useState({});
 
-  // Prefill name/email from session and check for an existing application
-  // each time the modal opens.
+  // Prefill name/email from session when the modal opens.
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (!open) return;
-    if (session?.user) {
-      /* eslint-disable react-hooks/set-state-in-effect */
-      setForm((prev) => ({
-        ...prev,
-        name: prev.name || session.user.name || "",
-        email: prev.email || session.user.email || "",
-      }));
-      /* eslint-enable react-hooks/set-state-in-effect */
-    }
     setError("");
     setFieldErrors({});
-    // Instant localStorage check before server fetch.
-    if (lsKey) migrateLegacyKeys(userId);
-    const localApplied = lsKey ? readLocalApplied(lsKey) : new Set();
-    if (localApplied.has(jobId)) {
-      setExistingApp({ jobId, status: "submitted", appliedAt: new Date().toISOString(), _local: true });
-      setLoadingStatus(false);
-      return;
-    }
-    setLoadingStatus(true);
-    if (session?.user) {
-      fetchApplicationForJob(jobId)
-        .then((application) => {
-          setExistingApp(application);
-        })
-        .finally(() => setLoadingStatus(false));
-    } else {
-      setLoadingStatus(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, jobId, session?.user?.id]);
+    setForm((prev) => ({
+      ...prev,
+      name: prev.name || session?.user?.name || "",
+      email: prev.email || session?.user?.email || "",
+    }));
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [open, session]);
 
   if (!open) return null;
 
@@ -146,51 +96,26 @@ export default function ApplyJobModal({ jobId, jobTitle, companySlug, open, onCl
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    setError("");
-
-    // Optimistic local write — instant "Applied" state in the UI
-    // and on the dashboard list, before the server confirms.
-    if (lsKey) migrateLegacyKeys(userId);
-    const localApplied = lsKey ? readLocalApplied(lsKey) : new Set();
-    const wasApplied = localApplied.has(jobId);
-    if (!wasApplied) {
-      localApplied.add(jobId);
-      if (lsKey) writeLocalApplied(lsKey, localApplied);
-      setExistingApp({ jobId, status: "submitted", appliedAt: new Date().toISOString(), _local: true });
-    }
-
     setSubmitting(true);
+    setError("");
     try {
-      const result = await applyToJob({
+      await applyToJob({
         jobId,
         name: form.name.trim(),
         email: form.email.trim(),
         phone: form.phone.trim() || undefined,
         resumeUrl: form.resumeUrl.trim() || undefined,
         coverLetter: form.coverLetter.trim() || undefined,
-        expectedSalary: form.expectedSalary
-          ? Number(form.expectedSalary)
-          : undefined,
+        expectedSalary: form.expectedSalary ? Number(form.expectedSalary) : undefined,
+        recruiterId,
       });
-      const app = result?.application;
-      if (app) {
-        setExistingApp(app);
-        onApplied?.(app);
-      }
       toast.success("Application submitted!");
+      onApplied?.();
+      router.refresh();
     } catch (err) {
       const message = err?.message ?? "Could not submit application";
-      // Roll back optimistic local write on failure.
-      if (!wasApplied && lsKey) {
-        const rolled = readLocalApplied(lsKey);
-        rolled.delete(jobId);
-        writeLocalApplied(lsKey, rolled);
-        setExistingApp(null);
-      }
       setError(message);
-      toast.warning("Could not submit application", {
-        description: message,
-      });
+      toast.warning("Could not submit application", { description: message });
     } finally {
       setSubmitting(false);
     }
@@ -229,11 +154,7 @@ export default function ApplyJobModal({ jobId, jobTitle, companySlug, open, onCl
           </h2>
         </header>
 
-        {sessionLoading || loadingStatus ? (
-          <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-            Loading application status…
-          </div>
-        ) : !session?.user ? (
+        {!session?.user ? (
           <div className="flex flex-col items-center gap-4 py-6 text-center">
             <p className="text-sm text-muted-foreground">
               Sign in to your HireSphere account to apply. We&apos;ll prefill your
@@ -251,42 +172,12 @@ export default function ApplyJobModal({ jobId, jobTitle, companySlug, open, onCl
               Recruiter accounts can&apos;t apply
             </h3>
             <p className="max-w-md text-sm text-muted-foreground">
-              Applications are submitted through a seeker account.
-              Sign in with a seeker account to apply to this role.
+              Applications are submitted through a seeker account. Sign in
+              with a seeker account to apply to this role.
             </p>
             <Button variant="secondary" onPress={onClose}>
               Close
             </Button>
-          </div>
-        ) : existingApp ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 px-6 py-10 text-center">
-            <div className="flex size-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
-              <Check className="size-6" />
-            </div>
-            <h3 className="text-lg font-semibold text-white">
-              You&apos;ve already applied
-            </h3>
-            <p className="max-w-md text-sm text-muted-foreground">
-              Submitted on{" "}
-              {new Date(existingApp.appliedAt).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-              . The recruiter will be in touch if you&apos;re a match.
-            </p>
-            <div className="flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:justify-center">
-              <Button variant="secondary" onPress={onClose}>
-                Close
-              </Button>
-              <a
-                href="/dashboard/applications"
-                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-gray-200"
-              >
-                View my applications
-                <ArrowRight className="size-4" />
-              </a>
-            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
