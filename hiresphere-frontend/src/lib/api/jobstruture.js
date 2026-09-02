@@ -1,22 +1,32 @@
-export const PLAN_LIMITS = {
+export const Recruiter_PLAN_LIMITS = {
   free: 3,
   growth: 10,
   enterprise: 50,
 };
 
 export const SEEKER_PLAN_LIMITS = {
+  free: 3,
+  pro: 30,
+  premium: Infinity,
+};
+
+export const SEEKER_SAVED_JOBS_LIMITS = {
   free: 10,
+  pro: Infinity,
   premium: Infinity,
 };
 
 export function getSeekerPlanUsage(activeApplications, plan = "free") {
   const normalized = SEEKER_PLAN_LIMITS[plan] ? plan : "free";
   const limit = SEEKER_PLAN_LIMITS[normalized];
+  const savedJobsLimit = SEEKER_SAVED_JOBS_LIMITS[normalized];
   return {
     plan: normalized,
     limit,
     used: activeApplications,
     isUnlimited: !Number.isFinite(limit),
+    savedJobsLimit,
+    isSavedJobsUnlimited: !Number.isFinite(savedJobsLimit),
   };
 }
 
@@ -31,12 +41,7 @@ export const JOB_CATEGORIES = [
   "Sales",
 ];
 
-export const JOB_TYPES = [
-  "Full-time",
-  "Part-time",
-  "Contract",
-  "Internship",
-];
+export const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"];
 
 export const CURRENCIES = ["USD", "EUR", "GBP", "INR"];
 
@@ -44,9 +49,9 @@ export function getActiveCount(jobs) {
   return jobs.filter((job) => job.status === "active").length;
 }
 
-export function getPlanUsage(activeCount, plan = "growth") {
-  const normalizedPlan = PLAN_LIMITS[plan] ? plan : "growth";
-  const limit = PLAN_LIMITS[normalizedPlan];
+export function getPlanUsage(activeCount, plan = "free") {
+  const normalizedPlan = Recruiter_PLAN_LIMITS[plan] ? plan : "free";
+  const limit = Recruiter_PLAN_LIMITS[normalizedPlan];
 
   return {
     plan: normalizedPlan,

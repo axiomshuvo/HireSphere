@@ -1,3 +1,4 @@
+import JobCardSkeleton from "@/components/shared/JobCardSkeleton";
 import {
   JobCategoryBadge,
   JobRemoteBadge,
@@ -58,25 +59,25 @@ function PageStrip({ page, totalPages, searchParams }) {
       {prev ? (
         <Link
           href={prev}
-          className="rounded-lg border border-default bg-content1 px-4 py-2 text-white transition-colors hover:border-indigo-500/50"
+          className="rounded-lg border border-(color-border) bg-(color-surface) px-4 py-2 text-(color-text) transition-colors hover:border-indigo-500/50"
         >
           Previous
         </Link>
       ) : (
-        <span className="text-muted-foreground">Previous</span>
+        <span className="text-(color-text-muted)">Previous</span>
       )}
-      <span className="text-muted-foreground">
+      <span className="text-(color-text-muted)">
         Page {page} of {totalPages}
       </span>
       {next ? (
         <Link
           href={next}
-          className="rounded-lg border border-default bg-content1 px-4 py-2 text-white transition-colors hover:border-indigo-500/50"
+          className="rounded-lg border border-(color-border) bg-(color-surface) px-4 py-2 text-(color-text) transition-colors hover:border-indigo-500/50"
         >
           Next
         </Link>
       ) : (
-        <span className="text-muted-foreground">Next</span>
+        <span className="text-(color-text-muted)">Next</span>
       )}
     </nav>
   );
@@ -108,10 +109,10 @@ export default async function PublicJobsPage({ searchParams }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12 lg:px-8">
       <header className="mb-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+        <h1 className="text-3xl font-semibold tracking-tight text-(color-text) sm:text-4xl">
           Open Roles
         </h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="mt-2 text-(color-text-muted)">
           {total === 0
             ? "No open roles match your filters."
             : `${total} ${total === 1 ? "role" : "roles"} hiring on HireSphere.`}
@@ -121,7 +122,7 @@ export default async function PublicJobsPage({ searchParams }) {
       <div className="mb-6">
         <Suspense
           fallback={
-            <div className="h-[88px] rounded-2xl border border-default bg-content1" />
+            <JobCardSkeleton />
           }
         >
           <JobsFilterBar />
@@ -129,18 +130,18 @@ export default async function PublicJobsPage({ searchParams }) {
       </div>
 
       {items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
-          <Briefcase className="size-8 text-muted-foreground" />
-          <h2 className="text-lg font-semibold text-white">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-(color-border) bg-(color-surface) px-6 py-16 text-center">
+          <Briefcase className="size-8 text-(color-text-muted)" />
+          <h2 className="text-lg font-semibold text-(color-text)">
             No matching roles
           </h2>
-          <p className="max-w-sm text-sm text-muted-foreground">
+          <p className="max-w-sm text-sm text-(color-text-muted)">
             Try clearing your filters, or check back soon — companies post new
             roles every week.
           </p>
           <Link
             href="/jobs"
-            className="mt-2 rounded-lg border border-default bg-content1 px-4 py-2 text-sm text-white transition-colors hover:border-indigo-500/50"
+            className="mt-2 rounded-lg border border-(color-border) bg-(color-surface) px-4 py-2 text-sm text-(color-text) transition-colors hover:border-indigo-500/50"
           >
             Reset filters
           </Link>
@@ -158,7 +159,7 @@ export default async function PublicJobsPage({ searchParams }) {
                 className="group block"
                 data-job-card={jobId}
               >
-                <Card className="flex h-full flex-col gap-3 rounded-2xl border border-default bg-content1 p-5 transition-colors group-hover:border-indigo-500/50">
+                <Card className="flex h-full flex-col gap-3 rounded-2xl border border-(color-border) bg-(color-surface) p-5 transition-colors group-hover:border-indigo-500/50">
                   <div
                     className="flex flex-wrap items-center gap-1.5"
                     data-job-card-badges
@@ -168,18 +169,18 @@ export default async function PublicJobsPage({ searchParams }) {
                     <JobCategoryBadge category={job.category} />
                   </div>
                   <div className="min-w-0" data-job-card-header>
-                    <h2 className="truncate text-lg font-semibold text-white">
+                    <h2 className="truncate text-lg font-semibold text-(color-text)">
                       {job.title ?? "Untitled role"}
                     </h2>
                     {job.companySlug && (
-                      <p className="mt-1 truncate text-sm text-muted-foreground">
+                      <p className="mt-1 truncate text-sm text-(color-text-muted)">
                         {job.companySlug}
                       </p>
                     )}
                   </div>
 
                   <div
-                    className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground"
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-(color-text-muted)"
                     data-job-card-meta
                   >
                     {loc && (

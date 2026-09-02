@@ -64,13 +64,13 @@ export default async function PublicCompanyPage({ params }) {
     <div className="mx-auto w-full max-w-5xl px-4 py-10 lg:px-8">
       <Link
         href="/company"
-        className="text-sm text-muted-foreground transition-colors hover:text-white"
+        className="text-sm text-(color-text-muted) transition-colors hover:text-(color-text)"
       >
         ← Back to companies
       </Link>
 
       {/* Hero */}
-      <section className="relative mt-4 overflow-hidden rounded-3xl border border-default bg-[radial-gradient(circle_at_78%_18%,rgba(99,102,241,0.32),transparent_45%),radial-gradient(circle_at_18%_82%,rgba(56,189,248,0.22),transparent_50%),linear-gradient(180deg,#16181c,#0f1013)] p-6 lg:p-8">
+      <section className="relative mt-4 overflow-hidden rounded-3xl border border-(color-border) bg-[radial-gradient(circle_at_78%_18%,rgba(99,102,241,0.32),transparent_45%),radial-gradient(circle_at_18%_82%,rgba(56,189,248,0.22),transparent_50%),linear-gradient(180deg,#16181c,#0f1013)] p-6 lg:p-8">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-indigo-500/10 blur-3xl"
@@ -80,10 +80,10 @@ export default async function PublicCompanyPage({ params }) {
             <img
               src={company.logo}
               alt={company.name}
-              className="size-24 shrink-0 rounded-2xl border border-default object-cover"
+              className="size-24 shrink-0 rounded-2xl border border-(color-border) object-cover"
             />
           ) : (
-            <Avatar.Root className="size-24 shrink-0 rounded-2xl bg-default text-3xl font-semibold text-default-foreground">
+            <Avatar.Root className="size-24 shrink-0 rounded-2xl bg-(color-surface-2) text-3xl font-semibold text-(color-text)">
               <Avatar.Fallback>{initials}</Avatar.Fallback>
             </Avatar.Root>
           )}
@@ -100,21 +100,21 @@ export default async function PublicCompanyPage({ params }) {
                   Verified
                 </Chip>
               )}
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-default bg-default px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-default-foreground">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-(color-border) bg-(color-surface-2) px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-(color-text)">
                 <Briefcase className="size-3" />
                 {activeJobs.length} open{" "}
                 {activeJobs.length === 1 ? "role" : "roles"}
               </span>
             </div>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-(color-text) sm:text-4xl">
               {company.name ?? "Unnamed company"}
             </h1>
             {company.tagline && (
-              <p className="mt-1.5 text-base text-muted-foreground">
+              <p className="mt-1.5 text-base text-(color-text-muted)">
                 {company.tagline}
               </p>
             )}
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-(color-text-muted)">
               {company.industry && <span>{company.industry}</span>}
               {company.location && (
                 <span className="inline-flex items-center gap-1.5">
@@ -136,12 +136,12 @@ export default async function PublicCompanyPage({ params }) {
       {company.description && (
         <section className="mt-8">
           <Typography.Heading
-            className="mb-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground"
+            className="mb-2 text-sm font-semibold uppercase tracking-wider text-(color-text-muted)"
             level={2}
           >
             About
           </Typography.Heading>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-white">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-(color-text)">
             {company.description}
           </p>
         </section>
@@ -165,12 +165,12 @@ export default async function PublicCompanyPage({ params }) {
         <div className="mb-4 flex items-end justify-between">
           <div>
             <Typography.Heading
-              className="text-xl font-semibold text-white"
+              className="text-xl font-semibold text-(color-text)"
               level={2}
             >
               Open Roles
             </Typography.Heading>
-            <Typography.Paragraph className="text-sm text-muted-foreground">
+            <Typography.Paragraph className="text-sm text-(color-text-muted)">
               {activeJobs.length === 0
                 ? "No open roles at the moment."
                 : `${activeJobs.length} ${activeJobs.length === 1 ? "role" : "roles"} hiring now`}
@@ -179,9 +179,9 @@ export default async function PublicCompanyPage({ params }) {
         </div>
 
         {activeJobs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-default bg-content1 px-6 py-12 text-center">
-            <Briefcase className="size-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-(color-border) bg-(color-surface) px-6 py-12 text-center">
+            <Briefcase className="size-8 text-(color-text-muted)" />
+            <p className="text-sm text-(color-text-muted)">
               No open roles at the moment.
             </p>
           </div>
@@ -197,18 +197,18 @@ export default async function PublicCompanyPage({ params }) {
                   href={`/jobs/${jobId}`}
                   className="group block"
                 >
-                  <Card className="flex h-full flex-col gap-2 rounded-2xl border border-default bg-content1 p-4 transition-colors group-hover:border-indigo-500/50">
+                  <Card className="flex h-full flex-col gap-2 rounded-2xl border border-(color-border) bg-(color-surface) p-4 transition-colors group-hover:border-indigo-500/50">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-base font-semibold text-white">
+                      <h3 className="text-base font-semibold text-(color-text)">
                         {job.title ?? "Untitled role"}
                       </h3>
                       {job.type && (
-                        <span className="shrink-0 rounded-full border border-default bg-default px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-default-foreground">
+                        <span className="shrink-0 rounded-full border border-(color-border) bg-(color-surface-2) px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-(color-text)">
                           {job.type}
                         </span>
                       )}
                     </div>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-(color-text-muted)">
                       {loc && (
                         <span className="inline-flex items-center gap-1.5">
                           <MapPin className="size-3" />
@@ -224,7 +224,7 @@ export default async function PublicCompanyPage({ params }) {
                     </div>
                     <div className="mt-auto flex items-center justify-between pt-2">
                       <DeadlineCountdown deadline={job.deadline} />
-                      <span className="inline-flex items-center gap-1 text-xs text-indigo-300 transition-colors group-hover:text-white">
+                      <span className="inline-flex items-center gap-1 text-xs text-indigo-300 transition-colors group-hover:text-(color-text)">
                         View
                         <ArrowRight className="size-3" />
                       </span>

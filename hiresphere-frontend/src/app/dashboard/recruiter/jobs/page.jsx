@@ -1,7 +1,8 @@
 "use client";
 
-import JobsFilters from "@/components/dashboard/jobs/JobsFilters";
+import { RecruiterJobsSkeleton } from "@/components/dashboard/jobs/JobsTableSkeleton";
 import JobsOverview from "@/components/dashboard/jobs/JobsOverview";
+import JobsFilters from "@/components/dashboard/jobs/JobsFilters";
 import JobsTable from "@/components/dashboard/jobs/JobsTable";
 import ButtonLink from "@/components/shared/ButtonLink";
 import { getRecruiterCompanies } from "@/lib/actions/company";
@@ -212,11 +213,7 @@ export default function RecruiterJobsPage() {
   }));
 
   if (isLoading) {
-    return (
-      <div className="flex flex-1 items-center justify-center px-4 py-8">
-        <p className="text-sm text-muted-foreground">Loading jobs...</p>
-      </div>
-    );
+    return <RecruiterJobsSkeleton />;
   }
 
   return (

@@ -29,6 +29,7 @@
   --focus: oklch(62.04% 0.195 253.83);
   --foreground: oklch(21.03% 0.0015 253.83);
   --muted: oklch(55.17% 0.003 253.83);
+  --muted-foreground: oklch(42% 0.003 253.83);
   --overlay: oklch(100% 0.0004 253.83);
   --overlay-foreground: oklch(21.03% 0.0015 253.83);
   --scrollbar: oklch(87.1% 0.0015 253.83);
@@ -74,6 +75,7 @@
   --focus: oklch(62.04% 0.195 253.83);
   --foreground: oklch(99.11% 0.0015 253.83);
   --muted: oklch(70.5% 0.003 253.83);
+  --muted-foreground: oklch(70.5% 0.003 253.83);
   --overlay: oklch(21.03% 0.003 253.83);
   --overlay-foreground: oklch(99.11% 0.0015 253.83);
   --scrollbar: oklch(70.5% 0.0015 253.83);
@@ -93,9 +95,15 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
+  --color-text: var(--foreground);
+  --color-text-muted: var(--muted-foreground);
+  --color-bg: var(--background);
+  --color-surface: var(--default);
+  --color-surface-2: var(--surface-secondary);
+  --color-surface-3: var(--surface-tertiary);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-foreground);
 }
 
 body {

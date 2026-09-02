@@ -33,27 +33,27 @@ function PageStrip({ page, totalPages, searchParams }) {
       {prev ? (
         <Link
           href={prev}
-          className="h-10 rounded-xl border border-white/10 bg-[#1b1c1e] px-5 text-sm font-medium text-white transition-colors hover:border-indigo-500/50"
+          className="h-10 rounded-xl border border-white/10 bg-(color-surface-2) px-5 text-sm font-medium text-(color-text) transition-colors hover:border-indigo-500/50"
         >
           ← Previous
         </Link>
       ) : (
-        <span className="h-10 rounded-xl border border-white/10 bg-[#1b1c1e]/50 px-5 text-sm text-muted-foreground">
+        <span className="h-10 rounded-xl border border-white/10 bg-(color-surface-2)/50 px-5 text-sm text-(color-text-muted)">
           ← Previous
         </span>
       )}
-      <span className="text-sm text-muted-foreground">
+      <span className="text-sm text-(color-text-muted)">
         Page {page} of {totalPages}
       </span>
       {next ? (
         <Link
           href={next}
-          className="h-10 rounded-xl border border-white/10 bg-[#1b1c1e] px-5 text-sm font-medium text-white transition-colors hover:border-indigo-500/50"
+          className="h-10 rounded-xl border border-white/10 bg-(color-surface-2) px-5 text-sm font-medium text-(color-text) transition-colors hover:border-indigo-500/50"
         >
           Next →
         </Link>
       ) : (
-        <span className="h-10 rounded-xl border border-white/10 bg-[#1b1c1e]/50 px-5 text-sm text-muted-foreground">
+        <span className="h-10 rounded-xl border border-white/10 bg-(color-surface-2)/50 px-5 text-sm text-(color-text-muted)">
           Next →
         </span>
       )}
@@ -83,7 +83,7 @@ export default async function PublicCompanyListPage({ searchParams }) {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl border border-default bg-[radial-gradient(circle_at_30%_0%,rgba(99,102,241,0.25),transparent_50%),radial-gradient(circle_at_70%_100%,rgba(16,185,129,0.15),transparent_50%),linear-gradient(180deg,#16181c,#0f1013)] p-6 pb-10 sm:p-10">
+      <section className="relative overflow-hidden rounded-3xl border border-(color-border) bg-[radial-gradient(circle_at_30%_0%,rgba(99,102,241,0.25),transparent_50%),radial-gradient(circle_at_70%_100%,rgba(16,185,129,0.15),transparent_50%),linear-gradient(180deg,#16181c,#0f1013)] p-6 pb-10 sm:p-10">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-20 -top-20 size-80 rounded-full bg-indigo-500/8 blur-3xl"
@@ -95,15 +95,15 @@ export default async function PublicCompanyListPage({ searchParams }) {
 
         <div className="relative">
           {/* Badge */}
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium text-muted-foreground">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium text-(color-text-muted)">
             <OfficeBadge className="size-3.5 text-indigo-300" />
             Discover companies hiring now
           </div>
 
-          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-(color-text) sm:text-4xl lg:text-5xl">
             Companies on HireSphere
           </h1>
-          <p className="mt-2 max-w-lg text-base text-muted-foreground">
+          <p className="mt-2 max-w-lg text-base text-(color-text-muted)">
             Explore organizations building innovative products. Find your next role or partnership among our growing network.
           </p>
         </div>
@@ -115,8 +115,8 @@ export default async function PublicCompanyListPage({ searchParams }) {
               <OfficeBadge className="size-4 text-indigo-300" />
             </div>
             <div>
-              <span className="block text-lg font-semibold text-white">{total}</span>
-              <span className="text-[11px] text-muted-foreground">companies</span>
+              <span className="block text-lg font-semibold text-(color-text)">{total}</span>
+              <span className="text-[11px] text-(color-text-muted)">companies</span>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
@@ -124,10 +124,10 @@ export default async function PublicCompanyListPage({ searchParams }) {
               <Briefcase className="size-4 text-emerald-300" />
             </div>
             <div>
-              <span className="block text-lg font-semibold text-white">
+              <span className="block text-lg font-semibold text-(color-text)">
                 {totalOpenRoles.toLocaleString()}
               </span>
-              <span className="text-[11px] text-muted-foreground">open roles</span>
+              <span className="text-[11px] text-(color-text-muted)">open roles</span>
             </div>
           </div>
           {uniqueIndustries.length > 0 && (
@@ -136,10 +136,10 @@ export default async function PublicCompanyListPage({ searchParams }) {
                 <Globe className="size-4 text-amber-300" />
               </div>
               <div>
-                <span className="block text-lg font-semibold text-white">
+                <span className="block text-lg font-semibold text-(color-text)">
                   {uniqueIndustries.length}
                 </span>
-                <span className="text-[11px] text-muted-foreground">industries</span>
+                <span className="text-[11px] text-(color-text-muted)">industries</span>
               </div>
             </div>
           )}
@@ -149,15 +149,15 @@ export default async function PublicCompanyListPage({ searchParams }) {
       {/* Industry filter chips */}
       {uniqueIndustries.length > 1 && (
         <div className="mt-8 flex flex-wrap items-center gap-2">
-          <Magnifier className="size-3.5 text-muted-foreground" />
+          <Magnifier className="size-3.5 text-(color-text-muted)" />
           {["All", ...uniqueIndustries].map((ind) => (
             <Chip
               key={ind}
               variant="flat"
               className={`cursor-pointer text-xs ${
                 ind === "All"
-                  ? "border-white/15 bg-default font-medium"
-                  : "bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:text-white"
+                  ? "border-white/15 bg-(color-surface-2) font-medium"
+                  : "bg-white/[0.03] text-(color-text-muted) hover:bg-white/[0.06] hover:text-(color-text)"
               }`}
             >
               {ind === "All" ? "All industries" : ind}
@@ -168,12 +168,12 @@ export default async function PublicCompanyListPage({ searchParams }) {
 
       {/* Company grid */}
       {items.length === 0 ? (
-        <div className="mt-16 flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-content1 px-6 py-20 text-center">
+        <div className="mt-16 flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-(color-surface) px-6 py-20 text-center">
           <div className="flex size-16 items-center justify-center rounded-2xl bg-white/[0.03] ring-1 ring-white/10">
-            <OfficeBadge className="size-7 text-muted-foreground" />
+            <OfficeBadge className="size-7 text-(color-text-muted)" />
           </div>
-          <h2 className="text-xl font-semibold text-white">No companies listed yet</h2>
-          <p className="max-w-sm text-sm text-muted-foreground">
+          <h2 className="text-xl font-semibold text-(color-text)">No companies listed yet</h2>
+          <p className="max-w-sm text-sm text-(color-text-muted)">
             Recruiters haven&apos;t added any public company profiles yet. Check back soon as we onboard new organizations.
           </p>
         </div>
@@ -188,7 +188,7 @@ export default async function PublicCompanyListPage({ searchParams }) {
                 href={`/company/${slug}`}
                 className="group block"
               >
-                <div className="flex h-full flex-col rounded-2xl border border-white/8 bg-[#15171a] p-5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-indigo-500/30 group-hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+                <div className="flex h-full flex-col rounded-2xl border border-white/8 bg-(color-surface-2) p-5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-indigo-500/30 group-hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
                   {/* Top accent line */}
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" style={{ width: '100%' }} />
 
@@ -208,14 +208,14 @@ export default async function PublicCompanyListPage({ searchParams }) {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h2 className="truncate text-base font-semibold text-white group-hover:text-indigo-200 transition-colors">
+                      <h2 className="truncate text-base font-semibold text-(color-text) group-hover:text-indigo-200 transition-colors">
                         {company.name ?? "Unnamed company"}
                       </h2>
                       {company.industry && (
                         <Chip
                           size="sm"
                           variant="flat"
-                          className="mt-1 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground bg-white/[0.03]"
+                          className="mt-1 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-(color-text-muted) bg-white/[0.03]"
                         >
                           {company.industry}
                         </Chip>
@@ -224,13 +224,13 @@ export default async function PublicCompanyListPage({ searchParams }) {
                   </div>
 
                   {company.tagline && (
-                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-(color-text-muted)">
                       {company.tagline}
                     </p>
                   )}
 
                   {/* Meta info */}
-                  <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                  <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-(color-text-muted)">
                     {company.location && (
                       <span className="inline-flex items-center gap-1.5">
                         <MapPin className="size-3 text-emerald-400/70" />
@@ -254,14 +254,14 @@ export default async function PublicCompanyListPage({ searchParams }) {
                   <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
                     <span className="inline-flex items-center gap-1.5 text-xs">
                       <Briefcase className="size-3.5 text-indigo-300/60" />
-                      <span className={activeJobs > 0 ? "text-white font-medium" : "text-muted-foreground"}>
+                      <span className={activeJobs > 0 ? "text-(color-text) font-medium" : "text-(color-text-muted)"}>
                         {activeJobs > 0
                           ? `${activeJobs} open ${activeJobs === 1 ? "role" : "roles"}`
                           : "No open roles"
                         }
                       </span>
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-indigo-300 transition-colors group-hover:text-white">
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-indigo-300 transition-colors group-hover:text-(color-text)">
                       View profile
                       <svg className="size-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

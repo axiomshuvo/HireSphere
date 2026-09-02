@@ -1,5 +1,6 @@
 "use client";
 
+import Logo from "@/components/shared/Logo";
 import { useSession } from "@/lib/auth-client";
 import {
   Bookmark,
@@ -112,7 +113,7 @@ function ProfileCard({ user, compact = false }) {
       className={compact ? "flex items-center gap-3" : "flex flex-col gap-3"}
     >
       <div className="flex items-center gap-3">
-        <Avatar.Root className="size-10 shrink-0 rounded-full bg-default text-sm font-semibold text-default-foreground">
+        <Avatar.Root className="size-10 shrink-0 rounded-full bg-(color-surface-2) text-sm font-semibold text-(color-text)">
           {user?.image ? (
             <Avatar.Image src={user.image} alt={name} />
           ) : (
@@ -120,15 +121,17 @@ function ProfileCard({ user, compact = false }) {
           )}
         </Avatar.Root>
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-white">{name}</p>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="truncate text-sm font-medium text-(color-text)">
+            {name}
+          </p>
+          <p className="truncate text-xs text-(color-text-muted)">
             {compact ? (user?.email ?? role) : role}
           </p>
         </div>
       </div>
 
       {!compact && (
-        <span className="w-fit rounded-full border border-default bg-default px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-default-foreground">
+        <span className="w-fit rounded-full border border-(color-border) bg-(color-surface-2) px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-(color-text)">
           {user?.plan ? `${user.plan} plan` : "Free plan"}
         </span>
       )}
@@ -143,11 +146,11 @@ function NavLink({ item, active }) {
       emerald: "text-emerald-300 bg-emerald-500/10 ring-emerald-500/20",
       amber: "text-amber-300 bg-amber-500/10 ring-amber-500/20",
       rose: "text-rose-300 bg-rose-500/10 ring-rose-500/20",
-    }[item.tone] ?? "text-muted-foreground bg-white/5 ring-white/10";
+    }[item.tone] ?? "text-(color-text-muted) bg-white/5 ring-(color-accent)/20";
   const baseClass = `relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
     active
-      ? "bg-default text-white ring-1 ring-white/10"
-      : "text-muted-foreground hover:bg-default hover:text-white"
+      ? "bg-(color-surface-2) text-(color-text) ring-1 ring-(color-accent)/20"
+      : "text-(color-text-muted) hover:bg-(color-surface-2) hover:text-(color-text)"
   }`;
 
   const iconEl = <item.icon className="size-5" />;
@@ -155,7 +158,7 @@ function NavLink({ item, active }) {
   return (
     <Link href={item.href} className={baseClass}>
       {active && (
-        <span className="absolute right-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-l-full bg-white" />
+        <span className="absolute right-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-l-full bg-(color-accent)" />
       )}
       <span
         className={`flex size-8 shrink-0 items-center justify-center rounded-lg ring-1 transition-colors ${tone}`}
@@ -185,25 +188,25 @@ export function DashBoardSideBar({ initialUser }) {
 
   return (
     <>
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-default p-4 lg:flex">
-        <Link href="/" className="mb-6 px-3 text-xl font-bold text-white">
-          HireLoop
-        </Link>
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-(color-border) p-4 lg:flex">
+        <div className="mb-6 px-3">
+          <Logo href="/" />
+        </div>
 
         <div className="mb-6">
           <ProfileCard user={user} />
         </div>
 
-        <div className="flex-1">{navContent}</div>
+        <div className="flex-1 overflow-y-auto">{navContent}</div>
 
-        <div className="mt-4 border-t border-default pt-4">
+        <div className="mt-4 border-t border-(color-border) pt-4">
           <ProfileCard user={user} compact />
         </div>
       </aside>
 
-      <div className="border-b border-default px-4 py-3 lg:hidden">
+      <div className="border-b border-(color-border) px-4 py-3 lg:hidden">
         <Drawer>
-          <Drawer.Trigger className="flex w-full cursor-pointer items-center justify-start gap-2 rounded-xl border border-white/10 bg-[#1b1c1e] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:border-indigo-500/50">
+          <Drawer.Trigger className="flex w-full cursor-pointer items-center justify-start gap-2 rounded-xl border border-white/10 bg-(color-surface-2) px-4 py-2.5 text-sm font-medium text-(color-text) transition-colors hover:border-indigo-500/50">
             <LayoutSideContent className="size-4" />
             Dashboard menu
           </Drawer.Trigger>
@@ -212,7 +215,7 @@ export function DashBoardSideBar({ initialUser }) {
               <Drawer.Dialog>
                 <Drawer.CloseTrigger />
                 <Drawer.Header>
-                  <Drawer.Heading>HireLoop</Drawer.Heading>
+                  <Logo href="/" />
                 </Drawer.Header>
                 <Drawer.Body>
                   <div className="mb-6">

@@ -1,5 +1,6 @@
 "use client";
 
+import Logo from "@/components/shared/Logo";
 import { signOut, useSession } from "@/lib/auth-client";
 import {
   ArrowRightFromSquare,
@@ -48,56 +49,7 @@ export default function Navbar() {
   };
 
   /* ─── Logo ───────────────────────────────────────────────── */
-  const logo = (
-    <Link
-      href="/"
-      className="flex items-center gap-2 select-none group"
-      aria-label="HireSphere Homepage"
-    >
-      <svg
-        viewBox="0 0 100 100"
-        className="w-8 h-8 drop-shadow-md group-hover:scale-105 transition-transform duration-200"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient id="sphereGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#00C6FF" />
-            <stop offset="50%" stopColor="#0072FF" />
-            <stop offset="100%" stopColor="#FF6A00" />
-          </linearGradient>
-          <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#FF6A00" />
-            <stop offset="100%" stopColor="#00C6FF" />
-          </linearGradient>
-        </defs>
-        <circle cx="50" cy="50" r="32" fill="url(#sphereGrad)" />
-        <ellipse
-          cx="50"
-          cy="50"
-          rx="45"
-          ry="18"
-          stroke="url(#orbitGrad)"
-          strokeWidth="7"
-          transform="rotate(-25 50 50)"
-          strokeDasharray="200"
-          strokeDashoffset="20"
-        />
-        <path
-          d="M 30,35 A 25,25 0 0,1 65,25"
-          stroke="white"
-          strokeWidth="4"
-          strokeLinecap="round"
-          opacity="0.4"
-        />
-      </svg>
-      <span className="text-xl font-bold tracking-tight">
-        <span className="text-[#0072FF]">Hire</span>
-        <span className="text-[#FF6A00]">Sphere</span>
-      </span>
-    </Link>
-  );
+  const logo = <Logo />;
 
   /* ─── Nav links (shared) ─────────────────────────────────── */
   const MotionLink = motion.create(Link);
@@ -334,7 +286,7 @@ export default function Navbar() {
                     key={item.label}
                     href={item.href}
                     onClick={closeAll}
-                    className="rounded-xl px-3 py-2 text-sm font-medium opacity-70 hover:opacity-100 hover:bg-default/40 transition-all"
+                    className="rounded-xl px-3 py-2 text-sm font-medium opacity-70 hover:opacity-100 hover:bg-(color-surface-3)/40 transition-all"
                   >
                     {item.label}
                   </Link>

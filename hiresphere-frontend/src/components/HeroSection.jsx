@@ -1,9 +1,23 @@
 "use client";
 
 import { Magnifier } from "@gravity-ui/icons";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+function buildJobSearchUrl(jobTitle, location) {
+  const params = new URLSearchParams();
+  if (jobTitle) params.set("search", jobTitle);
+  if (location) params.set("location", location);
+  const qs = params.toString();
+  return qs ? `/jobs?${qs}` : "/jobs";
+}
+
+function buildTagUrl(tag) {
+  return `/jobs?search=${encodeURIComponent(tag)}`;
+}
+
 export default function HeroSection() {
+  const router = useRouter();
   const [jobTitle, setJobTitle] = useState("");
   const [location, setLocation] = useState("");
 
@@ -15,7 +29,7 @@ export default function HeroSection() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log("Searching for:", { jobTitle, location });
+    router.push(buildJobSearchUrl(jobTitle, location));
   };
 
   return (
@@ -23,17 +37,17 @@ export default function HeroSection() {
       {/* Top Banner Badge */}
       <div className="relative w-full max-w-xl flex items-center justify-center mb-10">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-gray-200 dark:border-gray-800" />
+          <div className="w-full border-t border-(color-border)" />
         </div>
 
-        <div className="relative bg-white dark:bg-[#121315] border border-gray-200 dark:border-white/10 rounded-full px-5 py-2.5 flex items-center gap-2.5 shadow-sm dark:shadow-xl">
+        <div className="relative bg-(color-surface) border border-(color-border) rounded-full px-5 py-2.5 flex items-center gap-2.5 shadow-sm">
           <span className="text-xl" role="img" aria-label="Briefcase">
             💼
           </span>
-          <span className="font-bold text-gray-900 dark:text-white text-base sm:text-lg tracking-tight">
+          <span className="font-bold text-(color-text) text-base sm:text-lg tracking-tight">
             50,000+
           </span>
-          <span className="text-gray-500 dark:text-gray-400 font-mono text-xs sm:text-sm tracking-wider uppercase font-medium">
+          <span className="text-(color-text-muted) font-mono text-xs sm:text-sm tracking-wider uppercase font-medium">
             NEW JOBS THIS MONTH
           </span>
         </div>
@@ -41,13 +55,13 @@ export default function HeroSection() {
 
       {/* Hero Headline & Subtitle */}
       <div className="max-w-3xl mx-auto mb-12 space-y-4">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-(color-text) tracking-tight leading-tight">
           Find Your Next Dream Role in{" "}
           <span className="bg-gradient-to-r from-[#00C6FF] via-[#0072FF] to-[#FF6A00] bg-clip-text text-transparent">
             Tech & AI
           </span>
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg max-w-2xl mx-auto font-normal">
+        <p className="text-(color-text-muted) text-base sm:text-lg max-w-2xl mx-auto font-normal">
           AI-powered career matching for developers, designers, and tech
           leaders. Built for professionals who take their growth seriously.
         </p>
@@ -58,12 +72,12 @@ export default function HeroSection() {
         onSubmit={handleSearch}
         role="search"
         aria-label="Job Search"
-        className="w-full max-w-4xl bg-white dark:bg-[#121315] border border-gray-200 dark:border-white/10 rounded-2xl md:rounded-full p-2 md:p-2.5 flex flex-col md:flex-row items-center gap-2 shadow-lg dark:shadow-2xl transition-all duration-300"
+        className="w-full max-w-4xl bg-(color-surface) border border-(color-border) rounded-2xl md:rounded-full p-2 md:p-2.5 flex flex-col md:flex-row items-center gap-2 shadow-lg transition-all duration-300"
       >
         {/* Left Input: Job Title */}
         <div className="flex-1 flex items-center gap-3 px-4 py-3 w-full">
           <Magnifier
-            className="w-5 h-5 text-gray-400 dark:text-gray-500 shrink-0"
+            className="w-5 h-5 text-(color-text-muted) shrink-0"
             aria-hidden="true"
           />
           <input
@@ -71,21 +85,21 @@ export default function HeroSection() {
             placeholder="Job title, skill or company"
             value={jobTitle}
             onChange={(e) => setJobTitle(e.target.value)}
-            className="w-full bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base focus:outline-none"
+            className="w-full bg-transparent text-(color-text) placeholder-(color-text-muted) text-sm sm:text-base focus:outline-none"
             aria-label="Job title, skill or company"
           />
         </div>
 
         {/* Vertical Separator */}
         <div
-          className="hidden md:block h-8 w-[1px] bg-gray-200 dark:bg-gray-800 my-auto"
+          className="hidden md:block h-8 w-[1px] bg-(color-border) my-auto"
           aria-hidden="true"
         />
 
         {/* Right Input: Location */}
         <div className="flex-1 flex items-center gap-3 px-4 py-3 w-full">
           <Magnifier
-            className="w-5 h-5 text-gray-400 dark:text-gray-500 shrink-0"
+            className="w-5 h-5 text-(color-text-muted) shrink-0"
             aria-hidden="true"
           />
           <input
@@ -93,7 +107,7 @@ export default function HeroSection() {
             placeholder="Location or Remote"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base focus:outline-none"
+            className="w-full bg-transparent text-(color-text) placeholder-(color-text-muted) text-sm sm:text-base focus:outline-none"
             aria-label="Location or Remote"
           />
         </div>
@@ -114,8 +128,8 @@ export default function HeroSection() {
           <button
             key={tag}
             type="button"
-            onClick={() => setJobTitle(tag)}
-            className="bg-gray-100 dark:bg-[#1b1c1e] hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-medium px-5 py-2.5 rounded-full transition-all duration-200 cursor-pointer"
+            onClick={() => router.push(buildTagUrl(tag))}
+            className="bg-(color-surface) hover:bg-(color-surface-2) border border-(color-border) text-(color-text) text-xs sm:text-sm font-medium px-5 py-2.5 rounded-full transition-all duration-200 cursor-pointer"
           >
             {tag}
           </button>

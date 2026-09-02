@@ -1,5 +1,6 @@
 import RecruiterHomeView from "@/components/dashboard/RecruiterHomeView";
 import StatCard from "@/components/dashboard/StatCard";
+import UpgradePlanButton from "@/components/dashboard/UpgradePlanButton";
 import ButtonLink from "@/components/shared/ButtonLink";
 import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
 import { fetchMyApplications } from "@/lib/actions/applications";
@@ -114,10 +115,15 @@ async function RecruiterHome({ user }) {
   if (totalCompanies === 0) {
     return (
       <div className="flex-1 px-4 py-8 lg:px-8">
-        <h1 className="mb-2 text-3xl font-semibold tracking-tight text-white">
-          Welcome back, {greeting}
-        </h1>
-        <p className="mb-8 text-muted-foreground">{subtitle}</p>
+        <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight text-white">
+              Welcome back, {greeting}
+            </h1>
+            <p className="mt-2 text-muted-foreground">{subtitle}</p>
+          </div>
+          <UpgradePlanButton role="recruiter" currentPlan={user.plan} />
+        </header>
 
         <Card className="relative mb-8 overflow-hidden rounded-2xl border border-default bg-content1 p-6">
           <span
@@ -276,13 +282,16 @@ async function SeekerHome({ user }) {
             you saved.
           </p>
         </div>
-        <Link
-          href="/jobs"
-          className="inline-flex items-center gap-2 rounded-lg border border-default bg-content1 px-4 py-2 text-sm text-white transition-colors hover:border-indigo-500/50"
-        >
-          <Magnifier className="size-4" />
-          Browse all jobs
-        </Link>
+        <div className="flex items-center gap-3">
+          <UpgradePlanButton role="seeker" currentPlan={user.plan} />
+          <Link
+            href="/jobs"
+            className="inline-flex items-center gap-2 rounded-lg border border-default bg-content1 px-4 py-2 text-sm text-white transition-colors hover:border-indigo-500/50"
+          >
+            <Magnifier className="size-4" />
+            Browse all jobs
+          </Link>
+        </div>
       </header>
 
       <section className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">

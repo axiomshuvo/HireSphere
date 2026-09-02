@@ -41,18 +41,18 @@ function formatLocation(job) {
 function LongBlock({ label, value, icon: Icon }) {
   if (!value) return null;
   return (
-    <Card className="rounded-2xl border border-default bg-content1 p-6">
+    <Card className="rounded-2xl border border-(color-border) bg-(color-surface) p-6">
       <div className="mb-3 flex items-center gap-2">
         {Icon && (
-          <div className="flex size-8 items-center justify-center rounded-lg bg-default text-indigo-300">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-(color-surface-2) text-indigo-300">
             <Icon className="size-4" />
           </div>
         )}
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-(color-text-muted)">
           {label}
         </h2>
       </div>
-      <p className="whitespace-pre-line text-sm leading-relaxed text-white">
+      <p className="whitespace-pre-line text-sm leading-relaxed text-(color-text)">
         {value}
       </p>
     </Card>
@@ -127,13 +127,13 @@ export default async function PublicJobDetailPage({ params }) {
     <div className="mx-auto w-full max-w-6xl px-4 py-10 lg:px-8">
       <Link
         href="/jobs"
-        className="text-sm text-muted-foreground transition-colors hover:text-white"
+        className="text-sm text-(color-text-muted) transition-colors hover:text-(color-text)"
       >
         ← Back to jobs
       </Link>
 
       {/* Hero */}
-      <section className="relative mt-4 overflow-hidden rounded-3xl border border-default bg-[radial-gradient(circle_at_78%_18%,rgba(99,102,241,0.32),transparent_45%),radial-gradient(circle_at_18%_82%,rgba(56,189,248,0.22),transparent_50%),linear-gradient(180deg,#16181c,#0f1013)] p-6 lg:p-8">
+      <section className="relative mt-4 overflow-hidden rounded-3xl border border-(color-border) bg-[radial-gradient(circle_at_78%_18%,rgba(99,102,241,0.32),transparent_45%),radial-gradient(circle_at_18%_82%,rgba(56,189,248,0.22),transparent_50%),linear-gradient(180deg,#16181c,#0f1013)] p-6 lg:p-8">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-indigo-500/10 blur-3xl"
@@ -147,16 +147,16 @@ export default async function PublicJobDetailPage({ params }) {
               <JobHiringBadge />
             </div>
 
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-(color-text) sm:text-4xl">
               {job.title ?? "Untitled role"}
             </h1>
 
             {company && (
               <Link
                 href={`/company/${company.companySlug ?? company.id}`}
-                className="mt-2 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-white"
+                className="mt-2 inline-flex items-center gap-2 text-sm text-(color-text-muted) transition-colors hover:text-(color-text)"
               >
-                <Avatar.Root className="size-5 shrink-0 rounded bg-default text-[10px] font-semibold text-default-foreground">
+                <Avatar.Root className="size-5 shrink-0 rounded bg-(color-surface-2) text-[10px] font-semibold text-(color-text)">
                   <Avatar.Fallback>
                     {(company.name?.[0] ?? "?").toUpperCase()}
                   </Avatar.Fallback>
@@ -165,7 +165,7 @@ export default async function PublicJobDetailPage({ params }) {
               </Link>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-(color-text-muted)">
               {location && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="size-3" />
@@ -214,7 +214,7 @@ export default async function PublicJobDetailPage({ params }) {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1b1c1e] px-4 py-2 text-xs text-muted-foreground transition-colors hover:border-indigo-500/50 hover:text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-(color-surface-2) px-4 py-2 text-xs text-(color-text-muted) transition-colors hover:border-indigo-500/50 hover:text-(color-text)"
               >
                 <ArrowUpRightFromSquare className="size-3.5" />
                 Share
@@ -246,9 +246,9 @@ export default async function PublicJobDetailPage({ params }) {
 
         <aside className="flex flex-col gap-4">
           {company && (
-            <Card className="rounded-2xl border border-default bg-content1 p-5">
+            <Card className="rounded-2xl border border-(color-border) bg-(color-surface) p-5">
               <Typography.Heading
-                className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                className="mb-3 text-xs font-semibold uppercase tracking-wider text-(color-text-muted)"
                 level={2}
               >
                 Hiring Company
@@ -258,34 +258,34 @@ export default async function PublicJobDetailPage({ params }) {
                   <img
                     src={company.logo}
                     alt={company.name}
-                    className="size-12 shrink-0 rounded-xl border border-default object-cover"
+                    className="size-12 shrink-0 rounded-xl border border-(color-border) object-cover"
                   />
                 ) : (
-                  <Avatar.Root className="size-12 shrink-0 rounded-xl bg-default text-base font-semibold text-default-foreground">
+                  <Avatar.Root className="size-12 shrink-0 rounded-xl bg-(color-surface-2) text-base font-semibold text-(color-text)">
                     <Avatar.Fallback>
                       {(company.name?.[0] ?? "?").toUpperCase()}
                     </Avatar.Fallback>
                   </Avatar.Root>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-white">
+                  <p className="truncate font-medium text-(color-text)">
                     {company.name}
                   </p>
                   {company.industry && (
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="truncate text-xs text-(color-text-muted)">
                       {company.industry}
                     </p>
                   )}
                 </div>
               </div>
               {company.tagline && (
-                <p className="mt-3 text-sm text-muted-foreground">
+                <p className="mt-3 text-sm text-(color-text-muted)">
                   {company.tagline}
                 </p>
               )}
               <Link
                 href={`/company/${company.companySlug ?? company.id}`}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1b1c1e] px-4 py-2 text-sm text-white transition-colors hover:border-indigo-500/50"
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-(color-surface-2) px-4 py-2 text-sm text-(color-text) transition-colors hover:border-indigo-500/50"
               >
                 <Briefcase className="size-4" />
                 View company
@@ -293,29 +293,29 @@ export default async function PublicJobDetailPage({ params }) {
             </Card>
           )}
 
-          <Card className="rounded-2xl border border-default bg-content1 p-5">
+          <Card className="rounded-2xl border border-(color-border) bg-(color-surface) p-5">
             <Typography.Heading
-              className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              className="mb-3 text-xs font-semibold uppercase tracking-wider text-(color-text-muted)"
               level={2}
             >
               Quick Info
             </Typography.Heading>
             <dl className="flex flex-col gap-2 text-sm">
               <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Type</dt>
-                <dd className="font-medium text-white">
+                <dt className="text-(color-text-muted)">Type</dt>
+                <dd className="font-medium text-(color-text)">
                   <JobTypeBadge type={job.type} />
                 </dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Category</dt>
-                <dd className="font-medium text-white">
+                <dt className="text-(color-text-muted)">Category</dt>
+                <dd className="font-medium text-(color-text)">
                   <JobCategoryBadge category={job.category} />
                 </dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Work mode</dt>
-                <dd className="font-medium text-white">
+                <dt className="text-(color-text-muted)">Work mode</dt>
+                <dd className="font-medium text-(color-text)">
                   {job.remote ? (
                     <JobRemoteBadge remote />
                   ) : (
@@ -324,16 +324,16 @@ export default async function PublicJobDetailPage({ params }) {
                 </dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Location</dt>
-                <dd className="font-medium text-white">{location ?? "—"}</dd>
+                <dt className="text-(color-text-muted)">Location</dt>
+                <dd className="font-medium text-(color-text)">{location ?? "—"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Salary</dt>
-                <dd className="font-medium text-white">{salary ?? "—"}</dd>
+                <dt className="text-(color-text-muted)">Salary</dt>
+                <dd className="font-medium text-(color-text)">{salary ?? "—"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Visibility</dt>
-                <dd className="font-medium text-white">
+                <dt className="text-(color-text-muted)">Visibility</dt>
+                <dd className="font-medium text-(color-text)">
                   {job.isPublicVisible ? "Public" : "Private"}
                 </dd>
               </div>

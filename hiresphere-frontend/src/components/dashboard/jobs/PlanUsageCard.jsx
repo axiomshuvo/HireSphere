@@ -1,6 +1,9 @@
 "use client";
 
-import { Card, ProgressBar, Typography } from "@heroui/react";
+import PlanUpgradeModal from "@/components/shared/PlanUpgradeModal";
+import { Rocket } from "@gravity-ui/icons";
+import { Button, Card, ProgressBar, Typography } from "@heroui/react";
+import { useState } from "react";
 
 function formatPlan(plan) {
   if (!plan) return "Growth";
@@ -9,6 +12,7 @@ function formatPlan(plan) {
 
 export default function PlanUsageCard({ usage }) {
   const percentage = usage.limit > 0 ? (usage.used / usage.limit) * 100 : 0;
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
 
   return (
     <Card className="rounded-2xl border border-default bg-content1 p-5">
@@ -22,19 +26,39 @@ export default function PlanUsageCard({ usage }) {
           </Typography.Paragraph>
         </div>
 
-        <div className="w-full sm:w-72">
-          <ProgressBar.Root
-            value={usage.used}
-            maxValue={usage.limit}
-            aria-label="Active job posts usage"
-          >
-            <ProgressBar.Output className="text-xs text-muted-foreground" />
-            <ProgressBar.Track>
-              <ProgressBar.Fill />
-            </ProgressBar.Track>
-          </ProgressBar.Root>
+        <div className="flex flex-col items-end gap-2">
+          <div className="w-full sm:w-72">
+            <ProgressBar.Root
+              value={usage.used}
+              maxValue={usage.limit}
+              aria-label="Active job posts usage"
+            >
+              <ProgressBar.Output className="text-xs text-muted-foreground" />
+              <ProgressBar.Track>
+                <ProgressBar.Fill />
+              </ProgressBar.Track>
+            </ProgressBar.Root>
+          </div>
+          {usage.plan !== "enterprise" && (
+            <Button
+              variant="primary"
+              size="sm"
+              className="cursor-pointer"
+              onPress={() => setIsPlanModalOpen(true)}
+            >
+              Upgrade Plan
+              <Rocket className="size-4" />
+            </Button>
+          )}
         </div>
       </div>
+
+      <PlanUpgradeModal
+        isOpen={isPlanModalOpen}
+        onOpenChange={setIsPlanModalOpen}
+        role="recruiter"
+        currentPlan={usage.plan}
+      />
     </Card>
   );
 }

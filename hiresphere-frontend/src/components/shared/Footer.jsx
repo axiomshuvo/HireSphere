@@ -23,7 +23,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full max-w-7xl mx-auto px-4 py-8">
-      <div className="bg-[#1b1c1e] border border-white/10 rounded-2xl p-8 md:p-12 shadow-2xl">
+      <div className="bg-(color-surface-2) border border-white/10 rounded-2xl p-8 md:p-12 shadow-2xl">
         {/* Main Grid Content */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-12">
           {/* Left Column: Logo & Tagline */}
@@ -104,7 +104,7 @@ export default function Footer() {
               </Link>
 
               {/* Tagline */}
-              <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+              <p className="text-(color-text-muted) text-sm md:text-base leading-relaxed">
                 The AI-native career platform. Built for people who take their
                 work seriously.
               </p>
@@ -117,7 +117,7 @@ export default function Footer() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white transition-all duration-200"
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-(color-text-muted) hover:text-(color-accent) transition-all duration-200"
                 aria-label="HireSphere Facebook Page"
               >
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -143,7 +143,7 @@ export default function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white transition-all duration-200"
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-(color-text-muted) hover:text-(color-accent) transition-all duration-200"
                 aria-label="HireSphere LinkedIn Page"
               >
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -165,7 +165,7 @@ export default function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-gray-300 hover:text-white text-sm transition-colors duration-200"
+                      className="text-(color-text-muted) hover:text-(color-accent) text-sm transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -184,7 +184,7 @@ export default function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-gray-300 hover:text-white text-sm transition-colors duration-200"
+                      className="text-(color-text-muted) hover:text-(color-accent) text-sm transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -203,7 +203,7 @@ export default function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-gray-300 hover:text-white text-sm transition-colors duration-200"
+                      className="text-(color-text-muted) hover:text-(color-accent) text-sm transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -215,16 +215,16 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar: Copyright & Policies */}
-        <div className="mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-gray-400">
+        <div className="mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-(color-text-muted)">
           <p>© {new Date().getFullYear()} — HireSphere. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <Link href="/terms" className="hover:text-white transition-colors">
+            <Link href="/terms" className="hover:text-(color-text) transition-colors">
               Terms & Policy
             </Link>
             <span>-</span>
             <Link
               href="/privacy"
-              className="hover:text-white transition-colors"
+              className="hover:text-(color-text) transition-colors"
             >
               Privacy Guideline
             </Link>

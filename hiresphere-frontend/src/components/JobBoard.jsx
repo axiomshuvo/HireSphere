@@ -14,7 +14,7 @@ const jobListings = Array(6).fill({
 
 export default function JobBoard() {
   return (
-    <section className="w-full bg-white pt-24 pb-20 font-sans">
+    <section className="w-full bg-(color-surface) pt-24 pb-20 font-sans">
       <div className="max-w-[1200px] mx-auto px-6">
         {/* Header Section */}
         <div className="relative mb-16 flex flex-col items-center justify-center text-center">
@@ -29,11 +29,11 @@ export default function JobBoard() {
             <div></div>
           </div>
 
-          <div className="relative z-10 bg-white px-8">
+          <div className="relative z-10 bg-(color-surface) px-8">
             <span className="block text-[#6366F1] font-semibold tracking-wider uppercase text-[13px] mb-3">
               Smart job open
             </span>
-            <h2 className="text-[40px] md:text-[48px] font-bold text-gray-900 tracking-tight leading-tight">
+            <h2 className="text-[40px] md:text-[48px] font-bold text-(color-text) tracking-tight leading-tight">
               The roles you&apos;d never
             </h2>
           </div>
@@ -45,49 +45,49 @@ export default function JobBoard() {
             <Card
               key={index}
               shadow="none"
-              className="bg-[#151515] p-8 rounded-[20px] flex flex-col border-none"
+              className="bg-(color-surface-2) p-8 rounded-[20px] flex flex-col border border-(color-border)"
             >
               {/* Job Title & Description */}
               <div className="flex flex-col gap-3">
-                <h3 className="text-white text-[24px] font-medium tracking-tight">
+                <h3 className="text-(color-text) text-[24px] font-medium tracking-tight">
                   {job.title}
                 </h3>
-                <p className="text-[#9ca3af] text-[15px] leading-relaxed pr-2">
+                <p className="text-(color-text-muted) text-[15px] leading-relaxed pr-2">
                   {job.description}
                 </p>
               </div>
 
               {/* Tags / Badges */}
               <div className="flex flex-wrap gap-2.5 mt-6">
-                <Chip className="bg-[#202020] border-none h-[32px] px-1.5">
+                <Chip className="bg-(color-surface) border-none h-[32px] px-1.5">
                   <MapPin
                     width={14}
                     height={14}
                     className="text-[#e879f9] ml-1"
                   />
-                  <span className="text-white text-[13px] font-medium pr-1 pl-1">
+                  <span className="text-(color-text) text-[13px] font-medium pr-1 pl-1">
                     {job.location}
                   </span>
                 </Chip>
 
-                <Chip className="bg-[#202020] border-none h-[32px] px-1.5">
+                <Chip className="bg-(color-surface) border-none h-[32px] px-1.5">
                   <Briefcase
                     width={14}
                     height={14}
                     className="text-[#e879f9] ml-1"
                   />
-                  <span className="text-white text-[13px] font-medium pr-1 pl-1">
+                  <span className="text-(color-text) text-[13px] font-medium pr-1 pl-1">
                     {job.type}
                   </span>
                 </Chip>
 
-                <Chip className="bg-[#202020] border-none h-[32px] px-1.5">
+                <Chip className="bg-(color-surface) border-none h-[32px] px-1.5">
                   <FileDollar
                     width={14}
                     height={14}
                     className="text-[#e879f9] ml-1"
                   />
-                  <span className="text-white text-[13px] font-medium pr-1 pl-1">
+                  <span className="text-(color-text) text-[13px] font-medium pr-1 pl-1">
                     {job.salary}
                   </span>
                 </Chip>
@@ -98,7 +98,7 @@ export default function JobBoard() {
                 <Button
                   variant="light"
                   disableRipple
-                  className="p-0 text-white font-medium text-[14.5px] hover:text-[#e879f9] transition-colors bg-transparent min-w-0 h-auto flex items-center gap-2 data-[hover=true]:bg-transparent"
+                  className="p-0 text-(color-text) font-medium text-[14.5px] hover:text-[#e879f9] transition-colors bg-transparent min-w-0 h-auto flex items-center gap-2 data-[hover=true]:bg-transparent"
                   endContent={
                     <ArrowRight
                       width={16}
@@ -120,7 +120,7 @@ export default function JobBoard() {
             variant="bordered"
             disableRipple
             radius="lg"
-            className="border border-[#E5E7EB] bg-white text-[#111827] font-medium px-7 h-12 text-[14.5px] hover:bg-gray-50 transition-colors shadow-sm"
+            className="border-(color-border) bg-(color-surface-2) text-(color-text) font-medium px-7 h-12 text-[14.5px] hover:bg-(color-accent)/10 transition-colors shadow-sm"
           >
             View all job open
           </Button>

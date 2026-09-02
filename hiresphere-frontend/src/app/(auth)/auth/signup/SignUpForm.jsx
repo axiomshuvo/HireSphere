@@ -31,6 +31,7 @@ export default function SignUpForm() {
     password: "",
     confirmPassword: "",
     role: "seeker",
+    plan: "free",
   });
 
   const [errors, setErrors] = useState({});
@@ -76,6 +77,7 @@ export default function SignUpForm() {
         email: formData.email.trim(),
         password: formData.password,
         role: formData.role,
+        plan: formData.plan,
       });
       if (authError) {
         toast.danger("Registration Failed", {
@@ -103,11 +105,11 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-white dark:bg-[#121316] border border-gray-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl dark:shadow-2xl relative">
+    <div className="w-full max-w-md bg-(color-surface) border border-(color-border) rounded-2xl p-6 sm:p-8 shadow-xl relative">
       <div className="flex items-center justify-between mb-6">
         <Link
           href="/auth/signin"
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-(color-text-muted) hover:text-(color-text) transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Go to Sign In</span>
@@ -119,116 +121,132 @@ export default function SignUpForm() {
       </div>
 
       <div className="mb-6 space-y-1">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+        <h1 className="text-2xl font-bold text-(color-text) tracking-tight">
           Create your account
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-(color-text-muted)">
           Join HireSphere and accelerate your career with AI matching.
         </p>
       </div>
 
       <form onSubmit={handleSignUp} className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-(color-text-muted) uppercase tracking-wider mb-1.5">
             Full Name
           </label>
           <div className="relative flex items-center">
-            <Person className="w-5 h-5 text-gray-400 dark:text-gray-500 absolute left-3.5 pointer-events-none" />
+            <Person className="w-5 h-5 text-(color-text-muted) absolute left-3.5 pointer-events-none" />
             <input
               type="text"
               name="name"
               placeholder="John Doe"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-[#1b1c1e] rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none transition-colors border ${
+              className={`w-full pl-11 pr-4 py-2.5 bg-(color-surface-2) rounded-xl text-(color-text) placeholder-(color-text-muted) text-sm focus:outline-none transition-colors border ${
                 errors.name
                   ? "border-red-500 focus:border-red-500"
-                  : "border-gray-200 dark:border-white/10 focus:border-indigo-500"
+                  : "border-(color-border) focus:border-indigo-500"
               }`}
             />
           </div>
-          {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name}</p>}
+          {errors.name && (
+            <p className="text-red-500 text-xs mt-1.5">{errors.name}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-(color-text-muted) uppercase tracking-wider mb-1.5">
             Email Address
           </label>
           <div className="relative flex items-center">
-            <Envelope className="w-5 h-5 text-gray-400 dark:text-gray-500 absolute left-3.5 pointer-events-none" />
+            <Envelope className="w-5 h-5 text-(color-text-muted) absolute left-3.5 pointer-events-none" />
             <input
               type="email"
               name="email"
               placeholder="name@example.com"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full pl-11 pr-4 py-2.5 bg-gray-50 dark:bg-[#1b1c1e] rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none transition-colors border ${
+              className={`w-full pl-11 pr-4 py-2.5 bg-(color-surface-2) rounded-xl text-(color-text) placeholder-(color-text-muted) text-sm focus:outline-none transition-colors border ${
                 errors.email
                   ? "border-red-500 focus:border-red-500"
-                  : "border-gray-200 dark:border-white/10 focus:border-indigo-500"
+                  : "border-(color-border) focus:border-indigo-500"
               }`}
             />
           </div>
-          {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email}</p>}
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1.5">{errors.email}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-(color-text-muted) uppercase tracking-wider mb-1.5">
             Password
           </label>
           <div className="relative flex items-center">
-            <Lock className="w-5 h-5 text-gray-400 dark:text-gray-500 absolute left-3.5 pointer-events-none" />
+            <Lock className="w-5 h-5 text-(color-text-muted) absolute left-3.5 pointer-events-none" />
             <input
               type={showPassword ? "text" : "password"}
               name="password"
               placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full pl-11 pr-11 py-2.5 bg-gray-50 dark:bg-[#1b1c1e] rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none transition-colors border ${
+              className={`w-full pl-11 pr-11 py-2.5 bg-(color-surface-2) rounded-xl text-(color-text) placeholder-(color-text-muted) text-sm focus:outline-none transition-colors border ${
                 errors.password
                   ? "border-red-500 focus:border-red-500"
-                  : "border-gray-200 dark:border-white/10 focus:border-indigo-500"
+                  : "border-(color-border) focus:border-indigo-500"
               }`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none"
+              className="absolute right-3.5 text-(color-text-muted) hover:text-(color-text) focus:outline-none"
             >
-              {showPassword ? <EyeSlash className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showPassword ? (
+                <EyeSlash className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
             </button>
           </div>
-          {errors.password && <p className="text-red-500 text-xs mt-1.5">{errors.password}</p>}
+          {errors.password && (
+            <p className="text-red-500 text-xs mt-1.5">{errors.password}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-(color-text-muted) uppercase tracking-wider mb-1.5">
             Confirm Password
           </label>
           <div className="relative flex items-center">
-            <Lock className="w-5 h-5 text-gray-400 dark:text-gray-500 absolute left-3.5 pointer-events-none" />
+            <Lock className="w-5 h-5 text-(color-text-muted) absolute left-3.5 pointer-events-none" />
             <input
               type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
               placeholder="••••••••"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className={`w-full pl-11 pr-11 py-2.5 bg-gray-50 dark:bg-[#1b1c1e] rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none transition-colors border ${
+              className={`w-full pl-11 pr-11 py-2.5 bg-(color-surface-2) rounded-xl text-(color-text) placeholder-(color-text-muted) text-sm focus:outline-none transition-colors border ${
                 errors.confirmPassword
                   ? "border-red-500 focus:border-red-500"
-                  : "border-gray-200 dark:border-white/10 focus:border-indigo-500"
+                  : "border-(color-border) focus:border-indigo-500"
               }`}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3.5 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none"
+              className="absolute right-3.5 text-(color-text-muted) hover:text-(color-text) focus:outline-none"
             >
-              {showConfirmPassword ? <EyeSlash className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showConfirmPassword ? (
+                <EyeSlash className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-red-500 text-xs mt-1.5">{errors.confirmPassword}</p>
+            <p className="text-red-500 text-xs mt-1.5">
+              {errors.confirmPassword}
+            </p>
           )}
         </div>
 
@@ -273,7 +291,7 @@ export default function SignUpForm() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
+      <p className="text-center text-sm text-(color-text-muted) mt-6">
         Already have an account?{" "}
         <Link
           href={(() => {
@@ -282,7 +300,7 @@ export default function SignUpForm() {
               ? `/auth/signin?next=${encodeURIComponent(next)}`
               : "/auth/signin";
           })()}
-          className="text-[#4f46e5] dark:text-[#818cf8] font-semibold hover:underline"
+          className="text-indigo-500 font-semibold hover:underline"
         >
           Sign In
         </Link>

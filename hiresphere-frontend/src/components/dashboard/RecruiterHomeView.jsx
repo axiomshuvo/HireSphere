@@ -2,8 +2,9 @@
 
 import CompanyList from "@/components/dashboard/CompanyList";
 import DataTable from "@/components/dashboard/DataTable";
-import StatCard from "@/components/dashboard/StatCard";
 import MarketJobsPanel from "@/components/dashboard/MarketJobsPanel";
+import StatCard from "@/components/dashboard/StatCard";
+import UpgradePlanButton from "@/components/dashboard/UpgradePlanButton";
 
 const ICONS = {
   jobs: "file",
@@ -57,10 +58,15 @@ export default function RecruiterHomeView({
 
   return (
     <div className="flex-1 px-4 py-8 lg:px-8">
-      <h1 className="mb-2 text-3xl font-semibold tracking-tight text-white">
-        Welcome back, {greeting}
-      </h1>
-      <p className="mb-8 text-muted-foreground">{subtitle}</p>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-white">
+            Welcome back, {greeting}
+          </h1>
+          <p className="mt-2 text-muted-foreground">{subtitle}</p>
+        </div>
+        <UpgradePlanButton role="recruiter" />
+      </header>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (

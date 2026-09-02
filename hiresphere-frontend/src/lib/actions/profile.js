@@ -1,8 +1,8 @@
 "use server";
 
+import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 
 export async function updateProfileImage(imageUrl) {
   const trimmed = String(imageUrl ?? "").trim();
@@ -59,8 +59,10 @@ export async function updateProfileName(name) {
 }
 
 export async function updateProfilePlan(plan) {
-  const allowed = ["free", "growth", "enterprise", "premium"];
-  const trimmed = String(plan ?? "").trim().toLowerCase();
+  const allowed = ["free", "pro", "growth", "enterprise", "premium"];
+  const trimmed = String(plan ?? "")
+    .trim()
+    .toLowerCase();
   if (!allowed.includes(trimmed)) {
     throw new Error("Invalid plan");
   }
