@@ -37,10 +37,10 @@ function Field({ label, error, children }) {
   );
 }
 
-export default function JobForm({ job, activeJobCount = 0, companies = [] }) {
+export default function JobForm({ job, activeJobCount = 0, companies = [], userPlan = null }) {
   const router = useRouter();
   const isEditing = Boolean(job);
-  const usage = getPlanUsage(activeJobCount);
+  const usage = getPlanUsage(activeJobCount, userPlan);
 
   const [formData, setFormData] = useState(() =>
     job ? jobToFormValues(job) : { ...EMPTY_JOB_FORM },

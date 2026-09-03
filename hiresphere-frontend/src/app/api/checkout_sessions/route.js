@@ -1,42 +1,8 @@
+import { getPlans } from "@/lib/actions/plans";
 import { getCurrentUser } from "@/lib/core/session";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-
-const PLAN_CATALOG = {
-  pro: {
-    name: "Seeker Pro",
-    priceId: process.env.STRIPE_PRICE_SEEKER_PRO,
-    amount: 1900, // $19.00 USD
-    interval: "month",
-    description:
-      "Apply up to 30 jobs per month, unlimited saved jobs, and salary insights.",
-  },
-  premium: {
-    name: "Seeker Premium",
-    priceId: process.env.STRIPE_PRICE_SEEKER_PREMIUM,
-    amount: 3900, // $39.00 USD
-    interval: "month",
-    description:
-      "Unlimited applications, early access to new jobs, and profile boost.",
-  },
-  growth: {
-    name: "Recruiter Growth",
-    priceId: process.env.STRIPE_PRICE_RECRUITER_GROWTH,
-    amount: 4900, // $49.00 USD
-    interval: "month",
-    description:
-      "Up to 10 active job posts, applicant tracking, and basic analytics.",
-  },
-  enterprise: {
-    name: "Recruiter Enterprise",
-    priceId: process.env.STRIPE_PRICE_RECRUITER_ENTERPRISE,
-    amount: 14900, // $149.00 USD
-    interval: "month",
-    description:
-      "Up to 50 active job posts, advanced analytics dashboard, custom branding, and team access.",
-  },
-};
 
 export async function POST(request) {
   try {
@@ -62,31 +28,46 @@ export async function POST(request) {
     }
 
     const normalizedPlan = String(planId).toLowerCase().trim();
-    const catalogItem = PLAN_CATALOG[normalizedPlan];
 
-    if (!catalogItem) {
+    // Fetch all plans from DB to find the requested plan
+    const allPlans = (await getPlans()) || [];
+    const dbPlan = allPlans.find(
+      (p) => p.planId === normalizedPlan || p.id === normalizedPlan,
+    );
+
+    if (!dbPlan || normalizedPlan === "free") {
       return NextResponse.json(
-        { error: `Invalid plan specified: ${planId}` },
+        { error: `Invalid or free plan specified: ${planId}` },
         { status: 400 },
       );
     }
 
+    // Parse the cadence for Stripe (e.g. "per month" -> "month", "per year" -> "year")
+    let stripeInterval = "month";
+    if (dbPlan.pricing?.cadence?.toLowerCase().includes("year")) {
+      stripeInterval = "year";
+    }
+
     // Determine line item: Use pre-created Stripe Price ID if available, otherwise use price_data
-    const lineItem = catalogItem.priceId
+    const stripePriceId = dbPlan.pricing?.stripePriceId;
+    const lineItem = stripePriceId
       ? {
-          price: catalogItem.priceId,
+          price: stripePriceId,
           quantity: 1,
         }
       : {
           price_data: {
-            currency: "usd",
+            currency: dbPlan.pricing?.currency?.toLowerCase() || "usd",
             product_data: {
-              name: catalogItem.name,
-              description: catalogItem.description,
+              name: dbPlan.name,
+              description: dbPlan.tagline || "",
             },
-            unit_amount: catalogItem.amount,
+            unit_amount:
+              dbPlan.pricing?.amountInCents ??
+              dbPlan.pricing?.amount * 100 ??
+              0,
             recurring: {
-              interval: catalogItem.interval,
+              interval: stripeInterval,
             },
           },
           quantity: 1,

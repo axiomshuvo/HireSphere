@@ -4,6 +4,7 @@ import ProfileImageField from "@/components/dashboard/profile/ProfileImageField"
 import SeekerPlanCard from "@/components/dashboard/profile/SeekerPlanCard";
 import { fetchMyApplications } from "@/lib/actions/applications";
 import { getRecruiterJobStats } from "@/lib/actions/jobs";
+import { getPlans } from "@/lib/actions/plans";
 import { getPlanUsage } from "@/lib/api/jobstruture";
 import { auth } from "@/lib/auth";
 import { Calendar, Envelope, Person } from "@gravity-ui/icons";
@@ -56,12 +57,18 @@ export default async function ProfilePage() {
       : null;
 
   const isRecruiter = role === "recruiter";
-  const { active: activeJobCount } = isRecruiter
-    ? await loadRecruiterUsage()
-    : { active: 0 };
-  const { total: activeApplications } = !isRecruiter
-    ? await loadSeekerUsage()
-    : { total: 0 };
+
+  const [recruiterUsage, seekerUsage, allPlans] = await Promise.all([
+    isRecruiter ? loadRecruiterUsage() : Promise.resolve({ active: 0 }),
+    !isRecruiter ? loadSeekerUsage() : Promise.resolve({ total: 0 }),
+    getPlans(role),
+  ]);
+
+  const { active: activeJobCount } = recruiterUsage;
+  const { total: activeApplications } = seekerUsage;
+
+  const userPlan =
+    (allPlans || []).find((p) => (p.planId || p.id) === plan) || null;
 
   return (
     <div className="flex-1 px-4 py-10 sm:px-6 lg:px-8">
@@ -136,9 +143,12 @@ export default async function ProfilePage() {
         </section>
 
         {isRecruiter ? (
-          <PlanUsageCard usage={getPlanUsage(activeJobCount, plan)} />
+          <PlanUsageCard usage={getPlanUsage(activeJobCount, userPlan)} />
         ) : (
-          <SeekerPlanCard plan={plan} activeApplications={activeApplications} />
+          <SeekerPlanCard
+            userPlan={userPlan}
+            activeApplications={activeApplications}
+          />
         )}
 
         <Card className="rounded-2xl border border-default bg-content1 p-6 sm:p-8">

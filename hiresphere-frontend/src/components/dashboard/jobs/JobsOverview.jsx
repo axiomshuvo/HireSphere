@@ -38,7 +38,7 @@ function StatTile({ label, value, icon: Icon, color }) {
   );
 }
 
-export default function JobsOverview({ stats, activeJobCount }) {
+export default function JobsOverview({ stats, activeJobCount, userPlan }) {
   const active = stats?.active ?? 0;
   const closed = stats?.closed ?? 0;
   const draft = Math.max(
@@ -46,7 +46,7 @@ export default function JobsOverview({ stats, activeJobCount }) {
     (stats?.total ?? 0) - active - closed,
   );
   const totalApplicants = stats?.applicantsTotal ?? 0;
-  const usage = getPlanUsage(activeJobCount ?? active);
+  const usage = getPlanUsage(activeJobCount ?? active, userPlan);
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">

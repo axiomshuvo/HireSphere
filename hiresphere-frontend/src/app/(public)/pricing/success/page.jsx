@@ -1,6 +1,6 @@
 import { updateProfilePlan } from "@/lib/actions/profile";
 import { stripe } from "@/lib/stripe";
-import { ArrowRight, Check } from "@gravity-ui/icons";
+import { ArrowRight, Check, Sparkles } from "@gravity-ui/icons";
 import { Button } from "@heroui/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -44,45 +44,70 @@ export default async function Success({ searchParams }) {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-4 py-16 text-center">
-      <div className="relative mb-6 flex size-20 items-center justify-center rounded-3xl bg-emerald-500/10 text-emerald-400 ring-8 ring-emerald-500/5">
-        <Check className="size-10" />
+    <div className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 py-16">
+      {/* Background glow */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/20 blur-[100px]" />
       </div>
 
-      <h1 className="text-3xl font-bold tracking-tight text-(color-text) sm:text-4xl">
-        Payment Successful!
-      </h1>
-      <p className="mt-3 text-base text-(color-text-muted)">
-        We appreciate your business! A confirmation email will be sent to{" "}
-        <span className="font-semibold text-(color-text)">{customerEmail}</span>
-        .
-        {plan && (
-          <span className="block mt-1">
-            Your subscription to the{" "}
-            <strong className="uppercase text-indigo-400">{plan}</strong> plan
-            is now active.
-          </span>
-        )}
-      </p>
+      <div className="relative z-10 w-full max-w-xl text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="relative flex flex-col items-center overflow-hidden rounded-3xl border border-(color-border) bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.1),transparent_60%),linear-gradient(180deg,var(--color-surface-2),var(--color-surface))] p-8 shadow-2xl backdrop-blur-xl sm:p-12">
+          {/* Top glow line */}
+          <div className="absolute top-0 h-1 w-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
 
-      <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row">
-        <Link href="/dashboard" className="flex-1">
-          <Button
-            variant="solid"
-            className="w-full bg-indigo-500 font-medium text-white hover:bg-indigo-600"
-          >
-            Go to Dashboard
-            <ArrowRight className="size-4" />
-          </Button>
-        </Link>
-        <Link href="/dashboard/profile" className="flex-1">
-          <Button
-            variant="bordered"
-            className="w-full border-(color-border) font-medium"
-          >
-            View Profile
-          </Button>
-        </Link>
+          <div className="relative mb-8 flex size-20 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 ring-8 ring-emerald-500/10">
+            <Check className="size-10" />
+          </div>
+
+          <h1 className="mb-4 text-3xl font-bold tracking-tight text-(color-text) sm:text-4xl">
+            Payment Successful!
+          </h1>
+
+          <p className="mb-8 text-base text-(color-text-muted)">
+            We appreciate your business! A confirmation receipt has been sent to{" "}
+            <span className="font-semibold text-(color-text)">
+              {customerEmail}
+            </span>
+            .
+          </p>
+
+          {plan && (
+            <div className="mb-8 w-full rounded-2xl border border-indigo-500/20 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.15),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] p-6 shadow-inner">
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-400 mb-2">
+                New Plan Activated
+              </span>
+              <div className="flex items-center justify-center gap-2">
+                <Sparkles className="size-5 text-indigo-400" />
+                <span className="text-xl font-bold text-indigo-100 capitalize">
+                  {plan.replace(/_/g, " ")}
+                </span>
+                <Sparkles className="size-5 text-indigo-400" />
+              </div>
+            </div>
+          )}
+
+          <div className="flex w-full flex-col gap-3 sm:flex-row">
+            <Link href="/dashboard" className="flex-1">
+              <Button
+                variant="solid"
+                size="lg"
+                className="w-full bg-indigo-500 font-medium text-white shadow-[0_0_15px_rgba(99,102,241,0.2)] hover:bg-indigo-600 transition-all"
+              >
+                Go to Dashboard
+                <ArrowRight className="size-5" />
+              </Button>
+            </Link>
+            <Link href="/dashboard/profile" className="flex-1">
+              <Button
+                variant="bordered"
+                size="lg"
+                className="w-full border-(color-border) font-medium bg-(color-surface) hover:border-indigo-500/50 hover:text-indigo-400 transition-all"
+              >
+                View Profile
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

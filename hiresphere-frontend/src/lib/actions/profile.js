@@ -1,5 +1,6 @@
 "use server";
 
+import { getPlans } from "@/lib/actions/plans";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -59,11 +60,22 @@ export async function updateProfileName(name) {
 }
 
 export async function updateProfilePlan(plan) {
-  const allowed = ["free", "pro", "growth", "enterprise", "premium"];
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
   const trimmed = String(plan ?? "")
     .trim()
     .toLowerCase();
-  if (!allowed.includes(trimmed)) {
+
+  // Validate against database plans
+  const allPlans = (await getPlans(session.user.role)) || [];
+  const isValidPlan = allPlans.some(
+    (p) => p.planId === trimmed || p.id === trimmed,
+  );
+
+  if (!isValidPlan) {
     throw new Error("Invalid plan");
   }
 

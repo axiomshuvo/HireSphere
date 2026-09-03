@@ -12,8 +12,8 @@ function formatPlan(plan) {
   return plan.replace(/^./, (char) => char.toUpperCase());
 }
 
-export default function SeekerPlanCard({ plan, activeApplications }) {
-  const usage = getSeekerPlanUsage(activeApplications, plan);
+export default function SeekerPlanCard({ userPlan, activeApplications }) {
+  const usage = getSeekerPlanUsage(activeApplications, userPlan);
   const isUnlimited = usage.isUnlimited;
   const percentage = isUnlimited
     ? 0
@@ -45,7 +45,9 @@ export default function SeekerPlanCard({ plan, activeApplications }) {
                 className="cursor-pointer"
                 onPress={() => setIsPlanModalOpen(true)}
               >
-                {usage.plan === "free" ? "Upgrade to Pro" : "Upgrade to Premium"}
+                {usage.plan === "free"
+                  ? "Upgrade to Pro"
+                  : "Upgrade to Premium"}
                 <Rocket className="size-4" />
               </Button>
             )}

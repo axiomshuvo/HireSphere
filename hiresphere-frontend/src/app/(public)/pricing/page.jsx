@@ -2,11 +2,7 @@
 
 import ButtonLink from "@/components/shared/ButtonLink";
 import PlanUpgradeModal from "@/components/shared/PlanUpgradeModal";
-import {
-  Recruiter_PLAN_LIMITS,
-  SEEKER_PLAN_LIMITS,
-  SEEKER_SAVED_JOBS_LIMITS,
-} from "@/lib/api/jobstruture";
+import { getPlans } from "@/lib/actions/plans";
 import { useSession } from "@/lib/auth-client";
 import {
   ArrowRight,
@@ -21,153 +17,46 @@ import {
 } from "@gravity-ui/icons";
 import { Accordion, Button, Card, toast } from "@heroui/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-/* ------------------------------------------------------------------ */
-/*  Recruiter tiers                                                    */
-/* ------------------------------------------------------------------ */
+const ICON_MAP = {
+  sparkles: Sparkles,
+  rocket: Rocket,
+  star: Star,
+  crown: CrownDiamond,
+};
 
-const tiers = [
-  {
-    id: "free",
-    name: "Free",
-    tagline: "Great for a company's first year of hiring.",
-    price: "$0",
-    cadence: "forever",
-    icon: Sparkles,
-    highlight: false,
-    features: [
-      {
-        text: `Up to ${Recruiter_PLAN_LIMITS.free} active job posts`,
-        included: true,
-      },
-      { text: "Basic applicant management", included: true },
-      { text: "Standard listing visibility", included: true },
-      { text: "Public job board listing", included: true },
-      { text: "Email support", included: true },
-      { text: "Featured company badge", included: false },
-      { text: "Advanced analytics dashboard", included: false },
-      { text: "Custom branding", included: false },
-    ],
-  },
-  {
-    id: "growth",
-    name: "Growth",
-    tagline: "For growing teams hiring every month.",
-    price: "$49",
-    cadence: "per month",
-    icon: Rocket,
-    highlight: true,
-    features: [
-      {
-        text: `Up to ${Recruiter_PLAN_LIMITS.growth} active job posts`,
-        included: true,
-      },
-      { text: "Applicant tracking", included: true },
-      { text: "Basic analytics", included: true },
-      { text: "Public job board listing", included: true },
-      { text: "Email support", included: true },
-      { text: "Featured company badge", included: true },
-      { text: "Advanced analytics dashboard", included: false },
-      { text: "Custom branding", included: false },
-    ],
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    tagline: "Scale hiring with no limits and full control.",
-    price: "$149",
-    cadence: "per month",
-    icon: CrownDiamond,
-    highlight: false,
-    features: [
-      {
-        text: `Up to ${Recruiter_PLAN_LIMITS.enterprise} active job posts`,
-        included: true,
-      },
-      { text: "Advanced analytics dashboard", included: true },
-      { text: "Featured job listings", included: true },
-      { text: "Team collaboration", included: true },
-      { text: "Custom branding", included: true },
-      { text: "Priority support", included: true },
-      { text: "Dedicated account manager", included: true },
-      { text: "API access", included: true },
-    ],
-  },
-];
+function resolveIcon(iconName, defaultIcon = Sparkles) {
+  if (!iconName) return defaultIcon;
+  return ICON_MAP[String(iconName).toLowerCase()] || defaultIcon;
+}
 
-/* ------------------------------------------------------------------ */
-/*  Seeker tiers                                                       */
-/* ------------------------------------------------------------------ */
+function mapDbPlanToTier(plan, role) {
+  const isRecruiter = role === "recruiter";
+  const defaultIcon = isRecruiter
+    ? plan.planId === "enterprise"
+      ? CrownDiamond
+      : plan.planId === "growth"
+        ? Rocket
+        : Sparkles
+    : plan.planId === "premium"
+      ? Star
+      : plan.planId === "pro"
+        ? Rocket
+        : Sparkles;
 
-const seekerTiers = [
-  {
-    id: "seeker-free",
-    plan: "free",
-    name: "Free",
-    tagline: "Apply to roles and save your favorites.",
-    price: "$0",
-    cadence: "forever",
-    icon: Sparkles,
-    highlight: false,
-    features: [
-      {
-        text: `Browse & save up to ${SEEKER_SAVED_JOBS_LIMITS.free} jobs`,
-        included: true,
-      },
-      {
-        text: `Apply to up to ${SEEKER_PLAN_LIMITS.free} jobs per month`,
-        included: true,
-      },
-      { text: "Basic profile", included: true },
-      { text: "Email alerts", included: true },
-      { text: "Application tracking", included: false },
-      { text: "Salary insights", included: false },
-      { text: "Profile boost to recruiters", included: false },
-    ],
-  },
-  {
-    id: "seeker-pro",
-    plan: "pro",
-    name: "Pro",
-    tagline: "Apply more and track every opportunity.",
-    price: "$19",
-    cadence: "per month",
-    icon: Rocket,
-    highlight: true,
-    features: [
-      {
-        text: `Apply to up to ${SEEKER_PLAN_LIMITS.pro} jobs per month`,
-        included: true,
-      },
-      { text: "Unlimited saved jobs", included: true },
-      { text: "Application tracking", included: true },
-      { text: "Salary insights", included: true },
-      { text: "Enhanced profile", included: true },
-      { text: "Profile boost to recruiters", included: false },
-      { text: "Early access to new jobs", included: false },
-    ],
-  },
-  {
-    id: "seeker-premium",
-    plan: "premium",
-    name: "Premium",
-    tagline: "Stand out and apply without limits.",
-    price: "$39",
-    cadence: "per month",
-    icon: Star,
-    highlight: false,
-    features: [
-      { text: "Unlimited applications", included: true },
-      { text: "Unlimited saved jobs", included: true },
-      { text: "Application tracking", included: true },
-      { text: "Salary insights", included: true },
-      { text: "Profile boost to recruiters", included: true },
-      { text: "Early access to new jobs", included: true },
-      { text: "Priority support", included: true },
-    ],
-  },
-];
+  return {
+    id: isRecruiter ? plan.planId : `seeker-${plan.planId}`,
+    plan: plan.planId,
+    name: plan.name,
+    tagline: plan.tagline,
+    price: plan.pricing?.amount === 0 ? "$0" : `$${plan.pricing?.amount}`,
+    cadence: plan.pricing?.cadence || "per month",
+    icon: resolveIcon(plan.ui?.icon, defaultIcon),
+    highlight: plan.ui?.highlight ?? false,
+    features: plan.features || [],
+  };
+}
 
 /* ------------------------------------------------------------------ */
 /*  FAQ accordion data                                                 */
@@ -323,12 +212,68 @@ function TierCard({ tier, planParam, planRole, isLoggedIn, onGetStarted }) {
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
 
+function TierSkeleton() {
+  return (
+    <Card className="flex flex-col gap-4 rounded-2xl border border-(color-border) bg-(color-surface) p-6 animate-pulse">
+      <div className="flex items-center gap-3">
+        <div className="size-10 rounded-xl bg-(color-surface-2)" />
+        <div className="space-y-2 flex-1">
+          <div className="h-4 w-24 rounded bg-(color-surface-2)" />
+          <div className="h-3 w-40 rounded bg-(color-surface-2)" />
+        </div>
+      </div>
+      <div className="h-8 w-20 rounded bg-(color-surface-2) my-2" />
+      <div className="space-y-2 my-2">
+        <div className="h-3 w-full rounded bg-(color-surface-2)" />
+        <div className="h-3 w-4/5 rounded bg-(color-surface-2)" />
+        <div className="h-3 w-3/4 rounded bg-(color-surface-2)" />
+      </div>
+      <div className="h-10 w-full rounded-xl bg-(color-surface-2) mt-auto" />
+    </Card>
+  );
+}
+
 export default function PricingPage() {
   const { data: session } = useSession();
   const user = session?.user;
   const isLoggedIn = !!user;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalPlan, setModalPlan] = useState(null);
+
+  const [activeRecruiterTiers, setActiveRecruiterTiers] = useState([]);
+  const [activeSeekerTiers, setActiveSeekerTiers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadPlans() {
+      try {
+        const [recruiterPlans, seekerPlans] = await Promise.all([
+          getPlans("recruiter"),
+          getPlans("seeker"),
+        ]);
+        if (!isMounted) return;
+        if (recruiterPlans && recruiterPlans.length > 0) {
+          setActiveRecruiterTiers(
+            recruiterPlans.map((p) => mapDbPlanToTier(p, "recruiter")),
+          );
+        }
+        if (seekerPlans && seekerPlans.length > 0) {
+          setActiveSeekerTiers(
+            seekerPlans.map((p) => mapDbPlanToTier(p, "seeker")),
+          );
+        }
+      } catch (err) {
+        console.warn("Error loading plans from DB:", err);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+    loadPlans();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleGetStarted = (planId, planRole) => {
     if (!planRole || planRole === user?.role) {
@@ -374,16 +319,24 @@ export default function PricingPage() {
 
       {/* Recruiter tiers */}
       <section className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {tiers.map((tier) => (
-          <TierCard
-            key={tier.id}
-            tier={tier}
-            planParam={tier.id}
-            planRole="recruiter"
-            isLoggedIn={isLoggedIn}
-            onGetStarted={handleGetStarted}
-          />
-        ))}
+        {isLoading ? (
+          <>
+            <TierSkeleton />
+            <TierSkeleton />
+            <TierSkeleton />
+          </>
+        ) : (
+          activeRecruiterTiers.map((tier) => (
+            <TierCard
+              key={tier.id}
+              tier={tier}
+              planParam={tier.id}
+              planRole="recruiter"
+              isLoggedIn={isLoggedIn}
+              onGetStarted={handleGetStarted}
+            />
+          ))
+        )}
       </section>
 
       {/* Seeker tiers */}
@@ -402,16 +355,24 @@ export default function PricingPage() {
           </p>
         </header>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {seekerTiers.map((tier) => (
-            <TierCard
-              key={tier.id}
-              tier={tier}
-              planParam={tier.plan}
-              planRole="seeker"
-              isLoggedIn={isLoggedIn}
-              onGetStarted={handleGetStarted}
-            />
-          ))}
+          {isLoading ? (
+            <>
+              <TierSkeleton />
+              <TierSkeleton />
+              <TierSkeleton />
+            </>
+          ) : (
+            activeSeekerTiers.map((tier) => (
+              <TierCard
+                key={tier.id}
+                tier={tier}
+                planParam={tier.plan}
+                planRole="seeker"
+                isLoggedIn={isLoggedIn}
+                onGetStarted={handleGetStarted}
+              />
+            ))
+          )}
         </div>
       </section>
 

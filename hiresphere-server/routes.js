@@ -878,6 +878,29 @@ function mountPublicEnhancements(app, database) {
         .json({ message: "Error fetching job", error: error.message });
     }
   });
+
+  // GET /api/plans — public subscription plans
+  app.get("/api/plans", async (req, res) => {
+    try {
+      const plansCollection = database.collection("plans");
+      const { role } = req.query;
+      const filter = { isActive: { $ne: false } };
+      if (role) {
+        filter.role = String(role).toLowerCase().trim();
+      }
+
+      const plans = await plansCollection
+        .find(filter)
+        .sort({ tierOrder: 1 })
+        .toArray();
+
+      res.json(plans);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching plans", error: error.message });
+    }
+  });
 }
 
 module.exports = { mountMyRoutes, mountPublicEnhancements };

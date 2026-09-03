@@ -14,6 +14,8 @@ import {
 } from "@/lib/actions/jobs";
 import { getCompanySlug, normalizeCompanies } from "@/lib/api/companies";
 import { getJobId, getPlanUsage } from "@/lib/api/jobstruture";
+import { useSession } from "@/lib/auth-client";
+import { getPlans } from "@/lib/actions/plans";
 import { CirclePlus } from "@gravity-ui/icons";
 import { Button, Card, Typography, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -47,7 +49,9 @@ function jobMatches(job, { status, companyId, query }) {
 
 export default function RecruiterJobsPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [jobs, setJobs] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
@@ -74,8 +78,9 @@ export default function RecruiterJobsPage() {
       getRecruiterJobs({ page: 1, pageSize: FETCH_PAGE_SIZE }),
       getRecruiterJobStats(),
       getRecruiterCompanies({ pageSize: 100 }),
+      getPlans("recruiter"),
     ])
-      .then(([jobsData, statsData, companiesData]) => {
+      .then(([jobsData, statsData, companiesData, plansData]) => {
         if (cancelled) return;
 
         const jobList = Array.isArray(jobsData)
@@ -83,6 +88,10 @@ export default function RecruiterJobsPage() {
           : (jobsData?.items ?? []);
         setJobs(jobList.map(normalizeJob));
         setStats(statsData ?? {});
+        
+        if (plansData) {
+          setPlans(plansData);
+        }
 
         const companyList = Array.isArray(companiesData)
           ? companiesData
@@ -100,7 +109,7 @@ export default function RecruiterJobsPage() {
       })
       .catch((error) => {
         if (cancelled) return;
-        console.error("Failed to load jobs:", error);
+        console.error("Failed to load data:", error);
         toast.danger("Could not load jobs", {
           description: "Make sure the API server is running.",
         });
@@ -139,7 +148,9 @@ export default function RecruiterJobsPage() {
     [jobs, statusFilter, companyFilter, query],
   );
 
-  const usage = getPlanUsage(stats.active ?? 0);
+  const userPlanId = session?.user?.plan || "free";
+  const userPlan = plans.find((p) => (p.planId || p.id) === userPlanId) || null;
+  const usage = getPlanUsage(stats.active ?? 0, userPlan);
 
   const handleToggleStatus = async (job) => {
     const jobId = getJobId(job);
@@ -249,7 +260,7 @@ export default function RecruiterJobsPage() {
           </div>
         </header>
 
-        <JobsOverview stats={stats} activeJobCount={stats.active ?? 0} />
+        <JobsOverview stats={stats} activeJobCount={stats.active ?? 0} userPlan={userPlan} />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[260px_1fr]">
           <JobsFilters

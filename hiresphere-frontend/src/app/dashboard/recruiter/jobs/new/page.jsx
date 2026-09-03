@@ -2,6 +2,8 @@ import JobForm from "@/components/dashboard/jobs/JobForm";
 import ButtonLink from "@/components/shared/ButtonLink";
 import { getRecruiterCompanies } from "@/lib/actions/company";
 import { getRecruiterJobStats } from "@/lib/actions/jobs";
+import { getPlans } from "@/lib/actions/plans";
+import { getCurrentUser } from "@/lib/core/session";
 import { ArrowLeft, Briefcase } from "@gravity-ui/icons";
 
 export const dynamic = "force-dynamic";
@@ -9,16 +11,22 @@ export const dynamic = "force-dynamic";
 export default async function NewJobPage() {
   let activeJobCount = 0;
   let companies = [];
+  let userPlan = null;
 
   try {
-    const [stats, companiesData] = await Promise.all([
+    const [stats, companiesData, plansData, user] = await Promise.all([
       getRecruiterJobStats(),
       getRecruiterCompanies({ pageSize: 100 }),
+      getPlans("recruiter"),
+      getCurrentUser(),
     ]);
     activeJobCount = stats?.active ?? 0;
     companies = Array.isArray(companiesData)
       ? companiesData
       : (companiesData?.items ?? []);
+      
+    const userPlanId = user?.plan || "free";
+    userPlan = (plansData || []).find((p) => (p.planId || p.id) === userPlanId) || null;
   } catch (error) {
     console.error("Failed to load job form data:", error);
   }
@@ -57,7 +65,7 @@ export default async function NewJobPage() {
             </div>
           </div>
         </div>
-        <JobForm activeJobCount={activeJobCount} companies={companies} />
+        <JobForm activeJobCount={activeJobCount} companies={companies} userPlan={userPlan} />
       </div>
     </div>
   );
