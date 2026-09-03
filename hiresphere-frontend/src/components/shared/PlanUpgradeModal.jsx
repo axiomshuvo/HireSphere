@@ -230,6 +230,21 @@ export default function PlanUpgradeModal({
     if (!selectedPlan) return;
     startTransition(async () => {
       try {
+        const res = await fetch("/api/checkout_sessions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ plan: selectedPlan.id }),
+        });
+
+        const data = await res.json();
+        if (data?.url) {
+          window.location.href = data.url;
+          return;
+        }
+
+        // Fallback to direct plan update
         await updateProfilePlan(selectedPlan.id);
         toast.success("Plan updated", {
           description: `You are now on the ${selectedPlan.name} plan.`,
@@ -238,7 +253,7 @@ export default function PlanUpgradeModal({
       } catch (err) {
         toast.danger("Upgrade failed", {
           description:
-            err?.message ?? "Could not update your plan. Please try again.",
+            err?.message ?? "Could not initiate checkout. Please try again.",
         });
       }
     });
