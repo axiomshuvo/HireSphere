@@ -4,7 +4,7 @@ import SkeletonBlock from "@/components/shared/Skeleton";
 
 export default function JobsTableSkeleton({ rows = 5 }) {
   return (
-    <div className="space-y-3 rounded-2xl border border-(color-border) bg-(color-surface) p-5 animate-pulse">
+    <div className="space-y-3 rounded-2xl border border-default-200 bg-content1 p-5 animate-pulse">
       <div className="mb-4 flex items-center justify-between">
         <SkeletonBlock className="h-6 w-12 rounded" />
         <SkeletonBlock className="h-4 w-32 rounded" />
@@ -13,7 +13,7 @@ export default function JobsTableSkeleton({ rows = 5 }) {
       {[...Array(rows)].map((_, i) => (
         <div
           key={i}
-          className="flex items-center justify-between rounded-xl border border-(color-border) bg-(color-surface-2) p-4"
+          className="flex items-center justify-between rounded-xl border border-default-200 bg-default-100 p-4"
         >
           <div className="flex-1 space-y-2">
             <SkeletonBlock className="h-4 w-3/4 rounded" />

@@ -36,13 +36,16 @@ export const EMPTY_COMPANY_FORM = {
   website: "",
   location: "",
   employeeCount: "1-10 employees",
+  foundedYear: "",
+  linkedinUrl: "",
+  twitterUrl: "",
   description: "",
   logo: "",
   gallery: [],
 };
 
 const inputClass = (error) =>
-  `h-11 w-full rounded-xl border bg-[#17191d] px-3 text-sm text-white placeholder-gray-500 shadow-inner shadow-black/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+  `h-11 w-full rounded-xl border bg-[#17191d] px-3 text-sm text-foreground placeholder-gray-500 shadow-inner shadow-black/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
     error
       ? "border-red-500 focus:border-red-500"
       : "border-white/10 focus:border-indigo-500"
@@ -56,21 +59,36 @@ function FieldError({ message }) {
   return <p className="mt-1 text-xs text-red-500">{message}</p>;
 }
 
+function FormLabel({ htmlFor, required, children }) {
+  return (
+    <div className="flex items-center justify-between">
+      <Label className={labelClass} htmlFor={htmlFor}>
+        {children}
+      </Label>
+      {required && (
+        <span className="text-[10px] font-bold uppercase tracking-wider text-red-400">
+          * Required
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function CompanyFormFields({ formData, errors = {}, onChange }) {
   const handleChange = (name, value) => onChange(name, value);
 
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
       <div className="sm:col-span-2 border-b border-white/10 pb-3">
-        <p className="text-sm font-semibold text-white">Company identity</p>
+        <p className="text-sm font-semibold text-foreground">Company identity</p>
         <p className="mt-1 text-xs text-muted-foreground">
           Give candidates a clear first impression of your business.
         </p>
       </div>
       <div className="flex flex-col gap-2">
-        <Label className={labelClass} htmlFor="company-name">
+        <FormLabel htmlFor="company-name" required>
           Company Name
-        </Label>
+        </FormLabel>
         <Input
           id="company-name"
           placeholder="e.g. Acme Corp"
@@ -82,9 +100,9 @@ export default function CompanyFormFields({ formData, errors = {}, onChange }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label className={labelClass} htmlFor="industry">
+        <FormLabel htmlFor="industry" required>
           Industry / Category
-        </Label>
+        </FormLabel>
         <Select
           id="industry"
           selectedKey={formData.industry}
@@ -107,9 +125,9 @@ export default function CompanyFormFields({ formData, errors = {}, onChange }) {
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">
-        <Label className={labelClass} htmlFor="company-tagline">
+        <FormLabel htmlFor="company-tagline" required>
           Tagline
-        </Label>
+        </FormLabel>
         <Input
           id="company-tagline"
           placeholder="One line about what your company does"
@@ -121,9 +139,7 @@ export default function CompanyFormFields({ formData, errors = {}, onChange }) {
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">
-        <Label className={labelClass} htmlFor="website-url">
-          Website URL
-        </Label>
+        <FormLabel htmlFor="website-url">Website URL</FormLabel>
         <InputGroup>
           <InputGroup.Prefix>https://</InputGroup.Prefix>
           <InputGroup.Input
@@ -138,9 +154,9 @@ export default function CompanyFormFields({ formData, errors = {}, onChange }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label className={labelClass} htmlFor="location">
+        <FormLabel htmlFor="location" required>
           Location
-        </Label>
+        </FormLabel>
         <InputGroup>
           <InputGroup.Prefix>
             <MapPin className="size-4" />
@@ -157,9 +173,9 @@ export default function CompanyFormFields({ formData, errors = {}, onChange }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label className={labelClass} htmlFor="employee-count">
+        <FormLabel htmlFor="employee-count" required>
           Employee Count Range
-        </Label>
+        </FormLabel>
         <Select
           id="employee-count"
           selectedKey={formData.employeeCount}
@@ -182,10 +198,45 @@ export default function CompanyFormFields({ formData, errors = {}, onChange }) {
         <FieldError message={errors.employeeCount} />
       </div>
 
+      <div className="flex flex-col gap-2">
+        <FormLabel htmlFor="founded-year">Founded Year</FormLabel>
+        <Input
+          id="founded-year"
+          type="number"
+          placeholder="e.g. 2015"
+          className={inputClass(errors.foundedYear)}
+          value={formData.foundedYear}
+          onChange={(e) => handleChange("foundedYear", e.target.value)}
+        />
+        <FieldError message={errors.foundedYear} />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <FormLabel htmlFor="linkedin-url">LinkedIn URL (Optional)</FormLabel>
+        <Input
+          id="linkedin-url"
+          placeholder="https://linkedin.com/company/..."
+          className={inputClass(errors.linkedinUrl)}
+          value={formData.linkedinUrl}
+          onChange={(e) => handleChange("linkedinUrl", e.target.value)}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <FormLabel htmlFor="twitter-url">Twitter / X URL (Optional)</FormLabel>
+        <Input
+          id="twitter-url"
+          placeholder="https://twitter.com/..."
+          className={inputClass(errors.twitterUrl)}
+          value={formData.twitterUrl}
+          onChange={(e) => handleChange("twitterUrl", e.target.value)}
+        />
+      </div>
+
       <div className="flex flex-col gap-2 sm:col-span-2">
         <Label className={labelClass}>
           <span className="inline-flex items-center gap-1.5">
-            <Picture className="size-3.5 text-emerald-300" />
+            <Picture className="size-3.5 text-emerald-500" />
             Company Logo
           </span>
         </Label>
@@ -205,9 +256,9 @@ export default function CompanyFormFields({ formData, errors = {}, onChange }) {
       </div>
 
       <div className="flex flex-col gap-2 sm:col-span-2">
-        <Label className={labelClass} htmlFor="description">
+        <FormLabel htmlFor="description" required>
           Brief Description
-        </Label>
+        </FormLabel>
         <TextArea
           id="description"
           placeholder="Tell us about your company's mission and culture..."

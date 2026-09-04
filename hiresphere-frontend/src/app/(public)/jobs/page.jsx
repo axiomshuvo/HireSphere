@@ -191,7 +191,7 @@ export default async function PublicJobsPage({ searchParams }) {
                     )}
                     {salary && (
                       <span className="inline-flex items-center gap-1.5">
-                        <Wallet className="size-3 text-indigo-400" />
+                        <Wallet className="size-3 text-indigo-500" />
                         {salary}
                       </span>
                     )}

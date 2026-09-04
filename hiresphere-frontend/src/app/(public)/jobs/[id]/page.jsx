@@ -1,21 +1,22 @@
-import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
-import SaveJobButton from "@/components/public/SaveJobButton";
-import ApplyButton from "@/components/public/ApplyButton";
-import ApplyInterestCta from "@/components/public/ApplyInterestCta";
-import JobUnavailableNotice from "@/components/public/JobUnavailableNotice";
 import {
   JobCategoryBadge,
+  JobExperienceBadge,
   JobHiringBadge,
   JobRemoteBadge,
   JobTypeBadge,
+  JobWorkplaceBadge,
 } from "@/components/jobs/JobBadge";
+import ApplyButton from "@/components/public/ApplyButton";
+import ApplyInterestCta from "@/components/public/ApplyInterestCta";
+import JobUnavailableNotice from "@/components/public/JobUnavailableNotice";
+import SaveJobButton from "@/components/public/SaveJobButton";
+import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
+import { fetchApplicationForJob } from "@/lib/actions/applications";
 import { fetchPublicCompanyById } from "@/lib/actions/company";
 import { fetchPublicJobById, fetchPublicJobs } from "@/lib/actions/jobs";
-import { fetchApplicationForJob } from "@/lib/actions/applications";
 import { fetchSavedJobs } from "@/lib/actions/saved-jobs";
 import { getCurrentUser } from "@/lib/core/session";
 import {
-  ArrowRight,
   ArrowUpRightFromSquare,
   Briefcase,
   Calendar,
@@ -44,7 +45,7 @@ function LongBlock({ label, value, icon: Icon }) {
     <Card className="rounded-2xl border border-(color-border) bg-(color-surface) p-6">
       <div className="mb-3 flex items-center gap-2">
         {Icon && (
-          <div className="flex size-8 items-center justify-center rounded-lg bg-(color-surface-2) text-indigo-300">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-(color-surface-2) text-indigo-500">
             <Icon className="size-4" />
           </div>
         )}
@@ -109,15 +110,15 @@ export default async function PublicJobDetailPage({ params }) {
       fetchSavedJobs({ pageSize: 100 }).catch(() => ({ items: [] })),
       fetchApplicationForJob(id).catch(() => null),
     ]);
-    const savedItems = Array.isArray(savedResult) ? savedResult : (savedResult?.items ?? []);
+    const savedItems = Array.isArray(savedResult)
+      ? savedResult
+      : (savedResult?.items ?? []);
     initialSaved = savedItems.some((s) => (s.jobId ?? s._id) === id);
     initialApplied = !!appliedResult;
   }
 
   if (!isPublicVisible || job.status === "closed") {
-    return (
-      <JobUnavailableNotice reason={job.closedReason} />
-    );
+    return <JobUnavailableNotice reason={job.closedReason} />;
   }
 
   const salary = formatSalary(job);
@@ -143,7 +144,14 @@ export default async function PublicJobDetailPage({ params }) {
             <div className="flex flex-wrap items-center gap-2">
               <JobTypeBadge type={job.type} />
               <JobCategoryBadge category={job.category} />
-              <JobRemoteBadge remote={job.remote} />
+              {job.workplaceType ? (
+                <JobWorkplaceBadge type={job.workplaceType} />
+              ) : (
+                <JobRemoteBadge remote={job.remote} />
+              )}
+              {job.experienceLevel && (
+                <JobExperienceBadge level={job.experienceLevel} />
+              )}
               <JobHiringBadge />
             </div>
 
@@ -227,6 +235,18 @@ export default async function PublicJobDetailPage({ params }) {
       {/* Body grid */}
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr]">
         <div className="flex flex-col gap-4">
+          {job.description && (
+            <Card className="rounded-2xl border border-(color-border) bg-(color-surface) p-6">
+              <h2 className="mb-4 text-lg font-semibold text-(color-text)">
+                Role Overview
+              </h2>
+              <div
+                className="prose prose-invert max-w-none text-sm leading-relaxed text-(color-text-muted)"
+                dangerouslySetInnerHTML={{ __html: job.description }}
+              />
+            </Card>
+          )}
+
           <LongBlock
             label="Responsibilities"
             value={job.responsibilities}
@@ -237,11 +257,29 @@ export default async function PublicJobDetailPage({ params }) {
             value={job.requirements}
             icon={CircleCheck}
           />
-          <LongBlock
-            label="Benefits"
-            value={job.benefits}
-            icon={CircleCheck}
-          />
+          <LongBlock label="Benefits" value={job.benefits} icon={CircleCheck} />
+
+          {job.skills?.length > 0 && (
+            <Card className="rounded-2xl border border-(color-border) bg-(color-surface) p-6">
+              <h2 className="mb-4 text-lg font-semibold text-(color-text)">
+                Required Skills
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {job.skills.map((skill, index) => {
+                  const s = skill.trim();
+                  if (!s) return null;
+                  return (
+                    <span
+                      key={index}
+                      className="inline-flex items-center rounded-lg bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-500 border border-indigo-500/20"
+                    >
+                      {s}
+                    </span>
+                  );
+                })}
+              </div>
+            </Card>
+          )}
         </div>
 
         <aside className="flex flex-col gap-4">
@@ -316,20 +354,24 @@ export default async function PublicJobDetailPage({ params }) {
               <div className="flex items-center justify-between">
                 <dt className="text-(color-text-muted)">Work mode</dt>
                 <dd className="font-medium text-(color-text)">
-                  {job.remote ? (
-                    <JobRemoteBadge remote />
-                  ) : (
-                    "On-site / Hybrid"
-                  )}
+                  {job.workplaceType
+                    ? job.workplaceType
+                    : job.remote
+                      ? "Remote"
+                      : "On-site / Hybrid"}
                 </dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-(color-text-muted)">Location</dt>
-                <dd className="font-medium text-(color-text)">{location ?? "—"}</dd>
+                <dd className="font-medium text-(color-text)">
+                  {location ?? "—"}
+                </dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-(color-text-muted)">Salary</dt>
-                <dd className="font-medium text-(color-text)">{salary ?? "—"}</dd>
+                <dd className="font-medium text-(color-text)">
+                  {salary ?? "—"}
+                </dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-(color-text-muted)">Visibility</dt>

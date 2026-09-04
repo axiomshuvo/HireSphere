@@ -38,7 +38,7 @@ function JobFilterForm({ jobs, jobId, total }) {
         id="job-filter"
         name="jobId"
         defaultValue={jobId}
-        className="rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+        className="rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-sm text-foreground focus:border-indigo-500 focus:outline-none"
       >
         <option value="">All jobs ({total})</option>
         {jobs.map((job) => {
@@ -52,14 +52,14 @@ function JobFilterForm({ jobs, jobId, total }) {
       </select>
       <button
         type="submit"
-        className="cursor-pointer rounded-lg border border-white/10 bg-[#1b1c1e] px-4 py-2 text-sm text-white transition-colors hover:border-indigo-500/50"
+        className="cursor-pointer rounded-lg border border-default-200 bg-default-100 px-4 py-2 text-sm text-foreground transition-colors hover:border-indigo-500/50"
       >
         Apply
       </button>
       {jobId && (
         <Link
           href="/dashboard/recruiter/applications"
-          className="text-sm text-muted-foreground transition-colors hover:text-white"
+          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           Clear
         </Link>
@@ -97,8 +97,8 @@ export default async function RecruiterApplicationsPage({ searchParams }) {
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <Persons className="size-5 text-indigo-300" />
-            <h1 className="text-3xl font-semibold tracking-tight text-white">
+            <Persons className="size-5 text-indigo-500" />
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
               Applicants
             </h1>
           </div>
@@ -115,7 +115,7 @@ export default async function RecruiterApplicationsPage({ searchParams }) {
       {initialSorted.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
           <Persons className="size-8 text-muted-foreground" />
-          <h2 className="text-lg font-semibold text-white">No applicants yet</h2>
+          <h2 className="text-lg font-semibold text-foreground">No applicants yet</h2>
           <p className="max-w-sm text-sm text-muted-foreground">
             Share your public job links to start receiving applications.
           </p>

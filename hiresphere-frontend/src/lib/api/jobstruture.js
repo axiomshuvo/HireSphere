@@ -13,6 +13,17 @@ export function getSeekerPlanUsage(activeApplications, dbPlan = null) {
   };
 }
 
+export const DEMO_ACCOUNTS = {
+  seeker: {
+    email: "seeker@demo.com",
+    password: "password123",
+  },
+  recruiter: {
+    email: "recruiter@demo.com",
+    password: "password123",
+  },
+};
+
 export const JOB_CATEGORIES = [
   "Technology",
   "Engineering",
@@ -44,17 +55,31 @@ export function getPlanUsage(activeCount, dbPlan = null) {
   };
 }
 
+export const EXPERIENCE_LEVELS = [
+  "Internship",
+  "Entry-level",
+  "Mid-level",
+  "Senior",
+  "Lead",
+  "Executive",
+];
+
+export const WORKPLACE_TYPES = ["On-site", "Hybrid", "Remote"];
+
 export const EMPTY_JOB_FORM = {
   companySlug: "",
   title: "",
+  description: "",
+  experienceLevel: "Mid-level",
+  skills: [],
   category: "Technology",
   type: "Full-time",
+  workplaceType: "On-site",
   salaryMin: "",
   salaryMax: "",
   currency: "USD",
   city: "",
   country: "",
-  remote: false,
   deadline: "",
   responsibilities: "",
   requirements: "",
@@ -63,9 +88,20 @@ export const EMPTY_JOB_FORM = {
 };
 
 export function jobToFormValues(job) {
+  let parsedSkills = [];
+  if (Array.isArray(job?.skills)) {
+    parsedSkills = job.skills;
+  } else if (typeof job?.skills === "string" && job.skills.trim()) {
+    parsedSkills = job.skills
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
   return {
     ...EMPTY_JOB_FORM,
     ...job,
+    skills: parsedSkills,
   };
 }
 

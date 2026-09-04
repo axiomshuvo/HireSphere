@@ -64,7 +64,7 @@ export default function JobsTable({
       <div className="mb-4 flex items-center justify-between">
         <div>
           <Typography.Heading
-            className="text-lg font-semibold text-white"
+            className="text-lg font-semibold text-foreground"
             level={2}
           >
             Jobs
@@ -106,13 +106,13 @@ export default function JobsTable({
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href={`/dashboard/recruiter/jobs/${jobId}`}
-                      className="truncate text-base font-semibold text-white transition-colors hover:text-indigo-300"
+                      className="truncate text-base font-semibold text-foreground transition-colors hover:text-indigo-500"
                     >
                       {job.title || "Untitled job"}
                     </Link>
                     <JobStatusChip status={job.status} />
                     {job.closedReason === "company-renamed" && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-300">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-500">
                         company renamed
                       </span>
                     )}

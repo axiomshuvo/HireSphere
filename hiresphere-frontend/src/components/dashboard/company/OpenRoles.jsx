@@ -10,13 +10,13 @@ function RoleCard({ role }) {
     <div className="rounded-xl border border-default bg-[#1b1c1e] p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate font-medium text-white">{role.title}</p>
+          <p className="truncate font-medium text-foreground">{role.title}</p>
           <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
             <MapPin className="size-3" />
             {role.location}
           </p>
         </div>
-        <span className="shrink-0 rounded-md border border-white/10 bg-[#121316] px-2 py-1 text-xs text-white">
+        <span className="shrink-0 rounded-md border border-default-200 bg-[#121316] px-2 py-1 text-xs text-foreground">
           {role.salary}
         </span>
       </div>
@@ -51,7 +51,7 @@ export default function OpenRoles({ roles }) {
     <Card className="rounded-2xl border border-default bg-content1 p-5 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
         <Typography.Heading
-          className="text-lg font-semibold text-white"
+          className="text-lg font-semibold text-foreground"
           level={2}
         >
           Open Roles

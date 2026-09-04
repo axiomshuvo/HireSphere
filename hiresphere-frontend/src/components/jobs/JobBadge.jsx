@@ -54,7 +54,8 @@ const STATUS_META = {
     color: "emerald",
     icon: CircleCheck,
     label: "Active",
-    description: "This job is visible on the public board and accepting applications.",
+    description:
+      "This job is visible on the public board and accepting applications.",
   },
   draft: {
     color: "amber",
@@ -84,7 +85,14 @@ const COLOR_CLASSES = {
   purple: "bg-purple-500/15 text-purple-200 border-purple-400/30",
 };
 
-function BadgeShell({ color, Icon, label, title, size = "sm", className = "" }) {
+function BadgeShell({
+  color,
+  Icon,
+  label,
+  title,
+  size = "sm",
+  className = "",
+}) {
   const tone = COLOR_CLASSES[color] ?? COLOR_CLASSES.indigo;
   const sizing =
     size === "xs"
@@ -104,7 +112,10 @@ function BadgeShell({ color, Icon, label, title, size = "sm", className = "" }) 
 
 function lookup(map, value, fallback) {
   if (!value) return null;
-  return map[value] ?? fallback ?? { color: "indigo", icon: Tag, label: String(value) };
+  return (
+    map[value] ??
+    fallback ?? { color: "indigo", icon: Tag, label: String(value) }
+  );
 }
 
 export function JobTypeBadge({ type, size = "sm", className = "" }) {
@@ -167,6 +178,45 @@ export function JobRemoteBadge({ remote, size = "sm", className = "" }) {
       Icon={Globe}
       label="Remote"
       title="Fully remote — work from anywhere."
+      size={size}
+      className={className}
+    />
+  );
+}
+
+export function JobWorkplaceBadge({ type, size = "sm", className = "" }) {
+  if (!type) return null;
+  let color = "indigo";
+  let label = type;
+  if (type === "Remote") color = "purple";
+  if (type === "Hybrid") color = "sky";
+  if (type === "On-site") color = "amber";
+
+  return (
+    <BadgeShell
+      color={color}
+      Icon={Globe}
+      label={label}
+      title={`Workplace Type — ${label}`}
+      size={size}
+      className={className}
+    />
+  );
+}
+
+export function JobExperienceBadge({ level, size = "sm", className = "" }) {
+  if (!level) return null;
+  let color = "indigo";
+  if (level === "Senior" || level === "Lead" || level === "Executive")
+    color = "rose";
+  if (level === "Entry-level" || level === "Internship") color = "emerald";
+
+  return (
+    <BadgeShell
+      color={color}
+      Icon={Tag}
+      label={level}
+      title={`Experience Level — ${level}`}
       size={size}
       className={className}
     />

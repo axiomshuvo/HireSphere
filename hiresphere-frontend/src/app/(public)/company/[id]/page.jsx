@@ -3,7 +3,17 @@ import {
   fetchPublicCompanies,
   fetchPublicCompanyById,
 } from "@/lib/actions/company";
-import { ArrowRight, Briefcase, Globe, MapPin, Persons, Wallet } from "@gravity-ui/icons";
+import {
+  ArrowRight,
+  Briefcase,
+  Calendar,
+  Globe,
+  Link as LinkIcon,
+  LogoLinkedin,
+  MapPin,
+  Persons,
+  Wallet,
+} from "@gravity-ui/icons";
 import { Avatar, Card, Chip, Typography } from "@heroui/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -57,7 +67,9 @@ export default async function PublicCompanyPage({ params }) {
 
   if (!company) notFound();
 
-  const activeJobs = Array.isArray(company.activeJobs) ? company.activeJobs : [];
+  const activeJobs = Array.isArray(company.activeJobs)
+    ? company.activeJobs
+    : [];
   const initials = getInitials(company.name ?? "");
 
   return (
@@ -128,6 +140,48 @@ export default async function PublicCompanyPage({ params }) {
                   {company.employeeCount}
                 </span>
               )}
+              {company.foundedYear && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="size-3" />
+                  Founded {company.foundedYear}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              {company.website && (
+                <a
+                  href={company.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-foreground transition-colors hover:bg-white/10"
+                >
+                  <Globe className="size-3.5" />
+                  Website
+                </a>
+              )}
+              {company.linkedinUrl && (
+                <a
+                  href={company.linkedinUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-indigo-500 transition-colors hover:bg-white/10 hover:text-indigo-500"
+                >
+                  <LogoLinkedin className="size-3.5" />
+                  LinkedIn
+                </a>
+              )}
+              {company.twitterUrl && (
+                <a
+                  href={company.twitterUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-sky-400 transition-colors hover:bg-white/10 hover:text-sky-300"
+                >
+                  <LinkIcon className="size-3.5" />
+                  Twitter
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -144,20 +198,6 @@ export default async function PublicCompanyPage({ params }) {
           <p className="whitespace-pre-line text-sm leading-relaxed text-(color-text)">
             {company.description}
           </p>
-        </section>
-      )}
-
-      {company.website && (
-        <section className="mt-4">
-          <a
-            href={company.website}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-indigo-300 transition-colors hover:text-indigo-200"
-          >
-            <Globe className="size-3.5" />
-            {company.website}
-          </a>
         </section>
       )}
 
@@ -224,7 +264,7 @@ export default async function PublicCompanyPage({ params }) {
                     </div>
                     <div className="mt-auto flex items-center justify-between pt-2">
                       <DeadlineCountdown deadline={job.deadline} />
-                      <span className="inline-flex items-center gap-1 text-xs text-indigo-300 transition-colors group-hover:text-(color-text)">
+                      <span className="inline-flex items-center gap-1 text-xs text-indigo-500 transition-colors group-hover:text-(color-text)">
                         View
                         <ArrowRight className="size-3" />
                       </span>

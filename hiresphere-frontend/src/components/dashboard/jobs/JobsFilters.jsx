@@ -33,7 +33,7 @@ export default function JobsFilters({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex cursor-pointer items-center gap-1 text-xs text-indigo-300 transition-colors hover:text-indigo-200"
+            className="inline-flex cursor-pointer items-center gap-1 text-xs text-indigo-500 transition-colors hover:text-indigo-600"
           >
             <Xmark className="size-3" />
             Reset
@@ -56,7 +56,7 @@ export default function JobsFilters({
             value={query}
             onChange={(e) => onChangeQuery?.(e.target.value)}
             placeholder="Title, company, location…"
-            className="w-full rounded-lg border border-white/10 bg-[#1b1c1e] py-2 pl-9 pr-3 text-sm text-white placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none"
+            className="w-full rounded-lg border border-default-200 bg-default-100 py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none"
           />
         </div>
       </div>
@@ -74,8 +74,8 @@ export default function JobsFilters({
                   onClick={() => onChangeStatus?.(opt.id)}
                   className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
                     active
-                      ? "bg-default text-white"
-                      : "text-muted-foreground hover:bg-default hover:text-white"
+                      ? "bg-default text-foreground"
+                      : "text-muted-foreground hover:bg-default hover:text-foreground"
                   }`}
                 >
                   <span className="inline-flex items-center gap-2">
@@ -84,7 +84,7 @@ export default function JobsFilters({
                   </span>
                   <span
                     className={`text-xs ${
-                      active ? "text-white/80" : "text-muted-foreground"
+                      active ? "text-foreground/80" : "text-muted-foreground"
                     }`}
                   >
                     {count}
@@ -104,7 +104,7 @@ export default function JobsFilters({
         <select
           value={currentCompanyId}
           onChange={(e) => onChangeCompany?.(e.target.value)}
-          className="w-full rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          className="w-full rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-sm text-foreground focus:border-indigo-500 focus:outline-none"
         >
           <option value="all">All companies</option>
           {companies.map((c) => (

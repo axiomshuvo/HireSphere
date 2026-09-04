@@ -36,7 +36,7 @@ export default function DeleteJobDialog({ job, onConfirm }) {
               <Modal.Header>
                 <Modal.Heading>Delete job post?</Modal.Heading>
                 <Typography.Paragraph className="text-sm text-muted-foreground">
-                  This will permanently remove <span className="font-medium text-white">{job.title}</span>.
+                  This will permanently remove <span className="font-medium text-foreground">{job.title}</span>.
                 </Typography.Paragraph>
               </Modal.Header>
 

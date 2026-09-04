@@ -38,7 +38,7 @@ export default async function NewJobPage() {
           href="/dashboard/recruiter/jobs"
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-white"
+          className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to Manage Jobs
@@ -49,14 +49,14 @@ export default async function NewJobPage() {
         <div className="relative mb-6 overflow-hidden rounded-2xl border border-indigo-500/20 bg-content1 p-6 sm:p-8">
           <div className="absolute -right-10 -top-20 size-56 rounded-full bg-indigo-500/10 blur-3xl" />
           <div className="relative flex items-start gap-4">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-500/25">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/25">
               <Briefcase className="size-6" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-500">
                 Role publishing
               </p>
-              <h1 className="text-3xl font-semibold tracking-tight text-white">
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground">
                 Post a new job
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">

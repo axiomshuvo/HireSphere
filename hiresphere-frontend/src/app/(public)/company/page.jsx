@@ -1,6 +1,13 @@
 import { fetchPublicCompanies } from "@/lib/actions/company";
-import { Briefcase, Globe, MapPin, Magnifier, OfficeBadge, Person } from "@gravity-ui/icons";
-import { Avatar, Card, Chip } from "@heroui/react";
+import {
+  Briefcase,
+  Globe,
+  Magnifier,
+  MapPin,
+  OfficeBadge,
+  Person,
+} from "@gravity-ui/icons";
+import { Avatar, Chip } from "@heroui/react";
 import Link from "next/link";
 
 const PAGE_SIZE = 12;
@@ -65,7 +72,7 @@ export default async function PublicCompanyListPage({ searchParams }) {
   const params = await searchParams;
   const page = Math.max(1, Number(params?.page) || 1);
   const result = await fetchPublicCompanies({ page, pageSize: PAGE_SIZE });
-  const items = Array.isArray(result) ? result : result?.items ?? [];
+  const items = Array.isArray(result) ? result : (result?.items ?? []);
   const totalPages =
     typeof result?.totalPages === "number" ? Math.max(1, result.totalPages) : 1;
   const total = typeof result?.total === "number" ? result.total : items.length;
@@ -96,7 +103,7 @@ export default async function PublicCompanyListPage({ searchParams }) {
         <div className="relative">
           {/* Badge */}
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium text-(color-text-muted)">
-            <OfficeBadge className="size-3.5 text-indigo-300" />
+            <OfficeBadge className="size-3.5 text-indigo-500" />
             Discover companies hiring now
           </div>
 
@@ -104,7 +111,8 @@ export default async function PublicCompanyListPage({ searchParams }) {
             Companies on HireSphere
           </h1>
           <p className="mt-2 max-w-lg text-base text-(color-text-muted)">
-            Explore organizations building innovative products. Find your next role or partnership among our growing network.
+            Explore organizations building innovative products. Find your next
+            role or partnership among our growing network.
           </p>
         </div>
 
@@ -112,34 +120,42 @@ export default async function PublicCompanyListPage({ searchParams }) {
         <div className="relative mt-8 flex flex-wrap items-center gap-6">
           <div className="flex items-center gap-2.5">
             <div className="flex size-9 items-center justify-center rounded-xl bg-indigo-500/15 ring-1 ring-indigo-500/20">
-              <OfficeBadge className="size-4 text-indigo-300" />
+              <OfficeBadge className="size-4 text-indigo-500" />
             </div>
             <div>
-              <span className="block text-lg font-semibold text-(color-text)">{total}</span>
-              <span className="text-[11px] text-(color-text-muted)">companies</span>
+              <span className="block text-lg font-semibold text-(color-text)">
+                {total}
+              </span>
+              <span className="text-[11px] text-(color-text-muted)">
+                companies
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
             <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-500/15 ring-1 ring-emerald-500/20">
-              <Briefcase className="size-4 text-emerald-300" />
+              <Briefcase className="size-4 text-emerald-500" />
             </div>
             <div>
               <span className="block text-lg font-semibold text-(color-text)">
                 {totalOpenRoles.toLocaleString()}
               </span>
-              <span className="text-[11px] text-(color-text-muted)">open roles</span>
+              <span className="text-[11px] text-(color-text-muted)">
+                open roles
+              </span>
             </div>
           </div>
           {uniqueIndustries.length > 0 && (
             <div className="flex items-center gap-2.5">
               <div className="flex size-9 items-center justify-center rounded-xl bg-amber-500/15 ring-1 ring-amber-500/20">
-                <Globe className="size-4 text-amber-300" />
+                <Globe className="size-4 text-amber-500" />
               </div>
               <div>
                 <span className="block text-lg font-semibold text-(color-text)">
                   {uniqueIndustries.length}
                 </span>
-                <span className="text-[11px] text-(color-text-muted)">industries</span>
+                <span className="text-[11px] text-(color-text-muted)">
+                  industries
+                </span>
               </div>
             </div>
           )}
@@ -172,9 +188,12 @@ export default async function PublicCompanyListPage({ searchParams }) {
           <div className="flex size-16 items-center justify-center rounded-2xl bg-white/[0.03] ring-1 ring-white/10">
             <OfficeBadge className="size-7 text-(color-text-muted)" />
           </div>
-          <h2 className="text-xl font-semibold text-(color-text)">No companies listed yet</h2>
+          <h2 className="text-xl font-semibold text-(color-text)">
+            No companies listed yet
+          </h2>
           <p className="max-w-sm text-sm text-(color-text-muted)">
-            Recruiters haven&apos;t added any public company profiles yet. Check back soon as we onboard new organizations.
+            Recruiters haven&apos;t added any public company profiles yet. Check
+            back soon as we onboard new organizations.
           </p>
         </div>
       ) : (
@@ -190,7 +209,10 @@ export default async function PublicCompanyListPage({ searchParams }) {
               >
                 <div className="flex h-full flex-col rounded-2xl border border-white/8 bg-(color-surface-2) p-5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-indigo-500/30 group-hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
                   {/* Top accent line */}
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" style={{ width: '100%' }} />
+                  <div
+                    className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+                    style={{ width: "100%" }}
+                  />
 
                   <div className="flex items-start gap-3">
                     {/* Logo */}
@@ -203,12 +225,14 @@ export default async function PublicCompanyListPage({ searchParams }) {
                         />
                       ) : (
                         <Avatar.Root className="size-14 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/10 text-lg font-semibold text-indigo-200 ring-1 ring-indigo-500/20">
-                          <Avatar.Fallback>{getInitials(company.name ?? "")}</Avatar.Fallback>
+                          <Avatar.Fallback>
+                            {getInitials(company.name ?? "")}
+                          </Avatar.Fallback>
                         </Avatar.Root>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h2 className="truncate text-base font-semibold text-(color-text) group-hover:text-indigo-200 transition-colors">
+                      <h2 className="truncate text-base font-semibold text-(color-text) group-hover:text-indigo-600 transition-colors">
                         {company.name ?? "Unnamed company"}
                       </h2>
                       {company.industry && (
@@ -245,7 +269,7 @@ export default async function PublicCompanyListPage({ searchParams }) {
                     )}
                     {company.website && (
                       <span className="inline-flex items-center gap-1.5">
-                        <Globe className="size-3 text-indigo-400/70" />
+                        <Globe className="size-3 text-indigo-500/70" />
                       </span>
                     )}
                   </div>
@@ -253,18 +277,33 @@ export default async function PublicCompanyListPage({ searchParams }) {
                   {/* Bottom row */}
                   <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
                     <span className="inline-flex items-center gap-1.5 text-xs">
-                      <Briefcase className="size-3.5 text-indigo-300/60" />
-                      <span className={activeJobs > 0 ? "text-(color-text) font-medium" : "text-(color-text-muted)"}>
+                      <Briefcase className="size-3.5 text-indigo-500/60" />
+                      <span
+                        className={
+                          activeJobs > 0
+                            ? "text-(color-text) font-medium"
+                            : "text-(color-text-muted)"
+                        }
+                      >
                         {activeJobs > 0
                           ? `${activeJobs} open ${activeJobs === 1 ? "role" : "roles"}`
-                          : "No open roles"
-                        }
+                          : "No open roles"}
                       </span>
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-indigo-300 transition-colors group-hover:text-(color-text)">
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-indigo-500 transition-colors group-hover:text-(color-text)">
                       View profile
-                      <svg className="size-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      <svg
+                        className="size-3 transition-transform group-hover:translate-x-0.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
                       </svg>
                     </span>
                   </div>

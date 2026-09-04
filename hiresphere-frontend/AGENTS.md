@@ -7,3 +7,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# CRITICAL RULE: Version Check Before Reading Files
+
+ALWAYS check `package.json` for library versions and verify the component exports/API (e.g. `node_modules/@heroui/react/dist/components/...`) BEFORE assuming syntax is incorrect.
+UI libraries like HeroUI v3 introduced compound dot-notation components (e.g., `Dropdown.Menu`, `Drawer.Trigger`), which are fundamentally different from NextUI v2. Do not hallucinate downgrades.

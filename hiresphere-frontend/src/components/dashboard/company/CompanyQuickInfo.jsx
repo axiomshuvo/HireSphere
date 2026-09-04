@@ -13,12 +13,12 @@ function InfoRow({ label, value, href }) {
           href={href}
           target="_blank"
           rel="noreferrer"
-          className="truncate text-right text-sm text-indigo-400 transition-colors hover:text-indigo-300"
+          className="truncate text-right text-sm text-indigo-500 transition-colors hover:text-indigo-500"
         >
           {value}
         </a>
       ) : (
-        <span className="truncate text-right text-sm text-white">{value}</span>
+        <span className="truncate text-right text-sm text-foreground">{value}</span>
       )}
     </div>
   );

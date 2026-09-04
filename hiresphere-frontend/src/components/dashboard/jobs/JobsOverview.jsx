@@ -13,10 +13,10 @@ import { getPlanUsage } from "@/lib/api/jobstruture";
 
 function StatTile({ label, value, icon: Icon, color }) {
   const ring = {
-    emerald: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-    amber: "border-amber-500/30 bg-amber-500/10 text-amber-300",
+    emerald: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",
+    amber: "border-amber-500/30 bg-amber-500/10 text-amber-500",
     red: "border-red-500/30 bg-red-500/10 text-red-300",
-    indigo: "border-indigo-500/30 bg-indigo-500/10 text-indigo-300",
+    indigo: "border-indigo-500/30 bg-indigo-500/10 text-indigo-500",
   }[color];
 
   return (
@@ -31,7 +31,7 @@ function StatTile({ label, value, icon: Icon, color }) {
           <p className="truncate text-xs uppercase tracking-wider text-muted-foreground">
             {label}
           </p>
-          <p className="mt-0.5 text-2xl font-semibold text-white">{value}</p>
+          <p className="mt-0.5 text-2xl font-semibold text-foreground">{value}</p>
         </div>
       </div>
     </Card>

@@ -38,7 +38,7 @@ export default async function EditJobPage({ params }) {
           href="/dashboard/recruiter/jobs"
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-white"
+          className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to Manage Jobs

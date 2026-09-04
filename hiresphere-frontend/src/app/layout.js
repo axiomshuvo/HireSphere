@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/providers/ThemeProvider";
 import Toast from "@/providers/Toast";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -14,15 +15,20 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  // We leave the default HTML classes as dark to avoid flashing,
+  // the client-side ThemeProvider will handle swapping if the user prefers light.
   return (
     <html
       lang="en"
       data-theme="dark"
       className={`${inter.variable} dark h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
-        {children}
-        <Toast />
+      <body className="flex min-h-full flex-col">
+        <ThemeProvider>
+          {children}
+          <Toast />
+        </ThemeProvider>
       </body>
     </html>
   );

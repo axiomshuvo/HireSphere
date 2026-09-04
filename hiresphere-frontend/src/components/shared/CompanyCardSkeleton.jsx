@@ -5,7 +5,7 @@ import { Avatar, Card } from "@heroui/react";
 
 export default function CompanyCardSkeleton() {
   return (
-    <Card className="flex h-full flex-col gap-3 rounded-2xl border border-(color-border) bg-(color-surface-2) p-5">
+    <Card className="flex h-full flex-col gap-3 rounded-2xl border border-default-200 bg-default-100 p-5">
       <div className="flex items-start gap-3">
         <Avatar.Root className="size-14 shrink-0 rounded-2xl">
           <Avatar.Fallback>
@@ -26,7 +26,7 @@ export default function CompanyCardSkeleton() {
         <SkeletonBlock className="h-4 w-14 rounded" />
       </div>
 
-      <div className="mt-auto flex items-center justify-between pt-4 border-t border-(color-border)">
+      <div className="mt-auto flex items-center justify-between pt-4 border-t border-default-200">
         <SkeletonBlock className="h-4 w-20 rounded" />
         <SkeletonBlock className="h-4 w-8 rounded" />
       </div>

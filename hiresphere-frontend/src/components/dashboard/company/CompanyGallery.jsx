@@ -50,7 +50,7 @@ export default function CompanyGallery({ images = [] }) {
       <Card className="overflow-hidden rounded-2xl border border-default bg-content1">
         <div className="flex items-center justify-between border-b border-white/5 px-5 py-3 sm:px-6 sm:py-4">
           <div>
-            <h2 className="text-lg font-semibold text-white">Gallery</h2>
+            <h2 className="text-lg font-semibold text-foreground">Gallery</h2>
             <p className="text-xs text-muted-foreground">
               {safeImages.length} {safeImages.length === 1 ? "image" : "images"}
             </p>
@@ -138,7 +138,7 @@ export default function CompanyGallery({ images = [] }) {
           <button
             type="button"
             onClick={() => setLightboxOpen(false)}
-            className="absolute right-4 top-4 flex size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="absolute right-4 top-4 flex size-11 items-center justify-center rounded-full bg-white/10 text-foreground transition-colors hover:bg-white/20"
             aria-label="Close"
           >
             <Xmark className="size-5" />
@@ -150,7 +150,7 @@ export default function CompanyGallery({ images = [] }) {
               e.stopPropagation();
               goPrev();
             }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 flex size-12 items-center justify-center rounded-full bg-white/10 text-white transition-all hover:scale-110 hover:bg-white/20"
+            className="absolute left-4 top-1/2 -translate-y-1/2 flex size-12 items-center justify-center rounded-full bg-white/10 text-foreground transition-all hover:scale-110 hover:bg-white/20"
             aria-label="Previous image"
           >
             <CircleChevronLeft className="size-7" />
@@ -162,7 +162,7 @@ export default function CompanyGallery({ images = [] }) {
               e.stopPropagation();
               goNext();
             }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 flex size-12 items-center justify-center rounded-full bg-white/10 text-white transition-all hover:scale-110 hover:bg-white/20"
+            className="absolute right-4 top-1/2 -translate-y-1/2 flex size-12 items-center justify-center rounded-full bg-white/10 text-foreground transition-all hover:scale-110 hover:bg-white/20"
             aria-label="Next image"
           >
             <CircleChevronRight className="size-7" />
@@ -176,7 +176,9 @@ export default function CompanyGallery({ images = [] }) {
             <img
               src={safeImages[activeIndex]}
               alt={`Gallery ${activeIndex + 1}`}
-              className="max-h-[90vh] w-auto rounded-2xl object-contain shadow-2xl"
+              classNames={{ wrapper: "w-auto max-h-[90vh]", img: "max-h-[90vh] w-auto rounded-2xl object-contain shadow-2xl" }}
+              radius="lg"
+              key={activeIndex}
             />
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
               {activeIndex + 1} / {safeImages.length}

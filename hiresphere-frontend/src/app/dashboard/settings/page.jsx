@@ -46,9 +46,9 @@ const SECTIONS = [
 ];
 
 const TONES = {
-  indigo: "bg-indigo-500/10 text-indigo-300 ring-indigo-500/20",
-  emerald: "bg-emerald-500/10 text-emerald-300 ring-emerald-500/20",
-  amber: "bg-amber-500/10 text-amber-300 ring-amber-500/20",
+  indigo: "bg-indigo-500/10 text-indigo-500 ring-indigo-500/20",
+  emerald: "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20",
+  amber: "bg-amber-500/10 text-amber-500 ring-amber-500/20",
 };
 
 function formatRole(role) {
@@ -66,10 +66,10 @@ export default async function SettingsPage() {
     <div className="flex-1 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <header className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-500">
             Workspace controls
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
             Settings
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
@@ -86,10 +86,10 @@ export default async function SettingsPage() {
                 <Person className="size-6" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wider text-indigo-300">
+                <p className="text-xs font-semibold uppercase tracking-wider text-indigo-500">
                   Signed-in account
                 </p>
-                <h2 className="mt-1 truncate text-xl font-semibold text-white">
+                <h2 className="mt-1 truncate text-xl font-semibold text-foreground">
                   {user.name || "Your account"}
                 </h2>
                 <p className="mt-1 truncate text-sm text-muted-foreground">
@@ -109,11 +109,13 @@ export default async function SettingsPage() {
 
           <Card className="rounded-2xl border border-default bg-content1 p-6">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/20">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500 ring-1 ring-rose-500/20">
                 <Lock className="size-5" />
               </div>
               <div>
-                <h2 className="font-semibold text-white">Account access</h2>
+                <h2 className="font-semibold text-foreground">
+                  Account access
+                </h2>
                 <p className="text-xs text-muted-foreground">
                   Secure login controls
                 </p>
@@ -125,7 +127,7 @@ export default async function SettingsPage() {
             </p>
             <Link
               href="/dashboard/profile"
-              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-indigo-300 transition-colors hover:text-indigo-200"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-indigo-500 transition-colors hover:text-indigo-600"
             >
               Review profile
               <ChevronRight className="size-4" />
@@ -146,7 +148,7 @@ export default async function SettingsPage() {
                   <Icon className="size-5" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-white">{title}</h2>
+                  <h2 className="font-semibold text-foreground">{title}</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {description}
                   </p>
@@ -159,7 +161,9 @@ export default async function SettingsPage() {
                     className="flex items-center justify-between gap-4 py-4 last:pb-0"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white">{label}</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {label}
+                      </p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {optionDescription}
                       </p>

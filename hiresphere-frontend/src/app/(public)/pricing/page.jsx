@@ -137,7 +137,7 @@ function TierCard({ tier, planParam, planRole, isLoggedIn, onGetStarted }) {
         <div
           className={
             tier.highlight
-              ? "flex size-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-300"
+              ? "flex size-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-500"
               : "flex size-10 items-center justify-center rounded-xl bg-(color-surface-2) text-(color-text)"
           }
         >
@@ -385,7 +385,7 @@ export default function PricingPage() {
           Can&apos;t find what you&apos;re looking for?{" "}
           <Link
             href="/help"
-            className="text-indigo-300 transition-colors hover:text-indigo-200"
+            className="text-indigo-500 transition-colors hover:text-indigo-600"
           >
             Contact support
           </Link>
@@ -401,7 +401,7 @@ export default function PricingPage() {
               >
                 <Accordion.Heading>
                   <Accordion.Trigger className="group flex w-full items-center gap-3 py-4 text-left">
-                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-(color-surface-2) text-indigo-300">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-(color-surface-2) text-indigo-500">
                       <CircleQuestion className="size-4" />
                     </div>
                     <span className="flex-1 text-sm font-semibold text-(color-text)">
@@ -425,7 +425,7 @@ export default function PricingPage() {
 
       {/* Enterprise CTA */}
       <Card className="mt-16 rounded-2xl border border-(color-border) bg-[radial-gradient(circle_at_30%_50%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#16181c,#0f1013)] p-8 text-center">
-        <Sparkles className="mx-auto size-8 text-indigo-300" />
+        <Sparkles className="mx-auto size-8 text-indigo-500" />
         <h2 className="mt-3 text-2xl font-semibold text-(color-text)">
           Hiring at scale?
         </h2>

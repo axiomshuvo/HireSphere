@@ -84,7 +84,7 @@ export default function NewCompanyPage() {
           href="/dashboard/mycompany"
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-white"
+          className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to My Companies
@@ -95,14 +95,14 @@ export default function NewCompanyPage() {
         <div className="relative mb-6 overflow-hidden rounded-2xl border border-emerald-500/20 bg-content1 p-6 sm:p-8">
           <div className="absolute -right-10 -top-20 size-56 rounded-full bg-emerald-500/10 blur-3xl" />
           <div className="relative flex items-start gap-4">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/25">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/25">
               <OfficeBadge className="size-6" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">
                 Company profile
               </p>
-              <h1 className="text-3xl font-semibold tracking-tight text-white">
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground">
                 Add a new company
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -135,7 +135,7 @@ export default function NewCompanyPage() {
               type="submit"
               variant="primary"
               isDisabled={isSubmitting}
-              className="h-11 cursor-pointer rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 font-semibold text-white shadow-lg shadow-emerald-500/20"
+              className="h-11 cursor-pointer rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 font-semibold text-foreground shadow-lg shadow-emerald-500/20"
             >
               {isSubmitting ? "Registering…" : "Register Company"}
             </Button>

@@ -140,7 +140,7 @@ export default function CompanyDetailPage({ params }) {
           href="/dashboard/mycompany"
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-white"
+          className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to My Companies
@@ -159,7 +159,7 @@ export default function CompanyDetailPage({ params }) {
             <div className="flex items-center gap-3">
               <TrashBin className="size-5 shrink-0 text-red-400" />
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-foreground">
                   Delete <span className="font-semibold">{company.name}</span>?
                 </p>
                 <p className="text-xs text-muted-foreground">

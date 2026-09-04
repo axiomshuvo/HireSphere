@@ -5,8 +5,10 @@ import { getCompanyName, getCompanySlug } from "@/lib/api/companies";
 import {
   CURRENCIES,
   EMPTY_JOB_FORM,
+  EXPERIENCE_LEVELS,
   JOB_CATEGORIES,
   JOB_TYPES,
+  WORKPLACE_TYPES,
   getJobId,
   getPlanUsage,
   jobToFormValues,
@@ -18,28 +20,40 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const inputClass = (error) =>
-  `h-11 w-full rounded-xl border bg-[#17191d] px-3 text-sm text-white placeholder-gray-500 shadow-inner shadow-black/10 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
+  `h-11 w-full rounded-xl border bg-[#17191d] px-3 text-sm text-foreground placeholder-gray-500 shadow-inner shadow-black/10 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
     error
       ? "border-red-500 focus:border-red-500"
       : "border-white/10 focus:border-indigo-500"
   }`;
 
-const labelClass =
-  "mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground";
-
-function Field({ label, error, children }) {
+function Field({ label, required, error, children }) {
   return (
-    <div>
-      <label className={labelClass}>{label}</label>
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </label>
+        {required && (
+          <span className="text-[10px] font-bold uppercase tracking-wider text-red-400">
+            * Required
+          </span>
+        )}
+      </div>
       {children}
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }
 
-export default function JobForm({ job, activeJobCount = 0, companies = [], userPlan = null }) {
+export default function JobForm({
+  job,
+  activeJobCount = 0,
+  userPlan = "free",
+  isEditing = false,
+  companies = [],
+  onSubmit,
+}) {
   const router = useRouter();
-  const isEditing = Boolean(job);
   const usage = getPlanUsage(activeJobCount, userPlan);
 
   const [formData, setFormData] = useState(() =>
@@ -47,6 +61,25 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
   );
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [skillInput, setSkillInput] = useState("");
+
+  const handleSkillKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const val = skillInput.trim();
+      if (val && !formData.skills.includes(val)) {
+        setFormData((prev) => ({ ...prev, skills: [...prev.skills, val] }));
+      }
+      setSkillInput("");
+    }
+  };
+
+  const removeSkill = (skillToRemove) => {
+    setFormData((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((s) => s !== skillToRemove),
+    }));
+  };
 
   const selectedCompany = companies.find(
     (c) => getCompanySlug(c) === formData.companySlug,
@@ -58,10 +91,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleCompanyChange = (key) => {
@@ -79,14 +109,19 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
     if (!formData.companySlug)
       newErrors.companySlug = "Please select a company.";
     if (!formData.title.trim()) newErrors.title = "Job title is required.";
+    if (!formData.description?.trim())
+      newErrors.description = "Role description is required.";
     if (!formData.salaryMin)
       newErrors.salaryMin = "Minimum salary is required.";
     if (!formData.salaryMax)
       newErrors.salaryMax = "Maximum salary is required.";
-    if (!formData.remote && !formData.city.trim()) {
+
+    // Remote logic: if workplaceType is not Remote, require city and country
+    const isRemote = formData.workplaceType === "Remote" || formData.remote;
+    if (!isRemote && !formData.city.trim()) {
       newErrors.city = "City is required unless the job is remote.";
     }
-    if (!formData.remote && !formData.country.trim()) {
+    if (!isRemote && !formData.country.trim()) {
       newErrors.country = "Country is required unless the job is remote.";
     }
     if (!formData.deadline) newErrors.deadline = "Deadline is required.";
@@ -139,7 +174,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
       <div className="rounded-2xl border border-default bg-content1 p-6 shadow-2xl shadow-black/10 sm:p-8">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div>
-            <h2 className="text-base font-semibold text-white">
+            <h2 className="text-base font-semibold text-foreground">
               {isEditing ? "Edit Job" : "Job Details"}
             </h2>
             <p className="mt-0.5 text-xs text-gray-500">
@@ -169,7 +204,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Field label="Company" error={errors.companySlug}>
+            <Field label="Company" required error={errors.companySlug}>
               {companies.length === 0 ? (
                 <p className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-200">
                   You don&apos;t have any companies yet.{" "}
@@ -214,7 +249,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
           </div>
 
           <div className="sm:col-span-2">
-            <Field label="Job Title" error={errors.title}>
+            <Field label="Job Title" required error={errors.title}>
               <input
                 name="title"
                 placeholder="e.g. Senior Frontend Developer"
@@ -225,7 +260,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
             </Field>
           </div>
 
-          <Field label="Category">
+          <Field label="Category" required>
             <select
               name="category"
               value={formData.category}
@@ -240,7 +275,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
             </select>
           </Field>
 
-          <Field label="Job Type">
+          <Field label="Job Type" required>
             <select
               name="type"
               value={formData.type}
@@ -255,7 +290,77 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
             </select>
           </Field>
 
-          <Field label="Salary Min" error={errors.salaryMin}>
+          <Field label="Experience Level" required>
+            <select
+              name="experienceLevel"
+              value={formData.experienceLevel}
+              onChange={handleChange}
+              className={inputClass()}
+            >
+              {EXPERIENCE_LEVELS.map((lvl) => (
+                <option key={lvl} value={lvl}>
+                  {lvl}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Workplace Type" required>
+            <select
+              name="workplaceType"
+              value={formData.workplaceType}
+              onChange={handleChange}
+              className={inputClass()}
+            >
+              {WORKPLACE_TYPES.map((wpt) => (
+                <option key={wpt} value={wpt}>
+                  {wpt}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <div className="sm:col-span-2">
+            <Field label="Required Skills" error={errors.skills}>
+              <div
+                className={`flex flex-col gap-2 rounded-xl border bg-[#17191d] p-2 transition-colors focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-emerald-500/20 ${
+                  errors.skills ? "border-red-500" : "border-white/10"
+                }`}
+              >
+                <div className="flex flex-wrap gap-2">
+                  {formData.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="flex items-center gap-1 rounded-md bg-indigo-500/20 px-2 py-1 text-xs text-indigo-500"
+                    >
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => removeSkill(skill)}
+                        className="text-indigo-500 hover:text-indigo-600"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    name="skills"
+                    placeholder={
+                      formData.skills.length === 0
+                        ? "Type a skill and press Enter or Comma..."
+                        : ""
+                    }
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    onKeyDown={handleSkillKeyDown}
+                    className="flex-1 bg-transparent px-1 text-sm text-foreground placeholder-gray-500 focus:outline-none min-w-[120px]"
+                  />
+                </div>
+              </div>
+            </Field>
+          </div>
+
+          <Field label="Salary Min" required error={errors.salaryMin}>
             <input
               name="salaryMin"
               type="number"
@@ -266,7 +371,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
             />
           </Field>
 
-          <Field label="Salary Max" error={errors.salaryMax}>
+          <Field label="Salary Max" required error={errors.salaryMax}>
             <input
               name="salaryMax"
               type="number"
@@ -277,7 +382,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
             />
           </Field>
 
-          <Field label="Currency">
+          <Field label="Currency" required>
             <select
               name="currency"
               value={formData.currency}
@@ -292,7 +397,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
             </select>
           </Field>
 
-          <Field label="Deadline" error={errors.deadline}>
+          <Field label="Deadline" required error={errors.deadline}>
             <input
               name="deadline"
               type="date"
@@ -302,24 +407,32 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
             />
           </Field>
 
-          <Field label="City" error={errors.city}>
+          <Field
+            label="City"
+            required={formData.workplaceType !== "Remote" && !formData.remote}
+            error={errors.city}
+          >
             <input
               name="city"
               placeholder="San Francisco"
               value={formData.city}
               onChange={handleChange}
-              disabled={formData.remote}
+              disabled={formData.workplaceType === "Remote" || formData.remote}
               className={`${inputClass(errors.city)} disabled:opacity-40`}
             />
           </Field>
 
-          <Field label="Country" error={errors.country}>
+          <Field
+            label="Country"
+            required={formData.workplaceType !== "Remote" && !formData.remote}
+            error={errors.country}
+          >
             <input
               name="country"
               placeholder="USA"
               value={formData.country}
               onChange={handleChange}
-              disabled={formData.remote}
+              disabled={formData.workplaceType === "Remote" || formData.remote}
               className={`${inputClass(errors.country)} disabled:opacity-40`}
             />
           </Field>
@@ -353,7 +466,26 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
         </div>
 
         <div className="mt-5 space-y-4 border-t border-white/10 pt-5">
-          <Field label="Responsibilities" error={errors.responsibilities}>
+          <Field
+            label="Role Description / Mission"
+            required
+            error={errors.description}
+          >
+            <textarea
+              name="description"
+              placeholder="Provide a general overview of the role and its mission..."
+              value={formData.description}
+              onChange={handleChange}
+              rows={4}
+              className={`${inputClass(errors.description)} resize-y`}
+            />
+          </Field>
+
+          <Field
+            label="Responsibilities"
+            required
+            error={errors.responsibilities}
+          >
             <textarea
               name="responsibilities"
               placeholder="List the key responsibilities..."
@@ -364,7 +496,7 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
             />
           </Field>
 
-          <Field label="Requirements" error={errors.requirements}>
+          <Field label="Requirements" required error={errors.requirements}>
             <textarea
               name="requirements"
               placeholder="List the required skills and experience..."
@@ -399,14 +531,14 @@ export default function JobForm({ job, activeJobCount = 0, companies = [], userP
           <button
             type="button"
             onClick={() => router.push("/dashboard/recruiter/jobs")}
-            className="h-11 rounded-xl border border-white/10 bg-default px-5 text-sm font-medium text-white transition-colors hover:border-indigo-500/40 hover:bg-default-foreground/10"
+            className="h-11 rounded-xl border border-default-200 bg-default px-5 text-sm font-medium text-foreground transition-colors hover:border-indigo-500/40 hover:bg-default-foreground/10"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting || (!isEditing && !usage.hasAvailableSlots)}
-            className="h-11 cursor-pointer rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 px-5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-colors hover:from-indigo-400 hover:to-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-11 cursor-pointer rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 px-5 text-sm font-semibold text-foreground shadow-lg shadow-indigo-500/20 transition-colors hover:from-indigo-400 hover:to-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting
               ? isEditing

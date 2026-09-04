@@ -64,7 +64,7 @@ export default function ApplyButton({
     return (
       <Link
         href="/dashboard/applications"
-        className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-6 py-3 text-sm font-semibold text-emerald-300 transition-colors hover:border-emerald-500/60 lg:w-auto ${className}`}
+        className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-6 py-3 text-sm font-semibold text-emerald-500 transition-colors hover:border-emerald-500/60 lg:w-auto ${className}`}
       >
         <Check className="size-4" />
         Applied — view applications

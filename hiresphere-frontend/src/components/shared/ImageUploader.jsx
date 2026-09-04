@@ -100,7 +100,7 @@ export default function ImageUploader({ value, onChange, multiple = false }) {
               type="button"
               onClick={pickFiles}
               disabled={uploading}
-              className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-white/15 bg-[#1b1c1e] text-muted-foreground transition-colors hover:border-indigo-500/50 hover:text-white disabled:opacity-50"
+              className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-default-200 bg-default-100 text-muted-foreground transition-colors hover:border-indigo-500/50 hover:text-foreground disabled:opacity-50"
             >
               <CirclePlus className="size-6 transition-transform group-hover:scale-110" />
               <span className="text-[10px] font-medium uppercase tracking-wide">
@@ -142,13 +142,13 @@ export default function ImageUploader({ value, onChange, multiple = false }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={value} alt="Logo" className="size-full object-cover" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
-                <span className="text-[10px] font-medium uppercase tracking-wide text-white">
+                <span className="text-[10px] font-medium uppercase tracking-wide text-foreground">
                   Replace
                 </span>
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center gap-1 text-muted-foreground group-hover:text-white">
+            <div className="flex flex-col items-center gap-1 text-muted-foreground group-hover:text-foreground">
               <Picture className="size-6" />
               <span className="text-[10px] font-medium uppercase tracking-wide">
                 {uploading ? "Uploading…" : "Upload"}
@@ -158,7 +158,7 @@ export default function ImageUploader({ value, onChange, multiple = false }) {
         </button>
 
         <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-          <p className="font-medium text-white">Company logo</p>
+          <p className="font-medium text-foreground">Company logo</p>
           <p>PNG, JPG, WebP up to 5MB</p>
           {value ? (
             <button

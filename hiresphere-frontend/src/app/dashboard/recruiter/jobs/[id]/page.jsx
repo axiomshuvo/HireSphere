@@ -46,12 +46,12 @@ function InfoRow({ label, value, href }) {
           href={href}
           target="_blank"
           rel="noreferrer"
-          className="truncate text-right text-sm text-indigo-400 transition-colors hover:text-indigo-300"
+          className="truncate text-right text-sm text-indigo-500 transition-colors hover:text-indigo-500"
         >
           {value}
         </a>
       ) : (
-        <span className="truncate text-right text-sm text-white">
+        <span className="truncate text-right text-sm text-foreground">
           {value ?? "—"}
         </span>
       )}
@@ -66,7 +66,7 @@ function LongBlock({ label, value }) {
       <Typography.Paragraph className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {label}
       </Typography.Paragraph>
-      <p className="whitespace-pre-line text-sm leading-relaxed text-white">
+      <p className="whitespace-pre-line text-sm leading-relaxed text-foreground">
         {value}
       </p>
     </Card>
@@ -200,14 +200,14 @@ export default function JobDetailPage({ params }) {
       <div className="flex flex-1 items-center justify-center px-4 py-16">
         <div className="rounded-2xl border border-default bg-content1 p-8 text-center">
           <Typography.Heading
-            className="text-xl font-semibold text-white"
+            className="text-xl font-semibold text-foreground"
             level={2}
           >
             Job not found
           </Typography.Heading>
           <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
             We couldn&apos;t find a job with the id{" "}
-            <span className="font-mono text-white">{id}</span>.
+            <span className="font-mono text-foreground">{id}</span>.
           </Typography.Paragraph>
           <ButtonLink
             href="/dashboard/recruiter/jobs"
@@ -247,7 +247,7 @@ export default function JobDetailPage({ params }) {
           href="/dashboard/recruiter/jobs"
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-white"
+          className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to Manage Jobs
@@ -286,7 +286,7 @@ export default function JobDetailPage({ params }) {
                 )}
               </div>
 
-              <h1 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                 {job.title}
               </h1>
 
@@ -296,12 +296,12 @@ export default function JobDetailPage({ params }) {
                   {companyHref ? (
                     <a
                       href={companyHref}
-                      className="text-white transition-colors hover:text-indigo-300"
+                      className="text-foreground transition-colors hover:text-indigo-500"
                     >
                       {companyName}
                     </a>
                   ) : (
-                    <span className="text-white">{companyName}</span>
+                    <span className="text-foreground">{companyName}</span>
                   )}
                 </p>
               )}
@@ -329,7 +329,7 @@ export default function JobDetailPage({ params }) {
 
               {job.id && (
                 <div className="mt-4 inline-flex items-center gap-2 rounded-md border border-white/10 bg-[#1b1c1e] px-2 py-1 font-mono text-[10px] text-muted-foreground">
-                  <span className="text-white/40">ID</span>
+                  <span className="text-foreground/40">ID</span>
                   <span>{job.id}</span>
                 </div>
               )}
@@ -366,7 +366,7 @@ export default function JobDetailPage({ params }) {
             <Typography.Paragraph className="text-xs uppercase tracking-wider text-muted-foreground">
               Applicants
             </Typography.Paragraph>
-            <Typography.Paragraph className="mt-1 text-lg font-semibold text-white">
+            <Typography.Paragraph className="mt-1 text-lg font-semibold text-foreground">
               {job.applicants ?? 0}
             </Typography.Paragraph>
           </Card>
@@ -374,7 +374,7 @@ export default function JobDetailPage({ params }) {
             <Typography.Paragraph className="text-xs uppercase tracking-wider text-muted-foreground">
               Posted
             </Typography.Paragraph>
-            <Typography.Paragraph className="mt-1 text-sm font-semibold text-white">
+            <Typography.Paragraph className="mt-1 text-sm font-semibold text-foreground">
               {formatJobDate(getJobCreatedAt(job))}
             </Typography.Paragraph>
           </Card>
@@ -382,7 +382,7 @@ export default function JobDetailPage({ params }) {
             <Typography.Paragraph className="text-xs uppercase tracking-wider text-muted-foreground">
               Closes
             </Typography.Paragraph>
-            <Typography.Paragraph className="mt-1 text-sm font-semibold text-white">
+            <Typography.Paragraph className="mt-1 text-sm font-semibold text-foreground">
               {job.deadline ? formatJobDate(job.deadline) : "—"}
             </Typography.Paragraph>
           </Card>
@@ -390,7 +390,7 @@ export default function JobDetailPage({ params }) {
             <Typography.Paragraph className="text-xs uppercase tracking-wider text-muted-foreground">
               Type
             </Typography.Paragraph>
-            <Typography.Paragraph className="mt-1 text-sm font-semibold text-white">
+            <Typography.Paragraph className="mt-1 text-sm font-semibold text-foreground">
               {job.type ?? "—"}
             </Typography.Paragraph>
           </Card>
@@ -398,9 +398,45 @@ export default function JobDetailPage({ params }) {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="flex flex-col gap-6 lg:col-span-2">
+            {job.description && (
+              <Card className="rounded-2xl border border-default bg-content1 p-5">
+                <Typography.Paragraph className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Role Overview
+                </Typography.Paragraph>
+                <div
+                  className="prose prose-invert max-w-none text-sm leading-relaxed text-foreground"
+                  dangerouslySetInnerHTML={{ __html: job.description }}
+                />
+              </Card>
+            )}
+
             <LongBlock label="Responsibilities" value={job.responsibilities} />
             <LongBlock label="Requirements" value={job.requirements} />
             <LongBlock label="Benefits" value={job.benefits} />
+
+            {job.skills?.length > 0 && (
+              <Card className="rounded-2xl border border-default bg-content1 p-5">
+                <Typography.Paragraph className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Required Skills
+                </Typography.Paragraph>
+                <div className="flex flex-wrap gap-2">
+                  {job.skills.map((skill, index) => {
+                    const s = skill.trim();
+                    if (!s) return null;
+                    return (
+                      <Chip
+                        key={index}
+                        variant="flat"
+                        color="primary"
+                        size="sm"
+                      >
+                        {s}
+                      </Chip>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
           </div>
 
           <div className="flex flex-col gap-6 lg:col-span-1">
@@ -416,9 +452,15 @@ export default function JobDetailPage({ params }) {
                 />
                 <InfoRow label="Category" value={job.category ?? "—"} />
                 <InfoRow label="Type" value={job.type ?? "—"} />
+                {job.experienceLevel && (
+                  <InfoRow label="Level" value={job.experienceLevel} />
+                )}
                 <InfoRow
                   label="Work mode"
-                  value={isRemote ? "Fully remote" : "On-site / Hybrid"}
+                  value={
+                    job.workplaceType ||
+                    (isRemote ? "Fully remote" : "On-site / Hybrid")
+                  }
                 />
                 <InfoRow
                   label="Location"
@@ -449,7 +491,7 @@ export default function JobDetailPage({ params }) {
                     </Avatar.Fallback>
                   </Avatar.Root>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-white">
+                    <p className="truncate font-medium text-foreground">
                       {getCompanyName(company)}
                     </p>
                     {company.industry && (

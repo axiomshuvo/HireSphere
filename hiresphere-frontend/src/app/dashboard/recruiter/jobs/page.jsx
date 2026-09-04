@@ -232,7 +232,7 @@ export default function RecruiterJobsPage() {
       <div className="mx-auto max-w-7xl space-y-8">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-white">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
               Manage Jobs
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -244,7 +244,7 @@ export default function RecruiterJobsPage() {
               href="/jobs"
               variant="ghost"
               size="sm"
-              className="text-muted-foreground hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
             >
               View public board
             </ButtonLink>
@@ -279,7 +279,7 @@ export default function RecruiterJobsPage() {
             {filteredJobs.length === 0 ? (
               <Card className="rounded-2xl border border-dashed border-default bg-content1 p-8 text-center">
                 <Typography.Heading
-                  className="text-base font-semibold text-white"
+                  className="text-base font-semibold text-foreground"
                   level={2}
                 >
                   No jobs match these filters
@@ -291,7 +291,7 @@ export default function RecruiterJobsPage() {
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="mt-4 cursor-pointer rounded-lg border border-white/10 bg-default px-4 py-2 text-sm font-medium text-white transition-colors hover:border-indigo-500/50"
+                  className="mt-4 cursor-pointer rounded-lg border border-default-200 bg-default px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-indigo-500/50"
                 >
                   Reset filters
                 </button>

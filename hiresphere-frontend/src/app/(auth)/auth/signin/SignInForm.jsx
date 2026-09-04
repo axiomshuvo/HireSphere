@@ -1,5 +1,6 @@
 "use client";
 
+import { DEMO_ACCOUNTS } from "@/lib/api/jobstruture";
 import { authClient } from "@/lib/auth-client";
 import { ArrowLeft, Envelope, Eye, EyeSlash, Lock } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
@@ -26,6 +27,14 @@ export default function SignInForm() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleDemoLogin = (role) => {
+    setFormData({
+      email: DEMO_ACCOUNTS[role].email,
+      password: DEMO_ACCOUNTS[role].password,
+    });
+    setErrors({});
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -81,7 +90,7 @@ export default function SignInForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-(color-surface) border border-(color-border) rounded-2xl p-6 sm:p-8 shadow-xl relative">
+    <div className="w-full max-w-md relative">
       <div className="flex items-center justify-between mb-6">
         <Link
           href="/"
@@ -103,6 +112,32 @@ export default function SignInForm() {
         <p className="text-sm text-(color-text-muted)">
           Sign in to your HireSphere account to continue.
         </p>
+      </div>
+
+      <div className="mb-6">
+        <p className="text-xs font-medium text-(color-text-muted) uppercase tracking-wider mb-2">
+          Want quick access? Use a demo account:
+        </p>
+        <div className="flex gap-3">
+          <Button
+            size="sm"
+            variant="flat"
+            color="primary"
+            onClick={() => handleDemoLogin("seeker")}
+            className="flex-1 font-medium bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20"
+          >
+            Demo Seeker
+          </Button>
+          <Button
+            size="sm"
+            variant="flat"
+            color="secondary"
+            onClick={() => handleDemoLogin("recruiter")}
+            className="flex-1 font-medium bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+          >
+            Demo Recruiter
+          </Button>
+        </div>
       </div>
 
       <form onSubmit={handleSignIn} className="space-y-4">
@@ -188,7 +223,9 @@ export default function SignInForm() {
         <Link
           href={(() => {
             const next = searchParams.get("next");
-            return next ? `/auth/signup?next=${encodeURIComponent(next)}` : "/auth/signup";
+            return next
+              ? `/auth/signup?next=${encodeURIComponent(next)}`
+              : "/auth/signup";
           })()}
           className="text-indigo-500 font-semibold hover:underline"
         >

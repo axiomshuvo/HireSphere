@@ -1,14 +1,11 @@
 "use client";
 
+import JobStatusChip from "@/components/dashboard/jobs/JobStatusChip";
 import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
-import {
-  formatJobDate,
-  getJobCreatedAt,
-} from "@/lib/api/jobstruture";
+import { formatJobDate, getJobCreatedAt } from "@/lib/api/jobstruture";
 import { ArrowRight } from "@gravity-ui/icons";
 import { Card, Typography } from "@heroui/react";
 import Link from "next/link";
-import JobStatusChip from "@/components/dashboard/jobs/JobStatusChip";
 
 function formatLocation(job) {
   if (job.remote) return "Remote";
@@ -22,12 +19,12 @@ function JobRow({ job }) {
 
   return (
     <Link
-      href={`/dashboard/recruiter/jobs/${jobId}/edit`}
+      href={`/dashboard/recruiter/jobs/${jobId}`}
       className="group flex items-start gap-4 rounded-xl border border-transparent px-3 py-2.5 transition-colors hover:border-default hover:bg-[#1b1c1e]"
     >
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-sm font-medium text-white">{job.title}</p>
+          <p className="truncate text-sm font-medium text-foreground">{job.title}</p>
           <JobStatusChip status={job.status} />
           <DeadlineCountdown deadline={job.deadline} />
         </div>
@@ -37,7 +34,7 @@ function JobRow({ job }) {
           <span>• Posted {formatJobDate(getJobCreatedAt(job))}</span>
         </div>
       </div>
-      <ArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
+      <ArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
     </Link>
   );
 }
@@ -49,14 +46,14 @@ export default function CompanyJobsStrip({ jobs = [] }) {
     <Card className="rounded-2xl border border-default bg-content1 p-5">
       <div className="mb-3 flex items-center justify-between">
         <Typography.Heading
-          className="text-lg font-semibold text-white"
+          className="text-lg font-semibold text-foreground"
           level={2}
         >
           Recent Jobs
         </Typography.Heading>
         <Link
           href="/dashboard/recruiter/jobs"
-          className="text-xs text-indigo-400 transition-colors hover:text-indigo-300"
+          className="text-xs text-indigo-500 transition-colors hover:text-indigo-500"
         >
           View all
         </Link>

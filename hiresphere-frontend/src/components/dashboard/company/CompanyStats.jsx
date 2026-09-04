@@ -15,7 +15,7 @@ function CompanyStatCard({ label, value, icon: Icon }) {
           <Typography.Paragraph className="truncate text-xs uppercase tracking-wider text-muted-foreground">
             {label}
           </Typography.Paragraph>
-          <Typography.Paragraph className="truncate text-sm font-semibold text-white">
+          <Typography.Paragraph className="truncate text-sm font-semibold text-foreground">
             {value ?? "—"}
           </Typography.Paragraph>
         </div>

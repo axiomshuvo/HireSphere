@@ -31,13 +31,13 @@ export default function UpgradePlanButton({
         onPress={() => setIsOpen(true)}
         className={`cursor-pointer font-medium shadow-sm transition-all duration-200 ${
           variant === "primary"
-            ? "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700"
+            ? "bg-gradient-to-r from-indigo-500 to-indigo-600 text-foreground hover:from-indigo-600 hover:to-indigo-700"
             : ""
         } ${className}`}
       >
         {isHighestTier ? (
           <>
-            <Sparkles className="size-4 text-amber-300" />
+            <Sparkles className="size-4 text-amber-500" />
             <span>Manage Plan</span>
           </>
         ) : (

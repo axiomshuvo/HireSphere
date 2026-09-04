@@ -39,7 +39,7 @@ export default function MarketJobsPanel({ jobs = [] }) {
         </h2>
         <Link
           href="/jobs"
-          className="text-xs font-medium text-indigo-300 transition-colors hover:text-indigo-200"
+          className="text-xs font-medium text-indigo-500 transition-colors hover:text-indigo-600"
         >
           Browse all →
         </Link>
@@ -58,7 +58,7 @@ export default function MarketJobsPanel({ jobs = [] }) {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-white group-hover:text-indigo-300">
+                    <p className="truncate text-sm font-semibold text-foreground group-hover:text-indigo-500">
                       {job.title ?? "Untitled role"}
                     </p>
                     {job.companySlug && (
@@ -67,7 +67,7 @@ export default function MarketJobsPanel({ jobs = [] }) {
                       </p>
                     )}
                   </div>
-                  <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 text-indigo-300 ring-1 ring-indigo-500/30 transition-colors group-hover:text-indigo-200">
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 text-indigo-500 ring-1 ring-indigo-500/30 transition-colors group-hover:text-indigo-600">
                     <Briefcase className="size-3.5" />
                   </span>
                 </div>

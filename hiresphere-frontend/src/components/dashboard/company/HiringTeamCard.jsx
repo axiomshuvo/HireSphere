@@ -22,7 +22,7 @@ export default function HiringTeamCard({
           <Avatar.Fallback>{member.initials}</Avatar.Fallback>
         </Avatar.Root>
         <div>
-          <Typography.Paragraph className="font-medium text-white">
+          <Typography.Paragraph className="font-medium text-foreground">
             {member.name}
           </Typography.Paragraph>
           <Typography.Paragraph className="text-sm text-muted-foreground">

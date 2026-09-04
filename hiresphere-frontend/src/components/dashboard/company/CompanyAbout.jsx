@@ -12,7 +12,7 @@ export default function CompanyAbout({ company }) {
   return (
     <Card className="rounded-2xl border border-default bg-content1 p-5 sm:p-6">
       <Typography.Heading
-        className="mb-4 text-lg font-semibold text-white"
+        className="mb-4 text-lg font-semibold text-foreground"
         level={2}
       >
         About

@@ -13,7 +13,7 @@ export default function CompanyNotFound({ companySlug }) {
         </div>
 
         <Typography.Heading
-          className="text-xl font-semibold text-white"
+          className="text-xl font-semibold text-foreground"
           level={2}
         >
           No company found
@@ -21,7 +21,7 @@ export default function CompanyNotFound({ companySlug }) {
 
         <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
           We couldn&apos;t find a company with the id{" "}
-          <span className="font-mono text-white">{companySlug}</span>. It may
+          <span className="font-mono text-foreground">{companySlug}</span>. It may
           have been removed or the link is incorrect.
         </Typography.Paragraph>
 

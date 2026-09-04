@@ -188,14 +188,14 @@ export default function EditCompanyPage({ params }) {
       <div className="flex flex-1 items-center justify-center px-4 py-16">
         <div className="rounded-2xl border border-default bg-content1 p-8 text-center">
           <Typography.Heading
-            className="text-xl font-semibold text-white"
+            className="text-xl font-semibold text-foreground"
             level={2}
           >
             No company found
           </Typography.Heading>
           <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
             We couldn&apos;t find a company with the id{" "}
-            <span className="font-mono text-white">{id}</span>.
+            <span className="font-mono text-foreground">{id}</span>.
           </Typography.Paragraph>
           <ButtonLink
             href="/dashboard/mycompany"
@@ -217,7 +217,7 @@ export default function EditCompanyPage({ params }) {
           href={`/dashboard/mycompany/${id}`}
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-white"
+          className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to Company
@@ -226,12 +226,12 @@ export default function EditCompanyPage({ params }) {
 
       <div className="mx-auto max-w-3xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
             Update company
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Update the details for{" "}
-            <span className="text-white">{company.name}</span>.
+            <span className="text-foreground">{company.name}</span>.
           </p>
         </div>
 

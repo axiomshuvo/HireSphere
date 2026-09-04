@@ -217,7 +217,7 @@ export default function PlanUpgradeModal({
               <Modal.Heading className="flex items-center gap-2 text-2xl font-bold">
                 {step === "select" ? (
                   <>
-                    <Sparkles className="size-6 text-indigo-400" />
+                    <Sparkles className="size-6 text-indigo-500" />
                     Upgrade Your Plan
                   </>
                 ) : (
@@ -228,7 +228,7 @@ export default function PlanUpgradeModal({
                 )}
               </Modal.Heading>
               {step === "select" && (
-                <Typography.Paragraph className="text-sm text-(color-text-muted)">
+                <Typography.Paragraph className="text-sm text-default-500">
                   Choose a plan to unlock more features. Payment integration is
                   coming soon — plan switches take effect immediately.
                 </Typography.Paragraph>
@@ -241,9 +241,9 @@ export default function PlanUpgradeModal({
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3 p-2 pt-4">
                   {isLoading || plans.length === 0 ? (
                     <>
-                      <div className="flex h-80 flex-col gap-4 rounded-2xl border border-(color-border) bg-(color-surface) p-6 animate-pulse" />
-                      <div className="flex h-80 flex-col gap-4 rounded-2xl border border-(color-border) bg-(color-surface) p-6 animate-pulse" />
-                      <div className="flex h-80 flex-col gap-4 rounded-2xl border border-(color-border) bg-(color-surface) p-6 animate-pulse" />
+                      <div className="flex h-80 flex-col gap-4 rounded-2xl border border-default-200 bg-content1 p-6 animate-pulse" />
+                      <div className="flex h-80 flex-col gap-4 rounded-2xl border border-default-200 bg-content1 p-6 animate-pulse" />
+                      <div className="flex h-80 flex-col gap-4 rounded-2xl border border-default-200 bg-content1 p-6 animate-pulse" />
                     </>
                   ) : (
                     plans.map((plan) => {
@@ -262,18 +262,18 @@ export default function PlanUpgradeModal({
                           }}
                           className={
                             isDowngrade
-                              ? "relative flex flex-col gap-4 rounded-2xl border border-(color-border) bg-(color-surface-2)/50 p-6 cursor-not-allowed grayscale-[50%]"
+                              ? "relative flex flex-col gap-4 rounded-2xl border border-default-200 bg-default-100/50 p-6 cursor-not-allowed grayscale-[50%]"
                               : isCurrent
                                 ? "relative flex flex-col gap-4 rounded-2xl border-2 border-emerald-500/40 bg-gradient-to-b from-emerald-500/10 to-transparent p-6 cursor-default shadow-[0_0_20px_rgba(16,185,129,0.05)]"
                                 : isSelected
                                   ? "relative flex flex-col gap-4 rounded-2xl border-2 border-indigo-500 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.22),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] p-6 shadow-[0_0_15px_rgba(99,102,241,0.2)] cursor-pointer transition-all -translate-y-1"
                                   : plan.highlight
                                     ? "relative flex flex-col gap-4 rounded-2xl border border-indigo-500/50 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.12),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] p-6 shadow-lg cursor-pointer transition-all hover:-translate-y-1 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(99,102,241,0.15)] group"
-                                    : "relative flex flex-col gap-4 rounded-2xl border border-(color-border) bg-(color-surface) p-6 cursor-pointer transition-all hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-lg group"
+                                    : "relative flex flex-col gap-4 rounded-2xl border border-default-200 bg-content1 p-6 cursor-pointer transition-all hover:-translate-y-1 hover:border-indigo-500/40 hover:shadow-lg group"
                           }
                         >
                           {isDowngrade && (
-                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-(color-border) bg-(color-surface-2) px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-(color-text-muted)">
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-default-200 bg-default-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-default-500">
                               Included
                             </span>
                           )}
@@ -301,10 +301,10 @@ export default function PlanUpgradeModal({
                               className={
                                 isSelected ||
                                 (plan.highlight && !isDowngrade && !isCurrent)
-                                  ? "flex size-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 transition-colors group-hover:bg-indigo-500/30"
+                                  ? "flex size-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-500 transition-colors group-hover:bg-indigo-500/30"
                                   : isCurrent
                                     ? "flex size-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400"
-                                    : "flex size-10 items-center justify-center rounded-xl bg-(color-surface-2) text-(color-text) transition-colors group-hover:bg-indigo-500/10 group-hover:text-indigo-400"
+                                    : "flex size-10 items-center justify-center rounded-xl bg-default-100 text-foreground transition-colors group-hover:bg-indigo-500/10 group-hover:text-indigo-500"
                               }
                             >
                               <Icon className="size-5" />
@@ -313,14 +313,14 @@ export default function PlanUpgradeModal({
                               <h2
                                 className={
                                   isDowngrade
-                                    ? "text-lg font-semibold text-(color-text-muted)"
-                                    : "text-lg font-semibold text-(color-text)"
+                                    ? "text-lg font-semibold text-default-500"
+                                    : "text-lg font-semibold text-foreground"
                                 }
                               >
                                 {plan.name}
                               </h2>
                               {plan.tagline && (
-                                <p className="text-xs text-(color-text-muted)">
+                                <p className="text-xs text-default-500">
                                   {plan.tagline}
                                 </p>
                               )}
@@ -331,13 +331,13 @@ export default function PlanUpgradeModal({
                             <span
                               className={
                                 isDowngrade
-                                  ? "text-3xl font-bold text-(color-text-muted)"
-                                  : "text-3xl font-bold text-(color-text)"
+                                  ? "text-3xl font-bold text-default-500"
+                                  : "text-3xl font-bold text-foreground"
                               }
                             >
                               {plan.price}
                             </span>
-                            <span className="text-xs text-(color-text-muted)">
+                            <span className="text-xs text-default-500">
                               / {plan.cadence}
                             </span>
                           </div>
@@ -352,22 +352,22 @@ export default function PlanUpgradeModal({
                                   <Check
                                     className={
                                       isDowngrade
-                                        ? "mt-0.5 size-4 shrink-0 text-(color-text-muted)/50"
+                                        ? "mt-0.5 size-4 shrink-0 text-default-500/50"
                                         : isCurrent
                                           ? "mt-0.5 size-4 shrink-0 text-emerald-400"
-                                          : "mt-0.5 size-4 shrink-0 text-indigo-400"
+                                          : "mt-0.5 size-4 shrink-0 text-indigo-500"
                                     }
                                   />
                                 ) : (
-                                  <Xmark className="mt-0.5 size-4 shrink-0 text-(color-text-muted)/30" />
+                                  <Xmark className="mt-0.5 size-4 shrink-0 text-default-500/30" />
                                 )}
                                 <span
                                   className={
                                     feature.included
                                       ? isDowngrade
-                                        ? "text-(color-text-muted)"
-                                        : "text-(color-text)"
-                                      : "text-(color-text-muted)/50 line-through"
+                                        ? "text-default-500"
+                                        : "text-foreground"
+                                      : "text-default-500/50 line-through"
                                   }
                                 >
                                   {feature.text}
@@ -388,7 +388,7 @@ export default function PlanUpgradeModal({
                             ) : isDowngrade ? (
                               <Button
                                 variant="flat"
-                                className="w-full bg-(color-surface-2) text-(color-text-muted)"
+                                className="w-full bg-default-100 text-default-500"
                                 isDisabled
                               >
                                 Included in {currentPlanName}
@@ -408,7 +408,7 @@ export default function PlanUpgradeModal({
                                 className={
                                   plan.highlight || isSelected
                                     ? "w-full bg-indigo-500 text-white shadow-md hover:bg-indigo-600 font-medium"
-                                    : "w-full border-(color-border) hover:border-indigo-500 hover:text-indigo-400 font-medium transition-colors"
+                                    : "w-full border-default-200 hover:border-indigo-500 hover:text-indigo-500 font-medium transition-colors"
                                 }
                                 onPress={() => handlePlanSelect(plan)}
                               >
@@ -426,21 +426,21 @@ export default function PlanUpgradeModal({
               {step === "confirm" && selectedPlan && (
                 <div className="flex flex-col gap-6 py-2">
                   <div className="flex items-center justify-center gap-4">
-                    <div className="flex flex-col items-center gap-1 rounded-xl border border-(color-border) bg-(color-surface-2) px-6 py-4 shadow-sm">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-(color-text-muted)">
+                    <div className="flex flex-col items-center gap-1 rounded-xl border border-default-200 bg-default-100 px-6 py-4 shadow-sm">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-default-500">
                         Current
                       </span>
-                      <span className="text-lg font-bold text-(color-text)">
+                      <span className="text-lg font-bold text-foreground">
                         {currentPlanName}
                       </span>
                     </div>
 
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-500/10 text-indigo-400">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-500/10 text-indigo-500">
                       <ArrowRight className="size-5" />
                     </div>
 
                     <div className="flex flex-col items-center gap-1 rounded-xl border-2 border-indigo-500 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.15),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] px-6 py-4 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-300">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-500">
                         New Plan
                       </span>
                       <span className="text-lg font-bold text-indigo-100">
@@ -450,22 +450,22 @@ export default function PlanUpgradeModal({
                   </div>
 
                   <div className="text-center">
-                    <p className="text-sm text-(color-text-muted)">
+                    <p className="text-sm text-default-500">
                       {selectedPlan.tagline}
                     </p>
                   </div>
 
-                  <div className="mx-auto flex items-center gap-2 rounded-full border border-(color-border) bg-(color-surface) px-5 py-2 shadow-sm">
-                    <span className="text-sm font-bold text-(color-text)">
+                  <div className="mx-auto flex items-center gap-2 rounded-full border border-default-200 bg-content1 px-5 py-2 shadow-sm">
+                    <span className="text-sm font-bold text-foreground">
                       {selectedPlan.price}
                     </span>
-                    <span className="text-xs text-(color-text-muted)">
+                    <span className="text-xs text-default-500">
                       / {selectedPlan.cadence}
                     </span>
                   </div>
 
-                  <div className="space-y-4 rounded-2xl border border-(color-border) bg-(color-surface) p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-(color-text-muted)">
+                  <div className="space-y-4 rounded-2xl border border-default-200 bg-content1 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-default-500">
                       What you unlock with {selectedPlan.name}:
                     </p>
                     <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -478,7 +478,7 @@ export default function PlanUpgradeModal({
                             className="flex items-start gap-2"
                           >
                             <Check className="mt-0.5 size-4 shrink-0 text-emerald-400" />
-                            <span className="text-sm text-(color-text)">
+                            <span className="text-sm text-foreground">
                               {feature.text}
                             </span>
                           </li>
@@ -486,8 +486,8 @@ export default function PlanUpgradeModal({
                     </ul>
                   </div>
 
-                  <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/5 px-4 py-3 text-sm text-(color-text-muted)">
-                    <span className="font-medium text-indigo-300">
+                  <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/5 px-4 py-3 text-sm text-default-500">
+                    <span className="font-medium text-indigo-500">
                       Heads up:
                     </span>{" "}
                     Payment integration is coming soon. Your {selectedPlan.name}{" "}

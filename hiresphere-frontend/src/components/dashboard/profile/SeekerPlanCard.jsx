@@ -22,11 +22,11 @@ export default function SeekerPlanCard({ userPlan, activeApplications }) {
 
   return (
     <>
-      <Card className="rounded-2xl border border-default bg-content1 p-5">
+      <Card className="rounded-2xl border border-default bg-content1 p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <Typography.Heading
-              className="text-lg font-semibold text-white"
+              className="text-lg font-semibold text-foreground"
               level={2}
             >
               Current plan · {formatPlan(usage.plan)}

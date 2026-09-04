@@ -105,7 +105,7 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-(color-surface) border border-(color-border) rounded-2xl p-6 sm:p-8 shadow-xl relative">
+    <div className="w-full max-w-md relative">
       <div className="flex items-center justify-between mb-6">
         <Link
           href="/auth/signin"
@@ -285,7 +285,7 @@ export default function SignUpForm() {
           type="submit"
           isLoading={loading}
           radius="md"
-          className="w-full mt-2 h-[48px] bg-gradient-to-r border-none text-md from-[#4f46e5] to-[#6366f1] hover:from-[#4338ca] hover:to-[#4f46e5] text-white font-medium px-4 shadow-md transition-all duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full mt-2 h-[48px] bg-gradient-to-r border-none text-md from-[#4f46e5] to-[#6366f1] hover:from-[#4338ca] hover:to-[#4f46e5] text-foreground font-medium px-4 shadow-md transition-all duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Creating Account..." : "Create Account"}
         </Button>

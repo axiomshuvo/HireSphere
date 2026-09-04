@@ -47,7 +47,7 @@ export default function ApplicantsList({ applicants, total }) {
             id="applicants-sort"
             value={sortId}
             onChange={(e) => setSortId(e.target.value)}
-            className="cursor-pointer rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+            className="cursor-pointer rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-sm text-foreground focus:border-indigo-500 focus:outline-none"
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.id} value={opt.id}>
@@ -81,7 +81,7 @@ export default function ApplicantsList({ applicants, total }) {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Link
                     href={`/dashboard/recruiter/applications/${applicant._id ?? applicant.id}`}
-                    className="text-base font-semibold text-white transition-colors hover:text-indigo-200"
+                    className="text-base font-semibold text-foreground transition-colors hover:text-indigo-600"
                   >
                     {applicant.name || "Unnamed candidate"}
                   </Link>
@@ -92,7 +92,7 @@ export default function ApplicantsList({ applicants, total }) {
                         (applicant.status ?? "Submitted").slice(1)}
                   </Chip>
                   {isNewest && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-500">
                       Newest
                     </span>
                   )}
@@ -102,7 +102,7 @@ export default function ApplicantsList({ applicants, total }) {
                     <Envelope className="size-3" />
                     <a
                       href={`mailto:${applicant.email}`}
-                      className="text-indigo-300 transition-colors hover:text-indigo-200"
+                      className="text-indigo-500 transition-colors hover:text-indigo-600"
                     >
                       {applicant.email}
                     </a>
@@ -134,7 +134,7 @@ export default function ApplicantsList({ applicants, total }) {
                 )}
                 <Link
                   href={`/dashboard/recruiter/applications/${applicant._id ?? applicant.id}`}
-                  className="mt-3 inline-flex text-xs font-semibold text-indigo-300 transition-colors hover:text-indigo-200"
+                  className="mt-3 inline-flex text-xs font-semibold text-indigo-500 transition-colors hover:text-indigo-600"
                 >
                   View full application →
                 </Link>

@@ -145,14 +145,14 @@ export default function JobsFilterBar() {
             value={search}
             onChange={onSearchChange}
             placeholder="Search title or description"
-            className="w-full rounded-lg border border-white/10 bg-[#1b1c1e] py-2 pl-9 pr-3 text-sm text-white placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none"
+            className="w-full rounded-lg border border-default-200 bg-default-100 py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none"
           />
         </label>
 
         <select
           value={category}
           onChange={onCategoryChange}
-          className="w-full rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          className="w-full rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-sm text-foreground focus:border-indigo-500 focus:outline-none"
         >
           <option value="">All categories</option>
           {CATEGORIES.map((c) => (
@@ -165,7 +165,7 @@ export default function JobsFilterBar() {
         <select
           value={type}
           onChange={onTypeChange}
-          className="w-full rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          className="w-full rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-sm text-foreground focus:border-indigo-500 focus:outline-none"
         >
           <option value="">All types</option>
           {TYPES.map((t) => (
@@ -180,10 +180,10 @@ export default function JobsFilterBar() {
           value={location}
           onChange={onLocationChange}
           placeholder="City or country"
-          className="w-full rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none"
+          className="w-full rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-none"
         />
 
-        <label className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-2 text-sm text-white">
+        <label className="flex items-center justify-center gap-2 rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-sm text-foreground">
           <input
             type="checkbox"
             checked={remote}
@@ -199,7 +199,7 @@ export default function JobsFilterBar() {
           <button
             type="button"
             onClick={clear}
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-white"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <Xmark className="size-3" />
             Clear filters

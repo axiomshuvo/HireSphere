@@ -39,12 +39,12 @@ function formatDate(value) {
 function Detail({ icon: Icon, label, children }) {
   return (
     <div className="flex gap-3 border-b border-default py-4 last:border-b-0">
-      <Icon className="mt-0.5 size-4 shrink-0 text-indigo-300" />
+      <Icon className="mt-0.5 size-4 shrink-0 text-indigo-500" />
       <div className="min-w-0">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           {label}
         </p>
-        <div className="mt-1 break-words text-sm text-white">{children}</div>
+        <div className="mt-1 break-words text-sm text-foreground">{children}</div>
       </div>
     </div>
   );
@@ -76,7 +76,7 @@ export default async function RecruiterApplicationDetailPage({ params }) {
     <div className="flex-1 px-4 py-8 lg:px-8">
       <Link
         href="/dashboard/recruiter/applications"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-white"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
         Back to applicants
@@ -88,10 +88,10 @@ export default async function RecruiterApplicationDetailPage({ params }) {
             {initials || "?"}
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-indigo-300">
+            <p className="text-xs font-semibold uppercase tracking-wider text-indigo-500">
               Candidate application
             </p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
               {application.name || "Unnamed candidate"}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -114,7 +114,7 @@ export default async function RecruiterApplicationDetailPage({ params }) {
           <Card className="rounded-2xl border border-default bg-content1 p-5">
             <Typography.Heading
               level={2}
-              className="text-lg font-semibold text-white"
+              className="text-lg font-semibold text-foreground"
             >
               Submission
             </Typography.Heading>
@@ -122,7 +122,7 @@ export default async function RecruiterApplicationDetailPage({ params }) {
               <Detail icon={Envelope} label="Email">
                 <a
                   href={`mailto:${application.email}`}
-                  className="text-indigo-300 hover:text-indigo-200"
+                  className="text-indigo-500 hover:text-indigo-600"
                 >
                   {application.email || "Not provided"}
                 </a>
@@ -144,7 +144,7 @@ export default async function RecruiterApplicationDetailPage({ params }) {
           <Card className="rounded-2xl border border-default bg-content1 p-5">
             <Typography.Heading
               level={2}
-              className="text-lg font-semibold text-white"
+              className="text-lg font-semibold text-foreground"
             >
               Cover letter
             </Typography.Heading>
@@ -158,7 +158,7 @@ export default async function RecruiterApplicationDetailPage({ params }) {
           <Card className="rounded-2xl border border-default bg-content1 p-5">
             <Typography.Heading
               level={2}
-              className="text-lg font-semibold text-white"
+              className="text-lg font-semibold text-foreground"
             >
               Application files
             </Typography.Heading>
@@ -182,7 +182,7 @@ export default async function RecruiterApplicationDetailPage({ params }) {
           <Card className="rounded-2xl border border-default bg-content1 p-5">
             <Typography.Heading
               level={2}
-              className="text-lg font-semibold text-white"
+              className="text-lg font-semibold text-foreground"
             >
               Role details
             </Typography.Heading>
@@ -200,7 +200,7 @@ export default async function RecruiterApplicationDetailPage({ params }) {
             {job && (
               <Link
                 href={`/jobs/${application.jobId}`}
-                className="mt-4 inline-flex text-sm text-indigo-300 hover:text-indigo-200"
+                className="mt-4 inline-flex text-sm text-indigo-500 hover:text-indigo-600"
               >
                 View public job →
               </Link>

@@ -25,7 +25,7 @@ export default function CompanyHeader({ company, onEdit, onDelete }) {
 
       <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <Avatar.Root className="size-24 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#1b1c1e] text-3xl font-bold text-white shadow-lg ring-1 ring-white/5">
+          <Avatar.Root className="size-24 shrink-0 overflow-hidden rounded-2xl border border-default-200 bg-default-100 text-3xl font-bold text-foreground shadow-lg ring-1 ring-white/5">
             {company.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -42,7 +42,7 @@ export default function CompanyHeader({ company, onEdit, onDelete }) {
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                 {company.name}
               </h1>
               {company.plan && (
@@ -85,21 +85,47 @@ export default function CompanyHeader({ company, onEdit, onDelete }) {
                   {company.location}
                 </span>
               )}
+              {company.foundedYear && (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="size-1.5 rounded-full bg-emerald-400" />
+                  Founded {company.foundedYear}
+                </span>
+              )}
               {websiteUrl && (
                 <a
                   href={websiteUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-indigo-400 transition-colors hover:text-indigo-300"
+                  className="text-indigo-500 transition-colors hover:text-indigo-500"
                 >
                   {company.website}
+                </a>
+              )}
+              {company.linkedinUrl && (
+                <a
+                  href={company.linkedinUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-indigo-500 transition-colors hover:text-indigo-500"
+                >
+                  LinkedIn
+                </a>
+              )}
+              {company.twitterUrl && (
+                <a
+                  href={company.twitterUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sky-400 transition-colors hover:text-sky-300"
+                >
+                  Twitter
                 </a>
               )}
             </div>
 
             {company.id && (
               <div className="mt-4 inline-flex items-center gap-2 rounded-md border border-white/10 bg-[#1b1c1e] px-2 py-1 font-mono text-[10px] text-muted-foreground">
-                <span className="text-white/40">ID</span>
+                <span className="text-foreground/40">ID</span>
                 <span>{company.id}</span>
               </div>
             )}

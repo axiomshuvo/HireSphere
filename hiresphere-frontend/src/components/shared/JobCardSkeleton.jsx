@@ -5,7 +5,7 @@ import { Card } from "@heroui/react";
 
 export default function JobCardSkeleton() {
   return (
-    <Card className="flex h-full flex-col gap-3 rounded-2xl border border-(color-border) bg-(color-surface) p-5">
+    <Card className="flex h-full flex-col gap-3 rounded-2xl border border-default-200 bg-content1 p-5">
       <div className="flex flex-wrap items-center gap-1.5">
         <SkeletonBlock className="h-5 w-12 rounded-full" />
         <SkeletonBlock className="h-5 w-10 rounded-full" />

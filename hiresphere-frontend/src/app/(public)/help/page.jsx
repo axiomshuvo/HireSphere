@@ -93,7 +93,7 @@ const AccordionItem = ({ faq }) => {
         className="flex w-full items-center gap-4 text-left transition-opacity hover:opacity-85"
       >
         <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.02] ring-1 ring-white/5">
-          <Icon className="size-4 text-indigo-300" />
+          <Icon className="size-4 text-indigo-500" />
         </div>
         <span className="flex-1 text-left font-medium text-(color-text)">
           {faq.q}
@@ -148,7 +148,7 @@ export default function HelpPage() {
       {/* Hero */}
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 rounded-full border border-(color-border) bg-white/[0.02] px-4 py-1.5 text-xs font-medium text-(color-text-muted)">
-          <LifeRing className="size-3.5 text-indigo-300" />
+          <LifeRing className="size-3.5 text-indigo-500" />
           Help & Support
         </div>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-(color-text)">
@@ -178,7 +178,7 @@ export default function HelpPage() {
             No articles match your search.{" "}
             <Link
               href="/dashboard/help"
-              className="text-indigo-300 hover:text-indigo-200"
+              className="text-indigo-500 hover:text-indigo-600"
               onClick={() => setSearch("")}
             >
               Clear search
@@ -200,7 +200,7 @@ export default function HelpPage() {
               className="flex flex-col items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-4 text-center transition-all duration-200 hover:border-indigo-500/30 hover:bg-white/[0.04]"
             >
               <div className="flex size-10 items-center justify-center rounded-xl bg-indigo-500/10">
-                <link.icon className="size-4 text-indigo-300" />
+                <link.icon className="size-4 text-indigo-500" />
               </div>
               <span className="text-xs font-medium text-(color-text)">
                 {link.label}
@@ -225,7 +225,7 @@ export default function HelpPage() {
       <Card className="mt-10 rounded-2xl border border-(color-border) bg-(color-surface-2) p-6">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500/15">
-            <Envelope className="size-5 text-emerald-300" />
+            <Envelope className="size-5 text-emerald-500" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-(color-text)">
@@ -258,7 +258,7 @@ export default function HelpPage() {
               }}
               className="flex items-center gap-2 text-left"
             >
-              <Copy className="size-4 text-indigo-300" />
+              <Copy className="size-4 text-indigo-500" />
               Copy support email
             </button>
             <span className="text-xs text-(color-text-muted)">

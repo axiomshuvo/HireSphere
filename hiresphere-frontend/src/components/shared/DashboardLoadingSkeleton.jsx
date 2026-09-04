@@ -48,11 +48,11 @@ export default function DashboardLoadingSkeleton({ role = "seeker" }) {
                 <SkeletonBlock className="h-6 w-32 rounded" />
                 <SkeletonBlock className="h-6 w-16 rounded" />
               </div>
-              <div className="space-y-3 rounded-2xl border border-(color-border) bg-(color-surface) p-5">
+              <div className="space-y-3 rounded-2xl border border-default-200 bg-content1 p-5">
                 {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between rounded-xl border border-(color-border) bg-(color-surface-2) p-4"
+                    className="flex items-center justify-between rounded-xl border border-default-200 bg-default-100 p-4"
                   >
                     <div className="flex-1 space-y-2">
                       <SkeletonBlock className="h-4 w-3/4 rounded" />
@@ -68,7 +68,7 @@ export default function DashboardLoadingSkeleton({ role = "seeker" }) {
           <>
             {/* Seeker: Recommended + Applications + Saved sections */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              <section className="rounded-2xl border border-(color-border) bg-(color-surface) p-5 lg:col-span-1">
+              <section className="rounded-2xl border border-default-200 bg-content1 p-5 lg:col-span-1">
                 <div className="mb-3 flex items-center justify-between">
                   <SkeletonBlock className="h-6 w-40 rounded" />
                   <SkeletonBlock className="h-6 w-16 rounded" />
@@ -80,7 +80,7 @@ export default function DashboardLoadingSkeleton({ role = "seeker" }) {
                 </div>
               </section>
 
-              <section className="rounded-2xl border border-(color-border) bg-(color-surface) p-5 lg:col-span-1">
+              <section className="rounded-2xl border border-default-200 bg-content1 p-5 lg:col-span-1">
                 <div className="mb-3 flex items-center justify-between">
                   <SkeletonBlock className="h-6 w-44 rounded" />
                   <SkeletonBlock className="h-6 w-16 rounded" />
@@ -92,7 +92,7 @@ export default function DashboardLoadingSkeleton({ role = "seeker" }) {
                 </div>
               </section>
 
-              <section className="rounded-2xl border border-(color-border) bg-(color-surface) p-5 lg:col-span-1">
+              <section className="rounded-2xl border border-default-200 bg-content1 p-5 lg:col-span-1">
                 <div className="mb-3 flex items-center justify-between">
                   <SkeletonBlock className="h-6 w-32 rounded" />
                   <SkeletonBlock className="h-6 w-16 rounded" />

@@ -60,7 +60,7 @@ export default function RecruiterHomeView({
     <div className="flex-1 px-4 py-8 lg:px-8">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
             Welcome back, {greeting}
           </h1>
           <p className="mt-2 text-muted-foreground">{subtitle}</p>

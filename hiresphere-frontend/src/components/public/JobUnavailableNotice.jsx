@@ -17,12 +17,12 @@ export default function JobUnavailableNotice({ reason, title, description }) {
     <div className="mx-auto w-full max-w-3xl px-4 py-16 lg:px-8">
       <Link
         href="/jobs"
-        className="text-sm text-muted-foreground transition-colors hover:text-white"
+        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         ← Back to jobs
       </Link>
       <Card className="mt-8 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
-        <h1 className="text-2xl font-semibold text-white">{heading}</h1>
+        <h1 className="text-2xl font-semibold text-foreground">{heading}</h1>
         <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
           {body}
         </p>
@@ -35,7 +35,7 @@ export default function JobUnavailableNotice({ reason, title, description }) {
           </Link>
           <Link
             href="/"
-            className="rounded-lg border border-white/10 bg-transparent px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-white/30 hover:text-white"
+            className="rounded-lg border border-default-200 bg-transparent px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-white/30 hover:text-foreground"
           >
             Back to home
           </Link>

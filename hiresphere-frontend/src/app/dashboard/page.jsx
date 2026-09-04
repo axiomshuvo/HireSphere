@@ -117,7 +117,7 @@ async function RecruiterHome({ user }) {
       <div className="flex-1 px-4 py-8 lg:px-8">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-white">
+            <h1 className="text-3xl font-semibold tracking-tight text-(color-foreground)">
               Welcome back, {greeting}
             </h1>
             <p className="mt-2 text-muted-foreground">{subtitle}</p>
@@ -135,7 +135,7 @@ async function RecruiterHome({ user }) {
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-indigo-500/0 via-indigo-500/60 to-indigo-500/0"
           />
           <Typography.Heading
-            className="text-lg font-semibold text-white"
+            className="text-lg font-semibold text-(color-foreground)"
             level={2}
           >
             Create your first company
@@ -145,7 +145,7 @@ async function RecruiterHome({ user }) {
           </Typography.Paragraph>
           <ButtonLink
             href="/dashboard/mycompany/new"
-            className="mt-4 w-fit bg-gradient-to-r from-indigo-500 to-blue-500 font-semibold text-white shadow-lg shadow-indigo-500/20"
+            className="mt-4 w-fit bg-gradient-to-r from-indigo-500 to-blue-500 font-semibold text-(color-foreground) shadow-lg shadow-indigo-500/20"
           >
             Add Company
           </ButtonLink>
@@ -274,7 +274,7 @@ async function SeekerHome({ user }) {
     <div className="flex-1 px-4 py-8 lg:px-8">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-(color-foreground) sm:text-4xl">
             Welcome back, {greeting}
           </h1>
           <p className="mt-2 text-muted-foreground">
@@ -286,7 +286,7 @@ async function SeekerHome({ user }) {
           <UpgradePlanButton role="seeker" currentPlan={user.plan} />
           <Link
             href="/jobs"
-            className="inline-flex items-center gap-2 rounded-lg border border-default bg-content1 px-4 py-2 text-sm text-white transition-colors hover:border-indigo-500/50"
+            className="inline-flex items-center gap-2 rounded-lg border border-default bg-content1 px-4 py-2 text-sm text-(color-foreground) transition-colors hover:border-indigo-500/50"
           >
             <Magnifier className="size-4" />
             Browse all jobs
@@ -312,10 +312,10 @@ async function SeekerHome({ user }) {
           <div className="mb-3 flex items-center justify-between">
             <div>
               <Typography.Heading
-                className="flex items-center gap-2 text-lg font-semibold text-white"
+                className="flex items-center gap-2 text-lg font-semibold text-(color-foreground)"
                 level={2}
               >
-                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 text-emerald-300 ring-1 ring-emerald-500/30">
+                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 text-emerald-500 ring-1 ring-emerald-500/30">
                   <Magnifier className="size-4" />
                 </span>
                 Recommended for you
@@ -326,7 +326,7 @@ async function SeekerHome({ user }) {
             </div>
             <Link
               href="/jobs"
-              className="text-xs text-indigo-300 transition-colors hover:text-indigo-200"
+              className="text-xs text-indigo-500 transition-colors hover:text-indigo-600"
             >
               View all →
             </Link>
@@ -345,9 +345,9 @@ async function SeekerHome({ user }) {
                   <li key={job._id ?? job.id}>
                     <Link
                       href={`/jobs/${job._id ?? job.id}`}
-                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-[#1b1c1e]"
+                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-(color-surface-2)"
                     >
-                      <p className="truncate text-sm font-semibold text-white">
+                      <p className="truncate text-sm font-semibold text-(color-foreground)">
                         {job.title ?? "Untitled role"}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
@@ -380,10 +380,10 @@ async function SeekerHome({ user }) {
           <div className="mb-3 flex items-center justify-between">
             <div>
               <Typography.Heading
-                className="flex items-center gap-2 text-lg font-semibold text-white"
+                className="flex items-center gap-2 text-lg font-semibold text-(color-foreground)"
                 level={2}
               >
-                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 text-indigo-300 ring-1 ring-indigo-500/30">
+                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 text-indigo-500 ring-1 ring-indigo-500/30">
                   <FileText className="size-4" />
                 </span>
                 Recent applications
@@ -394,7 +394,7 @@ async function SeekerHome({ user }) {
             </div>
             <Link
               href="/dashboard/applications"
-              className="text-xs text-indigo-300 transition-colors hover:text-indigo-200"
+              className="text-xs text-indigo-500 transition-colors hover:text-indigo-600"
             >
               View all →
             </Link>
@@ -416,10 +416,10 @@ async function SeekerHome({ user }) {
                   <li key={application._id ?? application.jobId}>
                     <Link
                       href={`/jobs/${application.jobId}`}
-                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-[#1b1c1e]"
+                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-(color-surface-2)"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-sm font-semibold text-white">
+                        <p className="truncate text-sm font-semibold text-(color-foreground)">
                           {title}
                         </p>
                         {date && (
@@ -444,10 +444,10 @@ async function SeekerHome({ user }) {
           <div className="mb-3 flex items-center justify-between">
             <div>
               <Typography.Heading
-                className="flex items-center gap-2 text-lg font-semibold text-white"
+                className="flex items-center gap-2 text-lg font-semibold text-(color-foreground)"
                 level={2}
               >
-                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-500/5 text-amber-300 ring-1 ring-amber-500/30">
+                <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-500/5 text-amber-500 ring-1 ring-amber-500/30">
                   <Bookmark className="size-4" />
                 </span>
                 Saved jobs
@@ -458,7 +458,7 @@ async function SeekerHome({ user }) {
             </div>
             <Link
               href="/dashboard/saved-jobs"
-              className="text-xs text-indigo-300 transition-colors hover:text-indigo-200"
+              className="text-xs text-indigo-500 transition-colors hover:text-indigo-600"
             >
               View all →
             </Link>
@@ -477,10 +477,10 @@ async function SeekerHome({ user }) {
                   <li key={savedJob._id ?? savedJob.jobId}>
                     <Link
                       href={`/jobs/${savedJob.jobId}`}
-                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-[#1b1c1e]"
+                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-(color-surface-2)"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-sm font-semibold text-white">
+                        <p className="truncate text-sm font-semibold text-(color-foreground)">
                           {title}
                         </p>
                         <DeadlineCountdown

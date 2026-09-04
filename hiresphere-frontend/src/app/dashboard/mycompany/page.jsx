@@ -48,11 +48,11 @@ export default async function MyCompanyPage({ searchParams }) {
     <div className="flex-1 px-4 py-8 lg:px-8">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
+          <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">
             <OfficeBadge className="size-4" />
             Recruiter workspace
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             My Companies
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -69,7 +69,7 @@ export default async function MyCompanyPage({ searchParams }) {
 
       {companies.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
-          <h2 className="text-lg font-semibold text-white">No companies yet</h2>
+          <h2 className="text-lg font-semibold text-foreground">No companies yet</h2>
           <p className="max-w-sm text-sm text-muted-foreground">
             Register your first company to start posting jobs and managing
             applicants.

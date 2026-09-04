@@ -38,7 +38,7 @@ export default async function ApplicationsPage({ searchParams }) {
     <div className="flex-1 px-4 py-8 lg:px-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
             My Applications
           </h1>
           <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
@@ -49,7 +49,7 @@ export default async function ApplicationsPage({ searchParams }) {
         </div>
         <Link
           href="/jobs"
-          className="inline-flex items-center gap-2 rounded-lg border border-default bg-content1 px-4 py-2 text-sm text-white transition-colors hover:border-indigo-500/50"
+          className="inline-flex items-center gap-2 rounded-lg border border-default bg-content1 px-4 py-2 text-sm text-foreground transition-colors hover:border-indigo-500/50"
         >
           <Briefcase className="size-4" />
           Find more roles
@@ -59,7 +59,7 @@ export default async function ApplicationsPage({ searchParams }) {
       {enriched.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-default bg-content1 px-6 py-16 text-center">
           <FileText className="size-8 text-muted-foreground" />
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-foreground">
             No applications yet
           </h2>
           <p className="max-w-sm text-sm text-muted-foreground">
@@ -90,7 +90,7 @@ export default async function ApplicationsPage({ searchParams }) {
           {page > 1 ? (
             <Link
               href={`/dashboard/applications?page=${page - 1}`}
-              className="rounded-lg border border-default bg-content1 px-4 py-2 text-white transition-colors hover:border-indigo-500/50"
+              className="rounded-lg border border-default bg-content1 px-4 py-2 text-foreground transition-colors hover:border-indigo-500/50"
             >
               Previous
             </Link>
@@ -103,7 +103,7 @@ export default async function ApplicationsPage({ searchParams }) {
           {page < totalPages ? (
             <Link
               href={`/dashboard/applications?page=${page + 1}`}
-              className="rounded-lg border border-default bg-content1 px-4 py-2 text-white transition-colors hover:border-indigo-500/50"
+              className="rounded-lg border border-default bg-content1 px-4 py-2 text-foreground transition-colors hover:border-indigo-500/50"
             >
               Next
             </Link>

@@ -74,10 +74,10 @@ export default async function ProfilePage() {
     <div className="flex-1 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-5xl flex-col gap-8">
         <header>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Account workspace
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Your profile
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -86,55 +86,70 @@ export default async function ProfilePage() {
         </header>
 
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <Card className="overflow-hidden rounded-2xl border border-default bg-content1">
-            <div className="h-24 bg-[radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.45),transparent_55%),linear-gradient(110deg,#17191d,#20242d)]" />
-            <div className="-mt-10 px-6 pb-6 sm:px-8">
-              <div className="flex flex-wrap items-end justify-between gap-4">
-                <ProfileImageField name={name} image={image} />
-                <Chip color="primary" size="sm" variant="soft">
-                  {formatRole(role)}
-                </Chip>
-              </div>
-              <div className="mt-4">
-                <h2 className="text-2xl font-semibold tracking-tight text-white">
-                  {name || "Complete your profile"}
-                </h2>
-                <p className="mt-1 text-sm text-muted-foreground">{email}</p>
+          <Card className="rounded-2xl border border-default bg-content1 p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <ProfileImageField name={name} image={image} />
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                    {name || "Complete your profile"}
+                  </h2>
+                  <Chip color="primary" size="sm" variant="flat">
+                    {formatRole(role)}
+                  </Chip>
+                </div>
+                <p className="mt-1 text-sm text-default-500">{email}</p>
+                <p className="mt-3 text-xs text-default-500 max-w-sm">
+                  Click the avatar to update your profile photo. PNG, JPG, WebP
+                  up to 5MB.
+                </p>
               </div>
             </div>
           </Card>
 
           <Card className="rounded-2xl border border-default bg-content1 p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className="text-sm font-medium uppercase tracking-widest text-default-500">
               Account snapshot
             </h2>
-            <div className="mt-5 flex flex-col divide-y divide-default">
-              <div className="flex items-center gap-3 py-3 first:pt-0">
-                <Envelope className="size-4 text-indigo-300" />
+            <div className="mt-6 flex flex-col gap-5">
+              <div className="flex items-center gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-default-100">
+                  <Envelope className="size-4 text-foreground" />
+                </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-default-500">
                     Email
                   </p>
-                  <p className="truncate text-sm text-white">{email}</p>
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {email}
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 py-3">
-                <Person className="size-4 text-indigo-300" />
+              <div className="flex items-center gap-4">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-default-100">
+                  <Person className="size-4 text-foreground" />
+                </div>
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-default-500">
                     Account type
                   </p>
-                  <p className="text-sm text-white">{formatRole(role)}</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {formatRole(role)}
+                  </p>
                 </div>
               </div>
               {joined && (
-                <div className="flex items-center gap-3 py-3 last:pb-0">
-                  <Calendar className="size-4 text-indigo-300" />
+                <div className="flex items-center gap-4">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-default-100">
+                    <Calendar className="size-4 text-foreground" />
+                  </div>
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-default-500">
                       Member since
                     </p>
-                    <p className="text-sm text-white">{joined}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {joined}
+                    </p>
                   </div>
                 </div>
               )}
@@ -152,11 +167,11 @@ export default async function ProfilePage() {
         )}
 
         <Card className="rounded-2xl border border-default bg-content1 p-6 sm:p-8">
-          <div className="mb-6 border-b border-default pb-5">
-            <h2 className="text-xl font-semibold text-white">
+          <div className="mb-8 border-b border-default pb-6">
+            <h2 className="text-xl font-semibold text-foreground">
               Personal details
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-default-500">
               Update the name shown on your profile and dashboard.
             </p>
           </div>

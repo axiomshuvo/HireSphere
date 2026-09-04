@@ -64,12 +64,12 @@ export default function ApplicationCard({ application, job }) {
                 {job ? (
                   <Link
                     href={`/jobs/${application.jobId}`}
-                    className="block truncate text-xl font-semibold tracking-tight text-white transition-colors hover:text-indigo-200"
+                    className="block truncate text-xl font-semibold tracking-tight text-foreground transition-colors hover:text-indigo-600"
                   >
                     {title}
                   </Link>
                 ) : (
-                  <p className="truncate text-xl font-semibold tracking-tight text-white">
+                  <p className="truncate text-xl font-semibold tracking-tight text-foreground">
                     {title}
                   </p>
                 )}
@@ -96,19 +96,19 @@ export default function ApplicationCard({ application, job }) {
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
               {location && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-2.5 py-1.5">
-                  <MapPin className="size-3.5 text-indigo-300" />
+                  <MapPin className="size-3.5 text-indigo-500" />
                   {location}
                 </span>
               )}
               {salary && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-2.5 py-1.5">
-                  <Wallet className="size-3.5 text-indigo-300" />
+                  <Wallet className="size-3.5 text-indigo-500" />
                   {salary}
                 </span>
               )}
               {appliedDate && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-2.5 py-1.5">
-                  <Calendar className="size-3.5 text-indigo-300" />
+                  <Calendar className="size-3.5 text-indigo-500" />
                   Applied {appliedDate}
                 </span>
               )}
@@ -118,14 +118,14 @@ export default function ApplicationCard({ application, job }) {
 
         <div className="grid grid-cols-1 gap-3 border-t border-default pt-4 sm:grid-cols-2">
           <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-            <Envelope className="size-3.5 shrink-0 text-indigo-300" />
+            <Envelope className="size-3.5 shrink-0 text-indigo-500" />
             <span className="truncate">
               {application.email || "No email provided"}
             </span>
           </div>
           {application.phone && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Smartphone className="size-3.5 text-indigo-300" />
+              <Smartphone className="size-3.5 text-indigo-500" />
               <span>{application.phone}</span>
             </div>
           )}
@@ -142,7 +142,7 @@ export default function ApplicationCard({ application, job }) {
             {job && (
               <Link
                 href={`/jobs/${application.jobId}`}
-                className="inline-flex items-center rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-2 text-xs font-medium text-white transition-colors hover:border-indigo-500/50"
+                className="inline-flex items-center rounded-lg border border-default-200 bg-default-100 px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-indigo-500/50"
               >
                 View job
               </Link>

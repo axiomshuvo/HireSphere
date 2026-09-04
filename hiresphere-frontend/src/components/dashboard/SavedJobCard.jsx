@@ -67,19 +67,19 @@ export default function SavedJobCard({ saved, job }) {
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-transparent" />
       <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6">
         <div className="flex items-start gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20">
             <Bookmark className="size-5" />
           </div>
           <div className="min-w-0 flex-1">
             {job ? (
               <Link
                 href={`/jobs/${saved.jobId}`}
-                className="block truncate text-lg font-semibold tracking-tight text-white transition-colors hover:text-amber-200"
+                className="block truncate text-lg font-semibold tracking-tight text-foreground transition-colors hover:text-amber-600"
               >
                 {displayTitle}
               </Link>
             ) : (
-              <span className="block truncate text-lg font-semibold text-white">
+              <span className="block truncate text-lg font-semibold text-foreground">
                 {displayTitle}
               </span>
             )}
@@ -101,19 +101,19 @@ export default function SavedJobCard({ saved, job }) {
             )}
             {location && (
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-2.5 py-1.5">
-                <MapPin className="size-3.5 text-amber-300" />
+                <MapPin className="size-3.5 text-amber-500" />
                 {location}
               </span>
             )}
             {salary && (
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-2.5 py-1.5">
-                <Wallet className="size-3.5 text-amber-300" />
+                <Wallet className="size-3.5 text-amber-500" />
                 {salary}
               </span>
             )}
             {job.deadline && (
               <span className="inline-flex items-center gap-1.5">
-                <Calendar className="size-3.5 text-amber-300" />
+                <Calendar className="size-3.5 text-amber-500" />
                 Closes{" "}
                 {new Date(job.deadline).toLocaleDateString("en-US", {
                   month: "short",

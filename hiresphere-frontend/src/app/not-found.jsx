@@ -19,7 +19,7 @@ export default function NotFoundPage() {
 
       <div className="relative z-10 max-w-md text-center">
         {/* 404 */}
-        <div className="mb-2 text-[10rem] font-extrabold tracking-tight text-white sm:text-[12rem] md:text-[14rem]">
+        <div className="mb-2 text-[10rem] font-extrabold tracking-tight text-foreground sm:text-[12rem] md:text-[14rem]">
           <span className="bg-gradient-to-r from-indigo-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
             4
           </span>
@@ -31,7 +31,7 @@ export default function NotFoundPage() {
           </span>
         </div>
 
-        <h1 className="mt-2 text-2xl font-semibold text-white">
+        <h1 className="mt-2 text-2xl font-semibold text-foreground">
           Page not found
         </h1>
         <p className="mt-3 text-sm text-(color-text-muted)">
@@ -49,9 +49,9 @@ export default function NotFoundPage() {
           </Link>
           <Link
             href="/jobs"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-(color-surface-2) px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:border-indigo-500/40 hover:bg-white/[0.06]"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-default-200 bg-(color-surface-2) px-6 py-3 text-sm font-medium text-foreground transition-all duration-200 hover:border-indigo-500/40 hover:bg-white/[0.06]"
           >
-            <Magnifier className="size-4 text-indigo-300" />
+            <Magnifier className="size-4 text-indigo-500" />
             Browse jobs
           </Link>
         </div>

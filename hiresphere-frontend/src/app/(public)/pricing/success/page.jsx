@@ -87,15 +87,15 @@ export default async function Success({ searchParams }) {
 
           {plan && (
             <div className="mb-8 w-full rounded-2xl border border-indigo-500/20 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.15),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] p-6 shadow-inner">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-400 mb-2">
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-500 mb-2">
                 New Plan Activated
               </span>
               <div className="flex items-center justify-center gap-2">
-                <Sparkles className="size-5 text-indigo-400" />
+                <Sparkles className="size-5 text-indigo-500" />
                 <span className="text-xl font-bold text-indigo-100 capitalize">
                   {plan.replace(/_/g, " ")}
                 </span>
-                <Sparkles className="size-5 text-indigo-400" />
+                <Sparkles className="size-5 text-indigo-500" />
               </div>
             </div>
           )}
@@ -115,7 +115,7 @@ export default async function Success({ searchParams }) {
               <Button
                 variant="bordered"
                 size="lg"
-                className="w-full border-(color-border) font-medium bg-(color-surface) hover:border-indigo-500/50 hover:text-indigo-400 transition-all"
+                className="w-full border-(color-border) font-medium bg-(color-surface) hover:border-indigo-500/50 hover:text-indigo-500 transition-all"
               >
                 View Profile
               </Button>

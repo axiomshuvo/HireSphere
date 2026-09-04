@@ -15,10 +15,13 @@ export default function PlanUsageCard({ usage }) {
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
 
   return (
-    <Card className="rounded-2xl border border-default bg-content1 p-5">
+    <Card className="rounded-2xl border border-default bg-content1 p-5 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <Typography.Heading className="text-lg font-semibold text-white" level={2}>
+          <Typography.Heading
+            className="text-lg font-semibold text-foreground"
+            level={2}
+          >
             Active job posts
           </Typography.Heading>
           <Typography.Paragraph className="mt-1 text-sm text-muted-foreground">
@@ -43,7 +46,7 @@ export default function PlanUsageCard({ usage }) {
             <Button
               variant="primary"
               size="sm"
-              className="cursor-pointer"
+              className="mt-2 cursor-pointer"
               onPress={() => setIsPlanModalOpen(true)}
             >
               Upgrade Plan

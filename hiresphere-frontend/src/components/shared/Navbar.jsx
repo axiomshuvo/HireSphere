@@ -2,6 +2,7 @@
 
 import Logo from "@/components/shared/Logo";
 import { signOut, useSession } from "@/lib/auth-client";
+import { useTheme } from "@/providers/ThemeProvider";
 import {
   ArrowRightFromSquare,
   Bars,
@@ -14,7 +15,7 @@ import {
 import { Avatar, Button, Dropdown, Label } from "@heroui/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function Navbar() {
   const { data: session, isPending } = useSession();
@@ -22,15 +23,9 @@ export default function Navbar() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
 
-  useEffect(() => {
-    document.documentElement.setAttribute(
-      "data-theme",
-      isDark ? "dark" : "light",
-    );
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
 
   const navLinks = [
     { label: "Browse Jobs", href: "/jobs" },
@@ -82,12 +77,21 @@ export default function Navbar() {
         className="h-9 pl-1 pr-3 gap-2 min-w-0"
         aria-label="Account menu"
       >
-        <Avatar
-          size="sm"
-          name={session.user.name}
-          src={session.user.image || undefined}
-          className="w-7 h-7 text-xs shrink-0"
-        />
+        <Avatar.Root className="size-7 shrink-0 rounded-full bg-default-100 text-xs font-semibold text-foreground flex items-center justify-center overflow-hidden">
+          {session.user.image ? (
+            <Avatar.Image
+              src={session.user.image}
+              alt={session.user.name}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <Avatar.Fallback>
+              {session.user.name
+                ? session.user.name.charAt(0).toUpperCase()
+                : "U"}
+            </Avatar.Fallback>
+          )}
+        </Avatar.Root>
         <span className="hidden sm:block text-sm font-medium max-w-28 truncate">
           {session.user.name}
         </span>
@@ -149,12 +153,15 @@ export default function Navbar() {
   //       aria-label="Toggle profile actions"
   //     >
   //       <div className="flex items-center gap-3 min-w-0">
-  //         <Avatar
-  //           size="sm"
-  //           name={session.user.name}
-  //           src={session.user.image || undefined}
-  //           className="shrink-0"
-  //         />
+  //         <Avatar.Root className="size-8 shrink-0 rounded-full bg-default-100 text-xs font-semibold text-foreground flex items-center justify-center overflow-hidden">
+  //           {session.user.image ? (
+  //             <Avatar.Image src={session.user.image} alt={session.user.name} className="h-full w-full object-cover" />
+  //           ) : (
+  //             <Avatar.Fallback>
+  //               {session.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
+  //             </Avatar.Fallback>
+  //           )}
+  //         </Avatar.Root>
   //         <div className="min-w-0">
   //           <p className="text-sm font-semibold truncate">
   //             {session.user.name}
@@ -233,7 +240,7 @@ export default function Navbar() {
             variant="ghost"
             size="sm"
             radius="lg"
-            onClick={() => setIsDark((p) => !p)}
+            onClick={toggleTheme}
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
           >
             {isDark ? (

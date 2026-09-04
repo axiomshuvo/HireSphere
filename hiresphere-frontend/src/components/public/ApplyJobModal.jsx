@@ -9,7 +9,7 @@ import { applyToJob } from "@/lib/actions/applications";
 import { toast } from "@heroui/react";
 
 const inputClass = (error) =>
-  `w-full rounded-lg border bg-[#1b1c1e] px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none ${
+  `w-full rounded-lg border bg-default-100 px-3 py-2 text-sm text-foreground placeholder-gray-500 transition-colors focus:outline-none ${
     error ? "border-red-500 focus:border-red-500" : "border-white/10 focus:border-indigo-500"
   }`;
 
@@ -139,7 +139,7 @@ export default function ApplyJobModal({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-lg border border-white/10 bg-[#1b1c1e] text-muted-foreground transition-colors hover:border-indigo-500/50 hover:text-white"
+          className="absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-lg border border-default-200 bg-default-100 text-muted-foreground transition-colors hover:border-indigo-500/50 hover:text-foreground"
         >
           <Xmark className="size-4" />
         </button>
@@ -149,7 +149,7 @@ export default function ApplyJobModal({
             <Briefcase className="size-3.5" />
             {companySlug ? `${companySlug} • Apply` : "Apply"}
           </div>
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
             {jobTitle ?? "Apply to this role"}
           </h2>
         </header>
@@ -168,7 +168,7 @@ export default function ApplyJobModal({
         ) : session.user.role !== "seeker" ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-default bg-[#1b1c1e] px-6 py-10 text-center">
             <Ban className="size-8 text-muted-foreground" />
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-foreground">
               Recruiter accounts can&apos;t apply
             </h3>
             <p className="max-w-md text-sm text-muted-foreground">
@@ -261,7 +261,7 @@ export default function ApplyJobModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="h-10 rounded-lg border border-white/10 bg-[#1b1c1e] px-5 text-sm font-medium text-white transition-colors hover:border-indigo-500/50"
+                className="h-10 rounded-lg border border-default-200 bg-default-100 px-5 text-sm font-medium text-foreground transition-colors hover:border-indigo-500/50"
               >
                 Cancel
               </button>

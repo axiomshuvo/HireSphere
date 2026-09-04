@@ -67,7 +67,7 @@ export default function SaveJobButton({
       <div className={`flex w-full flex-col gap-2 lg:w-auto ${className}`}>
         <Link
           href="/dashboard/saved-jobs"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-6 py-3 text-sm font-semibold text-emerald-300 transition-colors hover:border-emerald-500/60 lg:w-auto"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-6 py-3 text-sm font-semibold text-emerald-500 transition-colors hover:border-emerald-500/60 lg:w-auto"
         >
           <Check className="size-4" />
           Saved — view saved jobs
@@ -86,7 +86,7 @@ export default function SaveJobButton({
               });
             }
           }}
-          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1b1c1e] px-6 py-3 text-xs text-muted-foreground transition-colors hover:text-white lg:w-auto"
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-default-200 bg-default-100 px-6 py-3 text-xs text-muted-foreground transition-colors hover:text-foreground lg:w-auto"
         >
           Remove
         </button>

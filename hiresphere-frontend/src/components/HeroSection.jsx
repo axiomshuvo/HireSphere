@@ -116,7 +116,7 @@ export default function HeroSection() {
         <button
           type="submit"
           aria-label="Submit Job Search"
-          className="w-full md:w-auto bg-[#4f46e5] hover:bg-[#4338ca] text-white p-3.5 md:p-4 rounded-xl md:rounded-full flex items-center justify-center shrink-0 shadow-md transition-all duration-200 cursor-pointer"
+          className="w-full md:w-auto bg-[#4f46e5] hover:bg-[#4338ca] text-foreground p-3.5 md:p-4 rounded-xl md:rounded-full flex items-center justify-center shrink-0 shadow-md transition-all duration-200 cursor-pointer"
         >
           <Magnifier className="w-5 h-5" />
         </button>

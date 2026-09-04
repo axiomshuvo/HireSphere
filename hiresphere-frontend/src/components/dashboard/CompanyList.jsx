@@ -17,11 +17,11 @@ export default function CompanyList({
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-500/0 via-emerald-500/60 to-emerald-500/0"
       />
       <div className="mb-4 flex items-center justify-between">
-        <Typography.Heading className="text-lg font-semibold text-white" level={2}>
+        <Typography.Heading className="text-lg font-semibold text-foreground" level={2}>
           {title}
         </Typography.Heading>
         <Button
-          className="text-sm text-emerald-300 hover:text-emerald-200"
+          className="text-sm text-emerald-500 hover:text-emerald-600"
           variant="light"
           endContent={<ArrowRight className="size-4" />}
         >
@@ -35,7 +35,7 @@ export default function CompanyList({
         ))}
       </ul>
 
-      <Button className="mt-6 w-full rounded-xl bg-gradient-to-r from-emerald-500/90 to-teal-500/90 font-semibold text-white shadow-lg shadow-emerald-500/20" variant="flat">
+      <Button className="mt-6 w-full rounded-xl bg-gradient-to-r from-emerald-500/90 to-teal-500/90 font-semibold text-foreground shadow-lg shadow-emerald-500/20" variant="flat">
         {actionLabel}
       </Button>
     </Card>

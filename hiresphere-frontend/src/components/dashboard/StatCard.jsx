@@ -12,22 +12,22 @@ import { Card, Typography } from "@heroui/react";
 
 const TONES = {
   indigo: {
-    chip: "from-indigo-500/20 to-indigo-500/5 text-indigo-300 ring-indigo-500/30",
+    chip: "from-indigo-500/20 to-indigo-500/5 text-indigo-500 ring-indigo-500/30",
     accent: "from-indigo-500 to-blue-500",
     halo: "bg-indigo-500/10",
   },
   emerald: {
-    chip: "from-emerald-500/20 to-emerald-500/5 text-emerald-300 ring-emerald-500/30",
+    chip: "from-emerald-500/20 to-emerald-500/5 text-emerald-500 ring-emerald-500/30",
     accent: "from-emerald-500 to-teal-500",
     halo: "bg-emerald-500/10",
   },
   amber: {
-    chip: "from-amber-500/20 to-amber-500/5 text-amber-300 ring-amber-500/30",
+    chip: "from-amber-500/20 to-amber-500/5 text-amber-500 ring-amber-500/30",
     accent: "from-amber-500 to-orange-500",
     halo: "bg-amber-500/10",
   },
   rose: {
-    chip: "from-rose-500/20 to-rose-500/5 text-rose-300 ring-rose-500/30",
+    chip: "from-rose-500/20 to-rose-500/5 text-rose-500 ring-rose-500/30",
     accent: "from-rose-500 to-pink-500",
     halo: "bg-rose-500/10",
   },
@@ -68,7 +68,7 @@ export default function StatCard({
             {label}
           </Typography.Paragraph>
           <Typography.Heading
-            className="mt-2 text-3xl font-semibold tabular-nums text-white"
+            className="mt-2 text-3xl font-semibold tabular-nums text-(color-foreground)"
             level={2}
           >
             {value}
