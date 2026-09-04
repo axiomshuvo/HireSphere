@@ -904,3 +904,73 @@ function mountPublicEnhancements(app, database) {
 }
 
 module.exports = { mountMyRoutes, mountPublicEnhancements };
+
+// ==== SUBSCRIPTION VERIFICATION ENDPOINT ====
+function mountSubscriptionsRoutes(app, database) {
+  const subscriptions = database.collection("subscriptions");
+  const users = database.collection("user");
+  const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+  const { ObjectId } = require("mongodb");
+
+  // Authentication middleware
+  async function requireUser(req, res, next) {
+    const userId = req.headers["x-recruiter-id"];
+    if (!userId || !ObjectId.isValid(userId)) {
+      return res.status(401).json({ message: "Missing or invalid user id" });
+    }
+    req.userId = userId;
+    return next();
+  }
+
+  app.post("/api/my/subscriptions/verify", requireUser, async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) {
+        return res.status(400).json({ message: "sessionId is required" });
+      }
+
+      // Securely fetch session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+      if (session.payment_status !== "paid") {
+        return res.status(400).json({ message: "Payment not completed" });
+      }
+
+      const planId = session.metadata.planId || session.metadata.plan;
+      if (!planId) {
+        return res.status(400).json({ message: "No planId found in session metadata" });
+      }
+
+      // Upsert into subscriptions collection
+      const subscriptionDoc = {
+        userId: req.userId,
+        planId: planId,
+        stripeCustomerId: session.customer,
+        stripeSubscriptionId: session.subscription,
+        status: "active",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await subscriptions.updateOne(
+        { stripeSubscriptionId: session.subscription },
+        { $set: subscriptionDoc },
+        { upsert: true }
+      );
+
+      // Update the user's plan field
+      await users.updateOne(
+        { _id: new ObjectId(req.userId) },
+        { $set: { plan: planId } }
+      );
+
+      return res.json({ success: true, planId });
+    } catch (error) {
+      console.error("Error verifying subscription:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+}
+
+// Export it so index.js can mount it
+module.exports.mountSubscriptionsRoutes = mountSubscriptionsRoutes;

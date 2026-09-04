@@ -90,3 +90,51 @@ export async function updateProfilePlan(plan) {
 
   return result;
 }
+
+export async function verifyStripePayment(sessionId) {
+  if (!sessionId) {
+    throw new Error("No session ID provided");
+  }
+
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  
+  try {
+    const res = await fetch(`${baseUrl}/api/my/subscriptions/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-recruiter-id": session.user.id,
+      },
+      body: JSON.stringify({ sessionId }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to verify subscription");
+    }
+
+    const data = await res.json();
+
+    // Update better-auth user so the UI reflects it instantly
+    if (data.planId) {
+      await auth.api.updateUser({
+        body: { plan: data.planId },
+        headers: await headers(),
+      });
+    }
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/profile");
+    revalidatePath("/pricing");
+
+    return { success: true, plan: data.planId };
+  } catch (error) {
+    console.error("Stripe Verification Error:", error);
+    throw new Error("Failed to verify payment");
+  }
+}

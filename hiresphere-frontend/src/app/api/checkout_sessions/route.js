@@ -81,9 +81,15 @@ export async function POST(request) {
       client_reference_id: user?.id || undefined,
       metadata: {
         userId: user?.id || "",
-        plan: normalizedPlan,
+        planId: normalizedPlan,
       },
-      success_url: `${origin}/pricing/success?session_id={CHECKOUT_SESSION_ID}&plan=${normalizedPlan}`,
+      subscription_data: {
+        metadata: {
+          userId: user?.id || "",
+          planId: normalizedPlan,
+        },
+      },
+      success_url: `${origin}/pricing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/pricing`,
     });
 

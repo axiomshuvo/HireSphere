@@ -1,9 +1,136 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-app.use(express.json());
-
 const dotenv = require("dotenv");
+dotenv.config();
+
+// --- STRIPE WEBHOOK MUST COME BEFORE express.json() ---
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
+app.post(
+  "/api/webhooks/stripe",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    let event;
+
+    try {
+      if (!endpointSecret) {
+        throw new Error("Missing STRIPE_WEBHOOK_SECRET");
+      }
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } catch (err) {
+      console.error("Webhook Error:", err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    try {
+      const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+      const client = new MongoClient(process.env.MONGODB_URI, {
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        },
+      });
+      await client.connect();
+      const database = client.db(process.env.MONGODB_DB_NAME);
+      const subscriptions = database.collection("subscriptions");
+      const users = database.collection("user");
+
+      // Handle the event
+      switch (event.type) {
+        case "customer.subscription.updated":
+        case "customer.subscription.deleted": {
+          const subscription = event.data.object;
+
+          await subscriptions.updateOne(
+            { stripeSubscriptionId: subscription.id },
+            {
+              $set: {
+                status: subscription.status,
+                currentPeriodEnd: new Date(
+                  subscription.current_period_end * 1000,
+                ).toISOString(),
+                cancelAtPeriodEnd: subscription.cancel_at_period_end,
+                updatedAt: new Date().toISOString(),
+              },
+            },
+          );
+
+          // If deleted or past_due, downgrade user to free plan
+          if (
+            subscription.status === "canceled" ||
+            subscription.status === "unpaid"
+          ) {
+            const subDoc = await subscriptions.findOne({
+              stripeSubscriptionId: subscription.id,
+            });
+            if (subDoc && subDoc.userId) {
+              await users.updateOne(
+                { _id: new ObjectId(subDoc.userId) },
+                { $set: { plan: "free" } },
+              );
+            }
+          }
+          break;
+        }
+        case "checkout.session.completed": {
+          // checkout session completed is handled mostly by our success verify route,
+          // but we can also handle it here as a fallback if the user closes the browser early.
+          const session = event.data.object;
+          if (
+            session.mode === "subscription" &&
+            session.payment_status === "paid"
+          ) {
+            const planId =
+              session.subscription_details?.metadata?.planId ||
+              session.metadata?.planId;
+            const userId =
+              session.subscription_details?.metadata?.userId ||
+              session.metadata?.userId;
+
+            if (userId && planId) {
+              await subscriptions.updateOne(
+                { stripeSubscriptionId: session.subscription },
+                {
+                  $set: {
+                    userId: userId,
+                    planId: planId,
+                    stripeCustomerId: session.customer,
+                    stripeSubscriptionId: session.subscription,
+                    status: "active",
+                    updatedAt: new Date().toISOString(),
+                  },
+                  $setOnInsert: {
+                    createdAt: new Date().toISOString(),
+                  },
+                },
+                { upsert: true },
+              );
+
+              await users.updateOne(
+                { _id: new ObjectId(userId) },
+                { $set: { plan: planId } },
+              );
+            }
+          }
+          break;
+        }
+        default:
+          console.log(`Unhandled event type ${event.type}`);
+      }
+      await client.close();
+    } catch (e) {
+      console.error("Database error in webhook:", e);
+    }
+
+    res.json({ received: true });
+  },
+);
+
+app.use(express.json());
 dotenv.config();
 
 app.use(cors());
@@ -39,10 +166,15 @@ async function run() {
     // Wire up the /api/my/* routes (recruiter-scoped, ownership-checked) and
     // enhance the public /api/companies + /api/jobs endpoints with pagination
     // and filters that the frontend expects.
-    const { mountMyRoutes, mountPublicEnhancements } = require("./routes");
+    const {
+      mountMyRoutes,
+      mountPublicEnhancements,
+      mountSubscriptionsRoutes,
+    } = require("./routes");
     mountMyRoutes(app, database);
     mountPublicEnhancements(app, database);
     mountApplicationsRoutes(app, database);
+    if (mountSubscriptionsRoutes) mountSubscriptionsRoutes(app, database);
 
     await client.db("admin").command({ ping: 1 });
 

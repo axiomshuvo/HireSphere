@@ -1,7 +1,8 @@
-import { updateProfilePlan } from "@/lib/actions/profile";
+import { auth } from "@/lib/auth";
 import { stripe } from "@/lib/stripe";
 import { ArrowRight, Check, Sparkles } from "@gravity-ui/icons";
 import { Button } from "@heroui/react";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -31,10 +32,23 @@ export default async function Success({ searchParams }) {
     return redirect("/");
   }
 
-  // Update user plan if available
-  if (status === "complete" && plan) {
+  // Delegate DB updates to the backend
+  if (status === "complete" && session_id) {
     try {
-      await updateProfilePlan(plan);
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      const reqHeaders = await headers();
+      const authSession = await auth.api.getSession({ headers: reqHeaders });
+
+      if (authSession?.user) {
+        await fetch(`${baseUrl}/api/my/subscriptions/verify`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-recruiter-id": authSession.user.id,
+          },
+          body: JSON.stringify({ sessionId: session_id }),
+        });
+      }
     } catch (e) {
       console.warn(
         "Could not automatically update user profile plan:",
