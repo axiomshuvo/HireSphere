@@ -68,7 +68,7 @@ export default async function ApplicationsPage({ searchParams }) {
           </p>
           <Link
             href="/jobs"
-            className="mt-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-gray-200"
+            className="mt-2 rounded-lg border border-default bg-content1 px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-indigo-500/50"
           >
             Browse open roles
           </Link>

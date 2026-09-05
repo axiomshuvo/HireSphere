@@ -4,21 +4,21 @@ import Link from "next/link";
 
 export default function Footer() {
   const productLinks = [
-    { label: "Job discovery", href: "#" },
-    { label: "Worker AI", href: "#" },
-    { label: "Companies", href: "#" },
-    { label: "Salary data", href: "#" },
+    { label: "Job discovery", href: "/job-discovery" },
+    { label: "Worker AI", href: "/worker-ai" },
+    { label: "Companies", href: "/company" },
+    { label: "Salary data", href: "/salary-data" },
   ];
 
   const navigationLinks = [
-    { label: "Help center", href: "#" },
-    { label: "Career library", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "Help center", href: "/help" },
+    { label: "Career library", href: "/career-library" },
+    { label: "Contact", href: "/contact" },
   ];
 
   const resourceLinks = [
-    { label: "Brand Guideline", href: "#" },
-    { label: "Newsroom", href: "#" },
+    { label: "Brand Guideline", href: "/brand" },
+    { label: "Newsroom", href: "/newsroom" },
   ];
 
   return (

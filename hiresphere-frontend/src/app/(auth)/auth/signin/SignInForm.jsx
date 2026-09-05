@@ -2,8 +2,9 @@
 
 import { DEMO_ACCOUNTS } from "@/lib/api/jobstruture";
 import { authClient } from "@/lib/auth-client";
+import { authToasts } from "@/lib/toast";
 import { ArrowLeft, Envelope, Eye, EyeSlash, Lock } from "@gravity-ui/icons";
-import { Button, toast } from "@heroui/react";
+import { Button } from "@heroui/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -63,32 +64,21 @@ export default function SignInForm() {
     setLoading(true);
 
     try {
-      const { error: authError } = await authClient.signIn.email({
+      const { data, error: authError } = await authClient.signIn.email({
         email: formData.email.trim(),
         password: formData.password,
       });
       if (authError) {
-        console.error("⚠️ Detailed Auth Error Object:", authError);
-        console.error("⚠️ Stringified:", JSON.stringify(authError, null, 2));
-        console.error("⚠️ Message:", authError?.message);
-        console.error("⚠️ Status:", authError?.status, authError?.code);
-        toast.danger("Sign In Failed", {
-          description: authError.message || "Invalid email or password.",
-        });
+        authToasts.signInFailed(authError);
         setLoading(false);
         return;
       }
-      toast.success("Welcome Back!", {
-        description: "Signed in successfully. Redirecting...",
-      });
+      authToasts.signInSuccess(data?.user);
       setTimeout(() => {
         router.push(resolveNextPath(searchParams.get("next")));
       }, 1000);
     } catch (err) {
-      console.error("Critical Signin Error:", err);
-      toast.danger("Network Error", {
-        description: "A critical network error occurred. Please try again.",
-      });
+      authToasts.networkError();
       setLoading(false);
     }
   };

@@ -47,7 +47,7 @@ export default function MarketJobsPanel({ jobs = [] }) {
 
       <ul className="flex flex-col gap-3">
         {jobs.map((job) => {
-          const id = job.jobId ?? job.slug ?? job._id;
+          const id = job.jobId ?? job.slug ?? job.id ?? job._id;
           const location = formatLocation(job);
           const salary = formatSalary(job);
           return (

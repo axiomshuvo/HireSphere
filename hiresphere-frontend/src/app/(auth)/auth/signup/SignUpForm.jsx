@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
+import { authToasts } from "@/lib/toast";
 import {
   ArrowLeft,
   Envelope,
@@ -9,7 +10,7 @@ import {
   Lock,
   Person,
 } from "@gravity-ui/icons";
-import { Button, Description, Radio, RadioGroup, toast } from "@heroui/react";
+import { Button, Description, Radio, RadioGroup } from "@heroui/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -80,26 +81,17 @@ export default function SignUpForm() {
         plan: formData.plan,
       });
       if (authError) {
-        toast.danger("Registration Failed", {
-          description:
-            authError.message ||
-            "Failed to create account. Please check your credentials.",
-        });
+        authToasts.signUpFailed(authError);
         setLoading(false);
         return;
       }
-      toast.success("Account Created!", {
-        description: "Welcome to HireSphere. Redirecting to sign in...",
-      });
+      authToasts.signUpSuccess({ name: formData.name, role: formData.role });
       setFormData({ name: "", email: "", password: "", confirmPassword: "" });
       setTimeout(() => {
         router.push(resolveNextPath(searchParams.get("next")));
       }, 1200);
     } catch (err) {
-      console.error("Critical Signup Error:", err);
-      toast.danger("Network Error", {
-        description: "A critical network error occurred. Please try again.",
-      });
+      authToasts.networkError();
       setLoading(false);
     }
   };

@@ -6,6 +6,7 @@ import { getRecruiterCompanies, updateRecruiterCompany } from "@/lib/actions/com
 import {
   generateCompanySlug,
   getCompanySlug,
+  matchCompanyId,
   normalizeCompany,
 } from "@/lib/api/companies";
 import { ArrowLeft } from "@gravity-ui/icons";
@@ -59,7 +60,7 @@ export default function EditCompanyPage({ params }) {
         if (cancelled) return;
         const list = Array.isArray(data) ? data : (data?.items ?? []);
         const found =
-          list.map(normalizeCompany).find((c) => getCompanySlug(c) === id) ??
+          list.map(normalizeCompany).find((c) => matchCompanyId(c, id)) ??
           null;
         setCompany(found);
         setFormData(buildFormData(found));
@@ -249,7 +250,7 @@ export default function EditCompanyPage({ params }) {
               Cancel
             </ButtonLink>
             <Button type="submit" variant="primary" isDisabled={isSubmitting}>
-              {isSubmitting ? "Saving…" : "Save Changes"}
+              {isSubmitting ? "Updating…" : "Update Company"}
             </Button>
           </div>
         </form>

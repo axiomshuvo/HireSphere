@@ -1,4 +1,6 @@
 import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
+import CompanyLogo from "@/components/public/CompanyLogo";
+import { matchCompanyId } from "@/lib/api/companies";
 import {
   fetchPublicCompanies,
   fetchPublicCompanyById,
@@ -14,16 +16,9 @@ import {
   Persons,
   Wallet,
 } from "@gravity-ui/icons";
-import { Avatar, Card, Chip, Typography } from "@heroui/react";
+import { Card, Chip, Typography } from "@heroui/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
-function getInitials(name) {
-  const parts = name?.trim().split(/\s+/) ?? [];
-  const first = parts[0]?.[0] ?? "";
-  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
-  return `${first}${last}`.toUpperCase() || "U";
-}
 
 function formatSalary(job) {
   if (!job.salaryMin || !job.salaryMax) return null;
@@ -54,9 +49,7 @@ export default async function PublicCompanyPage({ params }) {
       const list = await fetchPublicCompanies({ pageSize: 100 });
       const items = Array.isArray(list) ? list : (list?.items ?? []);
       company =
-        items.find(
-          (c) => c.companySlug === id || c.id === id || c._id === id,
-        ) ?? null;
+        items.find((c) => matchCompanyId(c, id)) ?? null;
     } catch (listError) {
       console.error(
         `[PublicCompanyPage] List fallback failed for "${id}":`,
@@ -70,7 +63,6 @@ export default async function PublicCompanyPage({ params }) {
   const activeJobs = Array.isArray(company.activeJobs)
     ? company.activeJobs
     : [];
-  const initials = getInitials(company.name ?? "");
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 lg:px-8">
@@ -88,17 +80,12 @@ export default async function PublicCompanyPage({ params }) {
           className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-indigo-500/10 blur-3xl"
         />
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start">
-          {company.logo ? (
-            <img
-              src={company.logo}
-              alt={company.name}
-              className="size-24 shrink-0 rounded-2xl border border-(color-border) object-cover"
-            />
-          ) : (
-            <Avatar.Root className="size-24 shrink-0 rounded-2xl bg-(color-surface-2) text-3xl font-semibold text-(color-text)">
-              <Avatar.Fallback>{initials}</Avatar.Fallback>
-            </Avatar.Root>
-          )}
+          <CompanyLogo
+            logo={company.logo}
+            name={company.name}
+            size="size-24"
+            text="text-3xl"
+          />
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -112,21 +99,21 @@ export default async function PublicCompanyPage({ params }) {
                   Verified
                 </Chip>
               )}
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-(color-border) bg-(color-surface-2) px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-(color-text)">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
                 <Briefcase className="size-3" />
                 {activeJobs.length} open{" "}
                 {activeJobs.length === 1 ? "role" : "roles"}
               </span>
             </div>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-(color-text) sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
               {company.name ?? "Unnamed company"}
             </h1>
             {company.tagline && (
-              <p className="mt-1.5 text-base text-(color-text-muted)">
+              <p className="mt-1.5 text-base text-white/70">
                 {company.tagline}
               </p>
             )}
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-(color-text-muted)">
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">
               {company.industry && <span>{company.industry}</span>}
               {company.location && (
                 <span className="inline-flex items-center gap-1.5">
@@ -154,7 +141,7 @@ export default async function PublicCompanyPage({ params }) {
                   href={company.website}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-foreground transition-colors hover:bg-white/10"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-white/20"
                 >
                   <Globe className="size-3.5" />
                   Website

@@ -4,11 +4,12 @@ import {
   JobTypeBadge,
 } from "@/components/jobs/JobBadge";
 import JobsFilterBar from "@/components/public/JobsFilterBar";
+import SpotlightCard from "@/components/public/SpotlightCard";
 import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
 import JobCardSkeleton from "@/components/shared/JobCardSkeleton";
 import { fetchPublicJobs } from "@/lib/actions/jobs";
+import { formatSlug } from "@/lib/api/jobstruture";
 import { Briefcase, MapPin, Wallet } from "@gravity-ui/icons";
-import { Card } from "@heroui/react";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -149,59 +150,48 @@ export default async function PublicJobsPage({ searchParams }) {
             const loc = formatLocation(job);
             const jobId = job._id ?? job.id;
             return (
-              <Link
-                key={jobId}
-                href={`/jobs/${jobId}`}
-                className="group block"
-                data-job-card={jobId}
-              >
-                <Card className="relative overflow-hidden flex h-full flex-col gap-3 rounded-2xl border border-(color-border) bg-(color-surface) p-5 transition-colors group-hover:border-indigo-500/50 cursor-pointer">
-                  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
-                    <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
-                  </div>
+              <SpotlightCard key={jobId} href={`/jobs/${jobId}`}>
+                <div
+                  className="flex flex-wrap items-center gap-1.5"
+                  data-job-card-badges
+                >
+                  <JobTypeBadge type={job.type} />
+                  <JobRemoteBadge remote={job.remote} />
+                  <JobCategoryBadge category={job.category} />
+                </div>
+                <div className="mt-3 min-w-0" data-job-card-header>
+                  <h2 className="truncate text-lg font-semibold text-(color-text)">
+                    {job.title ?? "Untitled role"}
+                  </h2>
+                  {job.companySlug && (
+                    <p className="mt-1 truncate text-sm text-(color-text-muted)">
+                      {formatSlug(job.companySlug)}
+                    </p>
+                  )}
+                </div>
 
-                  <div
-                    className="relative z-10 flex flex-wrap items-center gap-1.5"
-                    data-job-card-badges
-                  >
-                    <JobTypeBadge type={job.type} />
-                    <JobRemoteBadge remote={job.remote} />
-                    <JobCategoryBadge category={job.category} />
-                  </div>
-                  <div className="min-w-0" data-job-card-header>
-                    <h2 className="truncate text-lg font-semibold text-(color-text)">
-                      {job.title ?? "Untitled role"}
-                    </h2>
-                    {job.companySlug && (
-                      <p className="mt-1 truncate text-sm text-(color-text-muted)">
-                        {job.companySlug}
-                      </p>
-                    )}
-                  </div>
+                <div
+                  className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-(color-text-muted)"
+                  data-job-card-meta
+                >
+                  {loc && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin className="size-3 text-emerald-600 dark:text-emerald-400" />
+                      {loc}
+                    </span>
+                  )}
+                  {salary && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Wallet className="size-3 text-indigo-600 dark:text-indigo-400" />
+                      {salary}
+                    </span>
+                  )}
+                </div>
 
-                  <div
-                    className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-(color-text-muted)"
-                    data-job-card-meta
-                  >
-                    {loc && (
-                      <span className="inline-flex items-center gap-1.5">
-                        <MapPin className="size-3 text-emerald-400" />
-                        {loc}
-                      </span>
-                    )}
-                    {salary && (
-                      <span className="inline-flex items-center gap-1.5">
-                        <Wallet className="size-3 text-indigo-500" />
-                        {salary}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mt-auto" data-job-card-deadline>
-                    <DeadlineCountdown deadline={job.deadline} />
-                  </div>
-                </Card>
-              </Link>
+                <div className="mt-auto pt-3" data-job-card-deadline>
+                  <DeadlineCountdown deadline={job.deadline} />
+                </div>
+              </SpotlightCard>
             );
           })}
         </div>

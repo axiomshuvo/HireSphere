@@ -540,10 +540,10 @@ export default function JobForm({
           >
             {isSubmitting
               ? isEditing
-                ? "Saving…"
+                ? "Updating…"
                 : "Posting…"
               : isEditing
-                ? "Save Changes"
+                ? "Update Job"
                 : "Post Job"}
           </button>
         </div>

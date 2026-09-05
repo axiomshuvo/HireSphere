@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+/* Follow the .dark class on <html> (set by ThemeProvider) instead of
+ * the OS color scheme, so `dark:` variants track the theme toggle. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * HeroUI Theme Customization
  * Add this to your global.css after importing @heroui/styles

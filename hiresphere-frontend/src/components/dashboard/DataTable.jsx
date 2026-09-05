@@ -14,6 +14,7 @@ export default function DataTable({
   rows,
   viewAllLabel = "View all",
   viewAllHref,
+  rowHrefKey = null,
 }) {
   return (
     <Card className="relative overflow-hidden rounded-2xl border border-default bg-content1 p-5">
@@ -60,14 +61,30 @@ export default function DataTable({
                 key={row.id ?? rowIndex}
                 className="border-b border-default transition-colors last:border-b-0 hover:bg-white/[0.02]"
               >
-                {columns.map((column) => (
+                {columns.map((column, colIndex) => {
+                const cell = column.render
+                  ? column.render(row)
+                  : row[column.key];
+                const href = rowHrefKey ? row[rowHrefKey] : null;
+                const linkable = Boolean(href) && colIndex === 0;
+                return (
                   <Table.Cell
                     key={column.key}
                     className={column.cellClassName ?? "py-4 text-foreground"}
                   >
-                    {column.render ? column.render(row) : row[column.key]}
+                    {linkable ? (
+                      <Link
+                        href={href}
+                        className="font-medium transition-colors hover:text-indigo-500"
+                      >
+                        {cell}
+                      </Link>
+                    ) : (
+                      cell
+                    )}
                   </Table.Cell>
-                ))}
+                );
+              })}
               </Table.Row>
             ))}
           </Table.Body>

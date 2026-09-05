@@ -459,10 +459,10 @@ export default function PricingPage() {
       {/* Enterprise CTA */}
       <Card className="mt-16 rounded-2xl border border-(color-border) bg-[radial-gradient(circle_at_30%_50%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#16181c,#0f1013)] p-8 text-center">
         <Sparkles className="mx-auto size-8 text-indigo-500" />
-        <h2 className="mt-3 text-2xl font-semibold text-(color-text)">
+        <h2 className="mt-3 text-2xl font-semibold text-white">
           Hiring at scale?
         </h2>
-        <p className="mx-auto mt-1 max-w-md text-sm text-(color-text-muted)">
+        <p className="mx-auto mt-1 max-w-md text-sm text-white/70">
           Enterprise customers get volume discounts, an SLA, and a dedicated
           account manager. Talk to our team.
         </p>

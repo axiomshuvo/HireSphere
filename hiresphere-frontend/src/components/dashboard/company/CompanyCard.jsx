@@ -1,15 +1,10 @@
 "use client";
 
 import { Briefcase, MapPin, OfficeBadge } from "@gravity-ui/icons";
+import { getCompanySlug } from "@/lib/api/companies";
 import { Avatar, Card, Chip } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
-
-const planLabels = {
-  free: "Free",
-  growth: "Growth",
-  enterprise: "Enterprise",
-};
 
 export default function CompanyCard({ company }) {
   const activeJobs = Number(company.activeJobs ?? 0);
@@ -20,7 +15,7 @@ export default function CompanyCard({ company }) {
 
   return (
     <Link
-      href={`/dashboard/mycompany/${company.companySlug}`}
+      href={`/dashboard/mycompany/${getCompanySlug(company)}`}
       className="group block h-full outline-none"
     >
       <Card className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl border border-default bg-content1 p-5 transition-colors group-hover:border-emerald-500/50">
@@ -60,15 +55,14 @@ export default function CompanyCard({ company }) {
         </p>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Chip color="primary" size="sm" variant="soft">
-            {planLabels[company.plan] ?? company.plan}
-          </Chip>
           <Chip
-            color={company.isApproved ? "success" : "warning"}
+            color={activeJobs > 0 ? "success" : "default"}
             size="sm"
             variant="soft"
           >
-            {company.isApproved ? "Approved" : "Pending"}
+            {activeJobs === 0
+              ? "No open roles"
+              : `${activeJobs} open ${activeJobs === 1 ? "role" : "roles"}`}
           </Chip>
         </div>
 

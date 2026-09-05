@@ -15,7 +15,7 @@ import {
   getRecruiterCompanies,
 } from "@/lib/actions/company";
 import { getRecruiterJobs } from "@/lib/actions/jobs";
-import { getCompanySlug, normalizeCompany } from "@/lib/api/companies";
+import { getCompanySlug, matchCompanyId, normalizeCompany } from "@/lib/api/companies";
 import { getActiveCount } from "@/lib/api/jobstruture";
 import { ArrowLeft, TrashBin } from "@gravity-ui/icons";
 import { Button, Typography, toast } from "@heroui/react";
@@ -56,16 +56,8 @@ export default function CompanyDetailPage({ params }) {
           ? companiesData
           : (companiesData?.items ?? []);
         const found =
-          list
-            .map(normalizeCompany)
-            .find(
-              (c) =>
-                c.slug === id ||
-                c.companySlug === id ||
-                c.id === id ||
-                c._id === id ||
-                getCompanySlug(c) === id,
-            ) ?? null;
+          list.map(normalizeCompany).find((c) => matchCompanyId(c, id)) ??
+          null;
         setCompany(found);
 
         const allJobs = Array.isArray(jobsData)

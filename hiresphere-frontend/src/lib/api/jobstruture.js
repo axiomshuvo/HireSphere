@@ -109,6 +109,14 @@ export function getJobId(job) {
   return job?.id ?? job?._id ?? null;
 }
 
+export function formatSlug(slug) {
+  if (!slug) return "—";
+  return String(slug)
+    .split("-")
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+}
+
 export function getJobCreatedAt(job) {
   return job?.createdAt ?? job?.datePosted ?? null;
 }

@@ -12,7 +12,42 @@ export function generateCompanySlug(name) {
 
 export function getCompanySlug(company) {
   return (
-    company?.slug ?? company?.companySlug ?? company?.id ?? company?._id ?? null
+    company?.slug ??
+    company?.companySlug ??
+    company?.companyId ??
+    company?.id ??
+    company?._id ??
+    null
+  );
+}
+
+function normId(value) {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") {
+    if (typeof value.toString === "function") {
+      const s = value.toString();
+      if (s !== "[object Object]") return s;
+    }
+    return "";
+  }
+  return String(value);
+}
+
+// Match a company against a URL id in ANY of its identity forms
+// (slug, companySlug, companyId, id, _id) with ObjectId-safe comparison.
+export function matchCompanyId(company, id) {
+  if (!company) return false;
+  const want = normId(id);
+  if (!want) return false;
+  return (
+    [
+      company.slug,
+      company.companySlug,
+      company.companyId,
+      company.id,
+      company._id,
+      getCompanySlug(company),
+    ].some((v) => normId(v) === want && normId(v) !== "")
   );
 }
 
@@ -23,7 +58,7 @@ export function getCompanyName(company) {
 export function normalizeCompany(company) {
   if (!company || typeof company !== "object") return company;
   const next = { ...company };
-  const id = next.id ?? next._id;
+  const id = next.slug ?? next.id ?? next._id;
   if (!next.companySlug) next.companySlug = id;
   return next;
 }

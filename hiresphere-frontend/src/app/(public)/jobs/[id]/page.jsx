@@ -8,6 +8,7 @@ import {
 } from "@/components/jobs/JobBadge";
 import ApplyButton from "@/components/public/ApplyButton";
 import ApplyInterestCta from "@/components/public/ApplyInterestCta";
+import CompanyLogo from "@/components/public/CompanyLogo";
 import JobUnavailableNotice from "@/components/public/JobUnavailableNotice";
 import SaveJobButton from "@/components/public/SaveJobButton";
 import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
@@ -156,16 +157,16 @@ export default async function PublicJobDetailPage({ params }) {
               <JobHiringBadge />
             </div>
 
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-(color-text) sm:text-4xl">
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
               {job.title ?? "Untitled role"}
             </h1>
 
             {company && (
               <Link
                 href={`/company/${getCompanySlug(company)}`}
-                className="mt-2 inline-flex items-center gap-2 text-sm text-(color-text-muted) transition-colors hover:text-(color-text)"
+                className="mt-2 inline-flex items-center gap-2 text-sm text-white/70 transition-colors hover:text-white"
               >
-                <Avatar.Root className="size-5 shrink-0 rounded bg-(color-surface-2) text-[10px] font-semibold text-(color-text)">
+                <Avatar.Root className="size-5 shrink-0 rounded bg-white/10 text-[10px] font-semibold text-white">
                   <Avatar.Fallback>
                     {(company.name?.[0] ?? "?").toUpperCase()}
                   </Avatar.Fallback>
@@ -174,7 +175,7 @@ export default async function PublicJobDetailPage({ params }) {
               </Link>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-(color-text-muted)">
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">
               {location && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="size-3" />
@@ -293,19 +294,12 @@ export default async function PublicJobDetailPage({ params }) {
                 Hiring Company
               </Typography.Heading>
               <div className="flex items-center gap-3">
-                {company.logo ? (
-                  <img
-                    src={company.logo}
-                    alt={company.name}
-                    className="size-12 shrink-0 rounded-xl border border-(color-border) object-cover"
-                  />
-                ) : (
-                  <Avatar.Root className="size-12 shrink-0 rounded-xl bg-(color-surface-2) text-base font-semibold text-(color-text)">
-                    <Avatar.Fallback>
-                      {(company.name?.[0] ?? "?").toUpperCase()}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
-                )}
+                <CompanyLogo
+                  logo={company.logo}
+                  name={company.name}
+                  size="size-12"
+                  text="text-base"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-(color-text)">
                     {company.name}

@@ -78,7 +78,7 @@ const quickLinks = [
     icon: Briefcase,
     label: "My applications",
   },
-  { href: "/settings", icon: Lock, label: "Account settings" },
+  { href: "/dashboard/settings", icon: Lock, label: "Account settings" },
   { href: "/dashboard/profile", icon: House, label: "Edit profile" },
 ];
 
@@ -176,13 +176,13 @@ export default function HelpPage() {
         {search && filtered.length === 0 && (
           <p className="mt-2 text-xs text-(color-text-muted)">
             No articles match your search.{" "}
-            <Link
-              href="/dashboard/help"
+            <button
+              type="button"
               className="text-indigo-500 hover:text-indigo-600"
               onClick={() => setSearch("")}
             >
               Clear search
-            </Link>
+            </button>
           </p>
         )}
       </div>

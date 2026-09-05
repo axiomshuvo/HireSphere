@@ -93,12 +93,16 @@ async function RecruiterHome({ user }) {
     { key: "company", label: "Company" },
     { key: "status", label: "Status" },
   ];
-  const recentJobs = jobs.map((job) => ({
-    id: job._id ?? job.id,
-    title: job.title ?? "Untitled",
-    company: job.companySlug ?? "—",
-    status: job.status ?? "draft",
-  }));
+  const recentJobs = jobs.map((job) => {
+    const id = job._id ?? job.id;
+    return {
+      id,
+      title: job.title ?? "Untitled",
+      company: job.companySlug ?? "—",
+      status: job.status ?? "draft",
+      href: id ? `/dashboard/recruiter/jobs/${id}` : null,
+    };
+  });
 
   const companyItems = companies.map((company) => ({
     id: company.slug ?? company.companySlug ?? company._id ?? company.id,
@@ -163,6 +167,7 @@ async function RecruiterHome({ user }) {
           recentJobsColumns={recentJobsColumns}
           companyItems={companyItems}
           marketJobs={marketJobs}
+          currentPlan={user.plan}
         />
       </div>
     );
@@ -180,6 +185,7 @@ async function RecruiterHome({ user }) {
       recentJobsColumns={recentJobsColumns}
       companyItems={companyItems}
       marketJobs={marketJobs}
+      currentPlan={user.plan}
     />
   );
 }

@@ -95,18 +95,18 @@ export default function SavedJobCard({ saved, job }) {
         {job ? (
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
             {job.type && (
-              <span className="rounded-lg bg-white/[0.04] px-2.5 py-1.5">
+              <span className="rounded-lg bg-default px-2.5 py-1.5">
                 {job.type}
               </span>
             )}
             {location && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-2.5 py-1.5">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-default px-2.5 py-1.5">
                 <MapPin className="size-3.5 text-amber-500" />
                 {location}
               </span>
             )}
             {salary && (
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-2.5 py-1.5">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-default px-2.5 py-1.5">
                 <Wallet className="size-3.5 text-amber-500" />
                 {salary}
               </span>
@@ -136,7 +136,7 @@ export default function SavedJobCard({ saved, job }) {
             {job && (
               <Link
                 href={`/jobs/${saved.jobId}`}
-                className="inline-flex items-center rounded-lg bg-white px-3 py-2 text-xs font-semibold text-black transition-colors hover:bg-gray-200"
+                className="inline-flex items-center rounded-lg border border-default bg-content1 px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:border-amber-500/50"
               >
                 View job
               </Link>
@@ -145,7 +145,7 @@ export default function SavedJobCard({ saved, job }) {
               type="button"
               onClick={handleRemove}
               disabled={removing}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#1b1c1e] px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-red-500/50 hover:text-red-300 disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-default bg-content1 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-red-500/50 hover:text-red-300 disabled:opacity-60"
             >
               <TrashBin className="size-3.5" />
               {removing ? "Removing…" : "Remove"}

@@ -2,6 +2,7 @@
 
 import PlanUpgradeModal from "@/components/shared/PlanUpgradeModal";
 import { signOut, useSession } from "@/lib/auth-client";
+import { authToasts } from "@/lib/toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import {
   ArrowChevronUp,
@@ -108,7 +109,9 @@ export default function DashboardTopBar() {
     user?.role === "recruiter" ? RECRUITER_DROPDOWN : SEEKER_DROPDOWN;
 
   const handleSignOut = async () => {
+    const signedOutUser = user;
     await signOut();
+    authToasts.signedOut(signedOutUser);
     router.push("/");
   };
 

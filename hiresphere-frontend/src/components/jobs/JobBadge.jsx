@@ -72,17 +72,22 @@ const STATUS_META = {
 };
 
 const COLOR_CLASSES = {
-  indigo: "bg-indigo-500/15 text-indigo-200 border-indigo-400/30",
-  sky: "bg-sky-500/15 text-sky-200 border-sky-400/30",
-  amber: "bg-amber-500/15 text-amber-200 border-amber-400/30",
-  emerald: "bg-emerald-500/15 text-emerald-200 border-emerald-400/30",
-  rose: "bg-rose-500/15 text-rose-200 border-rose-400/30",
-  fuchsia: "bg-fuchsia-500/15 text-fuchsia-200 border-fuchsia-400/30",
-  pink: "bg-pink-500/15 text-pink-200 border-pink-400/30",
-  cyan: "bg-cyan-500/15 text-cyan-200 border-cyan-400/30",
-  lime: "bg-lime-500/15 text-lime-200 border-lime-400/30",
-  red: "bg-red-500/15 text-red-200 border-red-400/30",
-  purple: "bg-purple-500/15 text-purple-200 border-purple-400/30",
+  indigo:
+    "bg-indigo-500/15 text-indigo-700 border-indigo-500/30 dark:text-indigo-200 dark:border-indigo-400/30",
+  sky: "bg-sky-500/15 text-sky-700 border-sky-500/30 dark:text-sky-200 dark:border-sky-400/30",
+  amber:
+    "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-200 dark:border-amber-400/30",
+  emerald:
+    "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-200 dark:border-emerald-400/30",
+  rose: "bg-rose-500/15 text-rose-700 border-rose-500/30 dark:text-rose-200 dark:border-rose-400/30",
+  fuchsia:
+    "bg-fuchsia-500/15 text-fuchsia-700 border-fuchsia-500/30 dark:text-fuchsia-200 dark:border-fuchsia-400/30",
+  pink: "bg-pink-500/15 text-pink-700 border-pink-500/30 dark:text-pink-200 dark:border-pink-400/30",
+  cyan: "bg-cyan-500/15 text-cyan-700 border-cyan-500/30 dark:text-cyan-200 dark:border-cyan-400/30",
+  lime: "bg-lime-500/15 text-lime-700 border-lime-500/30 dark:text-lime-200 dark:border-lime-400/30",
+  red: "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-200 dark:border-red-400/30",
+  purple:
+    "bg-purple-500/15 text-purple-700 border-purple-500/30 dark:text-purple-200 dark:border-purple-400/30",
 };
 
 function BadgeShell({

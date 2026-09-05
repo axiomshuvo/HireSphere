@@ -2,6 +2,7 @@
 
 import Logo from "@/components/shared/Logo";
 import { signOut, useSession } from "@/lib/auth-client";
+import { authToasts } from "@/lib/toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import {
   ArrowRightFromSquare,
@@ -15,10 +16,12 @@ import {
 import { Avatar, Button, Dropdown, Label } from "@heroui/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Navbar() {
   const { data: session } = useSession();
+  const router = useRouter();
   const signedIn = !!session?.user;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,8 +40,11 @@ export default function Navbar() {
   };
 
   const handleSignOut = async () => {
+    const user = session?.user;
     await signOut();
+    authToasts.signedOut(user);
     closeAll();
+    router.push("/");
   };
 
   /* ─── Logo ───────────────────────────────────────────────── */

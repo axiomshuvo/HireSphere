@@ -24,6 +24,7 @@ export default function RecruiterHomeView({
   recentJobsColumns,
   companyItems,
   marketJobs = [],
+  currentPlan,
 }) {
   const stats = [
     {
@@ -65,7 +66,7 @@ export default function RecruiterHomeView({
           </h1>
           <p className="mt-2 text-muted-foreground">{subtitle}</p>
         </div>
-        <UpgradePlanButton role="recruiter" />
+        <UpgradePlanButton role="recruiter" currentPlan={currentPlan} />
       </header>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -87,13 +88,15 @@ export default function RecruiterHomeView({
           rows={recentJobs}
           viewAllLabel="View all jobs"
           viewAllHref="/dashboard/recruiter/jobs"
+          rowHrefKey="href"
         />
 
         <CompanyList
           title="My Companies"
           companies={companyItems}
           viewAllHref="/dashboard/mycompany"
-          actionHref="/dashboard/mycompany"
+          actionLabel="Add Company"
+          actionHref="/dashboard/mycompany/new"
         />
       </section>
 
