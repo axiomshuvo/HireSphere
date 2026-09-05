@@ -8,7 +8,24 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# CRITICAL RULE: Version Check Before Reading Files
+# CRITICAL RULES FOR ANY AI AGENT — READ BEFORE EVERY TASK
 
-ALWAYS check `package.json` for library versions and verify the component exports/API (e.g. `node_modules/@heroui/react/dist/components/...`) BEFORE assuming syntax is incorrect.
+## 1. Check my stack before assuming anything
+- ALWAYS inspect `package.json` (frontend + server), configs (`next.config.*`, `jsconfig.json`, `eslint.*`, `postcss.*`), and `src/` structure BEFORE writing or judging code.
+- NEVER assume library APIs from training data. Verify real exports in `node_modules/<lib>/dist/...` (e.g. HeroUI v3 uses `Dropdown.Menu`, `Drawer.Trigger` — not NextUI v2 syntax).
+- For Next.js specifics, read the local guide in `node_modules/next/dist/docs/` (Next 16 has breaking changes). Heed deprecation notices.
+- If unsure about a version/API, grep/read the code and say so — do not hallucinate downgrades or upgrades.
+
+## 2. Plan before work, wait for confirmation
+- For ANY non-trivial task (multi-step, edits, deletes, renames, installs): first CHECK the code, then give a short PLAN (what files, what changes, risks), then STOP and wait for explicit confirmation.
+- Do NOT start editing after an informational question (e.g. "what is X?", "tell me about Y", "check and understand"). Answer only.
+- A "plan" request means plan only — do not execute until told (e.g. "do it", "all fix", "Batch 1").
+
+## 3. No autonomous work mid-chat
+- NEVER start working on your own between messages. Only act on the latest explicit instruction.
+- NEVER create files unless necessary — prefer editing existing files. Never create docs (*.md) unless asked.
+- NEVER commit, push, or create PRs unless explicitly requested. Before committing, show `git status` + `diff` summary.
+- After edits, verify with real evidence (read the edited region, run `npm run lint` / relevant check) and report what changed + what was intentionally left untouched.
+
+## 4. Original rule (kept)
 UI libraries like HeroUI v3 introduced compound dot-notation components (e.g., `Dropdown.Menu`, `Drawer.Trigger`), which are fundamentally different from NextUI v2. Do not hallucinate downgrades.

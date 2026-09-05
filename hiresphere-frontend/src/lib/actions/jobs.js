@@ -94,8 +94,7 @@ export async function getRecruiterJobStats() {
   if (!user) return { total: 0, active: 0, closed: 0, applicantsTotal: 0 };
   try {
     return await request(`/api/my/jobs/stats`, {
-      tags: ["jobs"],
-      revalidate: STATS_REVALIDATE_SECONDS,
+      cache: "no-store",
       recruiterId: user.id,
     });
   } catch {

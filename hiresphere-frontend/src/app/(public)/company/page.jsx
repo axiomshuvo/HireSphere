@@ -207,14 +207,19 @@ export default async function PublicCompanyListPage({ searchParams }) {
                 href={`/company/${slug}`}
                 className="group block"
               >
-                <div className="flex h-full flex-col rounded-2xl border border-white/8 bg-(color-surface-2) p-5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-indigo-500/30 group-hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+                <div className="relative overflow-hidden flex h-full flex-col rounded-2xl border border-white/8 bg-(color-surface-2) p-5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-indigo-500/30 group-hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] cursor-pointer">
+                  {/* Shimmer Overlay */}
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+                    <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+                  </div>
+
                   {/* Top accent line */}
                   <div
-                    className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+                    className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100 z-10"
                     style={{ width: "100%" }}
                   />
 
-                  <div className="flex items-start gap-3">
+                  <div className="relative z-10 flex items-start gap-3">
                     {/* Logo */}
                     <div className="relative shrink-0">
                       {company.logo ? (

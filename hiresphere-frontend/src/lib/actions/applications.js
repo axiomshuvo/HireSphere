@@ -174,24 +174,6 @@ export async function withdrawApplication(jobId) {
   return result;
 }
 
-export async function fetchJobApplicants(jobId) {
-  const user = await getCurrentUser();
-  if (!user) return [];
-  try {
-    const result = await request(
-      `/api/my/applicants?jobId=${encodeURIComponent(jobId)}`,
-      { recruiterId: user.id },
-    );
-    return Array.isArray(result?.items) ? result.items : [];
-  } catch (error) {
-    console.warn(
-      `[fetchJobApplicants(${jobId})] failed:`,
-      error?.message ?? error,
-    );
-    return [];
-  }
-}
-
 export async function fetchAllApplicants({
   jobId,
   page = 1,

@@ -93,7 +93,6 @@ export default function EditCompanyPage({ params }) {
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
-    console.log("[EditCompanyPage] handleSubmit fired, id=", id);
 
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Company name is required.";
@@ -109,7 +108,6 @@ export default function EditCompanyPage({ params }) {
     }
 
     if (Object.keys(newErrors).length > 0) {
-      console.log("[EditCompanyPage] validation failed:", newErrors);
       setErrors(newErrors);
       setIsSubmitting(false);
       return;

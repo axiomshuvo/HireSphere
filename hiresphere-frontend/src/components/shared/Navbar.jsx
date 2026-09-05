@@ -18,11 +18,10 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function Navbar() {
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
   const signedIn = !!session?.user;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
@@ -35,7 +34,6 @@ export default function Navbar() {
 
   const closeAll = () => {
     setIsMenuOpen(false);
-    setIsProfileOpen(false);
   };
 
   const handleSignOut = async () => {
@@ -141,84 +139,6 @@ export default function Navbar() {
     </div>
   );
 
-  /* ─── Mobile auth — expandable profile or guest links ────── */
-  // const mobileAuth = signedIn ?
-  // (
-  //   <div className="flex flex-col">
-  //     <button
-  //       type="button"
-  //       onClick={() => setIsProfileOpen((p) => !p)}
-  //       className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 hover:bg-default/40 transition-colors text-left w-full"
-  //       aria-expanded={isProfileOpen}
-  //       aria-label="Toggle profile actions"
-  //     >
-  //       <div className="flex items-center gap-3 min-w-0">
-  //         <Avatar.Root className="size-8 shrink-0 rounded-full bg-default-100 text-xs font-semibold text-foreground flex items-center justify-center overflow-hidden">
-  //           {session.user.image ? (
-  //             <Avatar.Image src={session.user.image} alt={session.user.name} className="h-full w-full object-cover" />
-  //           ) : (
-  //             <Avatar.Fallback>
-  //               {session.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
-  //             </Avatar.Fallback>
-  //           )}
-  //         </Avatar.Root>
-  //         <div className="min-w-0">
-  //           <p className="text-sm font-semibold truncate">
-  //             {session.user.name}
-  //           </p>
-  //           <p className="text-xs opacity-50 truncate">{session.user.email}</p>
-  //         </div>
-  //       </div>
-  //       <ChevronDown
-  //         className={`w-4 h-4 opacity-50 shrink-0 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`}
-  //       />
-  //     </button>
-
-  //     {isProfileOpen && (
-  //       <div className="flex flex-col gap-0.5 pl-11 pb-1">
-  //         <Link
-  //           href="/dashboard"
-  //           onClick={closeAll}
-  //           className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium opacity-70 hover:opacity-100 hover:bg-default/40 transition-all"
-  //         >
-  //           <House className="w-4 h-4 shrink-0" /> Dashboard
-  //         </Link>
-  //         <button
-  //           type="button"
-  //           onClick={handleSignOut}
-  //           disabled={isPending}
-  //           className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-danger opacity-90 hover:opacity-100 hover:bg-danger/10 transition-all disabled:opacity-40 text-left w-full"
-  //         >
-  //           <ArrowRightFromSquare className="w-4 h-4 shrink-0" />
-  //           {isPending ? "Signing out…" : "Sign Out"}
-  //         </button>
-  //       </div>
-  //     )}
-  //   </div>
-  // ) : (
-  //   <div className="flex flex-col gap-1.5">
-  //     <Link
-  //       href="/auth/signin"
-  //       onClick={closeAll}
-  //       className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium opacity-70 hover:opacity-100 hover:bg-default/40 transition-all"
-  //     >
-  //       <Person className="w-4 h-4 shrink-0" /> Sign In
-  //     </Link>
-  //     <div className="px-3">
-  //       <Link href="/auth/signup" onClick={closeAll}>
-  //         <Button
-  //           color="primary"
-  //           size="sm"
-  //           radius="lg"
-  //           className="w-full font-semibold"
-  //         >
-  //           Get Started
-  //         </Button>
-  //       </Link>
-  //     </div>
-  //   </div>
-  // );
-
   return (
     <header className=" px-4 py-4 border-b ">
       <nav
@@ -258,7 +178,6 @@ export default function Navbar() {
             className="md:hidden"
             onClick={() => {
               setIsMenuOpen((p) => !p);
-              if (isMenuOpen) setIsProfileOpen(false);
             }}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMenuOpen}

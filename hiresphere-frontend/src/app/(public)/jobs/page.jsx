@@ -1,4 +1,3 @@
-import JobCardSkeleton from "@/components/shared/JobCardSkeleton";
 import {
   JobCategoryBadge,
   JobRemoteBadge,
@@ -6,6 +5,7 @@ import {
 } from "@/components/jobs/JobBadge";
 import JobsFilterBar from "@/components/public/JobsFilterBar";
 import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
+import JobCardSkeleton from "@/components/shared/JobCardSkeleton";
 import { fetchPublicJobs } from "@/lib/actions/jobs";
 import { Briefcase, MapPin, Wallet } from "@gravity-ui/icons";
 import { Card } from "@heroui/react";
@@ -120,11 +120,7 @@ export default async function PublicJobsPage({ searchParams }) {
       </header>
 
       <div className="mb-6">
-        <Suspense
-          fallback={
-            <JobCardSkeleton />
-          }
-        >
+        <Suspense fallback={<JobCardSkeleton />}>
           <JobsFilterBar />
         </Suspense>
       </div>
@@ -159,9 +155,13 @@ export default async function PublicJobsPage({ searchParams }) {
                 className="group block"
                 data-job-card={jobId}
               >
-                <Card className="flex h-full flex-col gap-3 rounded-2xl border border-(color-border) bg-(color-surface) p-5 transition-colors group-hover:border-indigo-500/50">
+                <Card className="relative overflow-hidden flex h-full flex-col gap-3 rounded-2xl border border-(color-border) bg-(color-surface) p-5 transition-colors group-hover:border-indigo-500/50 cursor-pointer">
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+                    <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+                  </div>
+
                   <div
-                    className="flex flex-wrap items-center gap-1.5"
+                    className="relative z-10 flex flex-wrap items-center gap-1.5"
                     data-job-card-badges
                   >
                     <JobTypeBadge type={job.type} />

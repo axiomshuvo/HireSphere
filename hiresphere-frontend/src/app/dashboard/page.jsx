@@ -101,6 +101,7 @@ async function RecruiterHome({ user }) {
   }));
 
   const companyItems = companies.map((company) => ({
+    id: company.slug ?? company.companySlug ?? company._id ?? company.id,
     name: company.name ?? "Unnamed",
     field: company.industry ?? "—",
     location: company.location ?? "—",
@@ -345,9 +346,12 @@ async function SeekerHome({ user }) {
                   <li key={job._id ?? job.id}>
                     <Link
                       href={`/jobs/${job._id ?? job.id}`}
-                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-(color-surface-2)"
+                      className="group relative overflow-hidden block rounded-xl border border-transparent p-3 transition-colors hover:border-indigo-500/30 hover:bg-white/[0.02] cursor-pointer"
                     >
-                      <p className="truncate text-sm font-semibold text-(color-foreground)">
+                      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+                        <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+                      </div>
+                      <p className="relative z-10 truncate text-sm font-semibold text-(color-foreground)">
                         {job.title ?? "Untitled role"}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
@@ -416,9 +420,12 @@ async function SeekerHome({ user }) {
                   <li key={application._id ?? application.jobId}>
                     <Link
                       href={`/jobs/${application.jobId}`}
-                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-(color-surface-2)"
+                      className="group relative overflow-hidden block rounded-xl border border-transparent p-3 transition-colors hover:border-indigo-500/30 hover:bg-white/[0.02] cursor-pointer"
                     >
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+                        <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+                      </div>
+                      <div className="relative z-10 flex items-center justify-between gap-2">
                         <p className="truncate text-sm font-semibold text-(color-foreground)">
                           {title}
                         </p>
@@ -477,9 +484,12 @@ async function SeekerHome({ user }) {
                   <li key={savedJob._id ?? savedJob.jobId}>
                     <Link
                       href={`/jobs/${savedJob.jobId}`}
-                      className="block rounded-xl border border-transparent p-3 transition-colors hover:border-default hover:bg-(color-surface-2)"
+                      className="group relative overflow-hidden block rounded-xl border border-transparent p-3 transition-colors hover:border-indigo-500/30 hover:bg-white/[0.02] cursor-pointer"
                     >
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+                        <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+                      </div>
+                      <div className="relative z-10 flex items-center justify-between gap-2">
                         <p className="truncate text-sm font-semibold text-(color-foreground)">
                           {title}
                         </p>

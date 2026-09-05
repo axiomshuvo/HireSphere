@@ -19,26 +19,6 @@ export async function updateProfileImage(imageUrl) {
   return result;
 }
 
-export async function updateProfileEmail(email) {
-  const trimmed = String(email ?? "").trim();
-  if (!trimmed) {
-    throw new Error("Email is required");
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-    throw new Error("Invalid email format");
-  }
-
-  const result = await auth.api.updateUser({
-    body: { email: trimmed },
-    headers: await headers(),
-  });
-
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/profile");
-
-  return result;
-}
-
 export async function updateProfileName(name) {
   const trimmed = String(name ?? "").trim();
   if (!trimmed) {

@@ -1,7 +1,7 @@
 {
-  "name": "yes",
+  "name": "hiresphere-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "HireSphere Express + MongoDB API",
   "license": "MIT",
   "author": "",
   "type": "commonjs",
@@ -17,8 +17,5 @@
     "express": "^5.2.1",
     "mongodb": "^7.5.0",
     "stripe": "^22.6.1"
-  },
-  "overrides": {
-    "qs": "^6.16.0"
   }
 }

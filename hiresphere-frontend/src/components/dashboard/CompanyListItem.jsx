@@ -2,6 +2,7 @@
 
 import { MapPin } from "@gravity-ui/icons";
 import { Avatar, Typography } from "@heroui/react";
+import Link from "next/link";
 
 const AVATAR_GRADIENTS = [
   "from-indigo-500 to-blue-500",
@@ -22,6 +23,7 @@ function pickGradient(seed) {
 }
 
 export default function CompanyListItem({
+  id,
   name,
   field,
   location,
@@ -29,15 +31,19 @@ export default function CompanyListItem({
   initials,
 }) {
   const gradient = pickGradient(name);
-  return (
-    <li className="flex items-center gap-3 rounded-xl border border-default p-3 transition-colors hover:border-white/15 hover:bg-white/[0.02]">
+  const content = (
+    <li className="group relative overflow-hidden flex items-center gap-3 rounded-xl border border-default p-3 transition-colors hover:border-indigo-500/50 hover:bg-white/[0.02] cursor-pointer">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+        <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+      </div>
+
       <Avatar.Root
-        className={`flex size-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} text-sm font-semibold text-foreground shadow-md shadow-black/30`}
+        className={`relative z-10 flex size-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} text-sm font-semibold text-foreground shadow-md shadow-black/30`}
       >
         <Avatar.Fallback>{initials}</Avatar.Fallback>
       </Avatar.Root>
-      <div className="min-w-0 flex-1">
-        <Typography.Paragraph className="truncate font-medium text-foreground">
+      <div className="relative z-10 min-w-0 flex-1">
+        <Typography.Paragraph className="truncate font-medium text-foreground group-hover:text-indigo-500 transition-colors">
           {name}
         </Typography.Paragraph>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -47,8 +53,8 @@ export default function CompanyListItem({
           <span>{location}</span>
         </div>
       </div>
-      <div className="text-right">
-        <Typography.Paragraph className="text-sm font-semibold tabular-nums text-foreground">
+      <div className="relative z-10 text-right">
+        <Typography.Paragraph className="text-sm font-semibold tabular-nums text-foreground group-hover:text-indigo-400 transition-colors">
           {activeJobs}
         </Typography.Paragraph>
         <Typography.Paragraph className="text-[10px] uppercase tracking-wide text-muted-foreground">
@@ -57,4 +63,13 @@ export default function CompanyListItem({
       </div>
     </li>
   );
+
+  if (id) {
+    return (
+      <Link href={`/dashboard/mycompany/${id}`} className="block">
+        {content}
+      </Link>
+    );
+  }
+  return content;
 }

@@ -68,6 +68,10 @@ export default function SignInForm() {
         password: formData.password,
       });
       if (authError) {
+        console.error("⚠️ Detailed Auth Error Object:", authError);
+        console.error("⚠️ Stringified:", JSON.stringify(authError, null, 2));
+        console.error("⚠️ Message:", authError?.message);
+        console.error("⚠️ Status:", authError?.status, authError?.code);
         toast.danger("Sign In Failed", {
           description: authError.message || "Invalid email or password.",
         });

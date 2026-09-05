@@ -86,9 +86,15 @@ export default function RecruiterHomeView({
           columns={recentJobsColumns}
           rows={recentJobs}
           viewAllLabel="View all jobs"
+          viewAllHref="/dashboard/recruiter/jobs"
         />
 
-        <CompanyList title="My Companies" companies={companyItems} />
+        <CompanyList
+          title="My Companies"
+          companies={companyItems}
+          viewAllHref="/dashboard/mycompany"
+          actionHref="/dashboard/mycompany"
+        />
       </section>
 
       {marketJobs.length > 0 && (

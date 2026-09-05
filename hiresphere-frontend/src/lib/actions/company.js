@@ -54,15 +54,6 @@ export async function fetchPublicCompanyById(companyId) {
   });
 }
 
-export async function getRecruiterCompany(companyId) {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  return request(`/api/my/companies/${companyId}`, {
-    tags: [`company:${companyId}`, "companies"],
-    recruiterId: user.id,
-  });
-}
-
 export async function getRecruiterCompanies({ page = 1, pageSize = 12 } = {}) {
   const user = await getCurrentUser();
   if (!user) return { items: [], page: 1, pageSize, total: 0, totalPages: 0 };

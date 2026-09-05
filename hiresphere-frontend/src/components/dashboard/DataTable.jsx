@@ -3,10 +3,18 @@
 import { ArrowRight } from "@gravity-ui/icons";
 import { Button, Card, Table, Typography } from "@heroui/react";
 
+import Link from "next/link";
+
 const columnClassName =
   "py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground";
 
-export default function DataTable({ title, columns, rows, viewAllLabel = "View all" }) {
+export default function DataTable({
+  title,
+  columns,
+  rows,
+  viewAllLabel = "View all",
+  viewAllHref,
+}) {
   return (
     <Card className="relative overflow-hidden rounded-2xl border border-default bg-content1 p-5">
       <span
@@ -14,16 +22,23 @@ export default function DataTable({ title, columns, rows, viewAllLabel = "View a
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-indigo-500/0 via-indigo-500/60 to-indigo-500/0"
       />
       <div className="mb-4 flex items-center justify-between">
-        <Typography.Heading className="text-lg font-semibold text-foreground" level={2}>
+        <Typography.Heading
+          className="text-lg font-semibold text-foreground"
+          level={2}
+        >
           {title}
         </Typography.Heading>
-        <Button
-          className="text-sm text-indigo-500 hover:text-indigo-600"
-          variant="light"
-          endContent={<ArrowRight className="size-4" />}
-        >
-          {viewAllLabel}
-        </Button>
+        {viewAllHref && (
+          <Button
+            as={Link}
+            href={viewAllHref}
+            className="text-sm text-indigo-500 hover:text-indigo-600"
+            variant="light"
+            endContent={<ArrowRight className="size-4" />}
+          >
+            {viewAllLabel}
+          </Button>
+        )}
       </div>
 
       <Table.Root className="w-full">

@@ -10,7 +10,10 @@ import CompanyStats from "@/components/dashboard/company/CompanyStats";
 import HiringTeamCard from "@/components/dashboard/company/HiringTeamCard";
 import OpenRoles from "@/components/dashboard/company/OpenRoles";
 import ButtonLink from "@/components/shared/ButtonLink";
-import { deleteRecruiterCompany, getRecruiterCompanies } from "@/lib/actions/company";
+import {
+  deleteRecruiterCompany,
+  getRecruiterCompanies,
+} from "@/lib/actions/company";
 import { getRecruiterJobs } from "@/lib/actions/jobs";
 import { getCompanySlug, normalizeCompany } from "@/lib/api/companies";
 import { getActiveCount } from "@/lib/api/jobstruture";
@@ -43,19 +46,43 @@ export default function CompanyDetailPage({ params }) {
   useEffect(() => {
     let cancelled = false;
 
-    Promise.all([getRecruiterCompanies({ pageSize: 100 }), getRecruiterJobs({ pageSize: 100 })])
+    Promise.all([
+      getRecruiterCompanies({ pageSize: 100 }),
+      getRecruiterJobs({ pageSize: 100 }),
+    ])
       .then(([companiesData, jobsData]) => {
         if (cancelled) return;
         const list = Array.isArray(companiesData)
           ? companiesData
           : (companiesData?.items ?? []);
         const found =
-          list.map(normalizeCompany).find((c) => getCompanySlug(c) === id) ??
-          null;
+          list
+            .map(normalizeCompany)
+            .find(
+              (c) =>
+                c.slug === id ||
+                c.companySlug === id ||
+                c.id === id ||
+                c._id === id ||
+                getCompanySlug(c) === id,
+            ) ?? null;
         setCompany(found);
 
-        const allJobs = Array.isArray(jobsData) ? jobsData : (jobsData?.items ?? []);
-        setJobs(allJobs.filter((j) => j.companySlug === id));
+        const allJobs = Array.isArray(jobsData)
+          ? jobsData
+          : (jobsData?.items ?? []);
+        setJobs(
+          allJobs.filter((j) => {
+            const matchId = found ? found.slug : id;
+            const matchId2 = found ? found._id : id;
+            return (
+              j.companySlug === id ||
+              j.companyId === id ||
+              j.companySlug === matchId ||
+              j.companyId === matchId2
+            );
+          }),
+        );
       })
       .catch((error) => {
         if (cancelled) return;
@@ -79,7 +106,6 @@ export default function CompanyDetailPage({ params }) {
     setIsDeleting(true);
 
     const companySlug = getCompanySlug(company);
-    console.log("[CompanyDetailPage] Deleting company:", companySlug);
 
     try {
       await deleteRecruiterCompany(companySlug);

@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Briefcase, MapPin, Wallet } from "@gravity-ui/icons";
 import { Card } from "@heroui/react";
+import Link from "next/link";
 
 function formatLocation(job) {
   if (job?.remote) return "Remote";
@@ -54,9 +54,13 @@ export default function MarketJobsPanel({ jobs = [] }) {
             <li key={id}>
               <Link
                 href={`/jobs/${id}`}
-                className="group block rounded-xl border border-default bg-[#1b1c1e] p-3 transition-all hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5"
+                className="group relative overflow-hidden block rounded-xl border border-default bg-[#1b1c1e] p-3 transition-all hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 cursor-pointer"
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+                  <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+                </div>
+
+                <div className="relative z-10 flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-foreground group-hover:text-indigo-500">
                       {job.title ?? "Untitled role"}

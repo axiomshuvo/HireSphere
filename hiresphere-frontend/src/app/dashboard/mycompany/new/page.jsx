@@ -55,11 +55,8 @@ export default function NewCompanyPage() {
       companySlug: generateCompanySlug(formData.name),
     };
 
-    console.log("[NewCompanyPage] Payload:", payload);
-
     try {
       const created = await createRecruiterCompany(payload);
-      console.log("[NewCompanyPage] Server response:", created);
       toast.success(`Company "${formData.name}" registered successfully!`);
       const createdCompany = created?.company ?? created;
       const newId = getCompanySlug(createdCompany);

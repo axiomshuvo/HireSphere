@@ -26,16 +26,18 @@ app.post(
     }
 
     try {
-      const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-      const client = new MongoClient(process.env.MONGODB_URI, {
-        serverApi: {
-          version: ServerApiVersion.v1,
-          strict: true,
-          deprecationErrors: true,
-        },
-      });
-      await client.connect();
-      const database = client.db(process.env.MONGODB_DB_NAME);
+      if (!client || !database) {
+        return res.status(503).json({ message: "Database not configured" });
+      }
+      if (!dbReady) {
+        try {
+          await client.connect();
+          dbReady = true;
+        } catch (dbErr) {
+          console.error("Webhook DB connect failed:", dbErr?.message ?? dbErr);
+          return res.status(503).json({ message: "Database starting, retry shortly" });
+        }
+      }
       const subscriptions = database.collection("subscriptions");
       const users = database.collection("user");
 
@@ -121,8 +123,7 @@ app.post(
         default:
           console.log(`Unhandled event type ${event.type}`);
       }
-      await client.close();
-    } catch (e) {
+      } catch (e) {
       console.error("Database error in webhook:", e);
     }
 
@@ -141,52 +142,82 @@ app.use((req, res, next) => {
 
 const port = process.env.PORT || process.env.port;
 
-//mongodb connection
+//mongodb connection — cached for Vercel serverless reuse.
+// Db object can be created synchronously; actual socket connects lazily
+// via ensureDb so routes exist even on cold start.
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const uri = process.env.MONGODB_URI;
+const dbName = process.env.MONGODB_DB_NAME;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-async function run() {
+function createMongoClient() {
+  return new MongoClient(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    },
+  });
+}
+
+if (!global._hiresphereClient) {
+  global._hiresphereClient = uri ? createMongoClient() : null;
+}
+const client = global._hiresphereClient;
+const database = client ? client.db(dbName) : null;
+
+let dbReady = false;
+async function ensureDb(req, res, next) {
+  if (!client || !database) {
+    return res.status(503).json({ message: "Database not configured" });
+  }
+  if (dbReady) return next();
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-
-    const database = client.db(process.env.MONGODB_DB_NAME);
-    // all database collections
-
-    // Wire up the /api/my/* routes (recruiter-scoped, ownership-checked) and
-    // enhance the public /api/companies + /api/jobs endpoints with pagination
-    // and filters that the frontend expects.
-    const {
-      mountMyRoutes,
-      mountPublicEnhancements,
-      mountSubscriptionsRoutes,
-    } = require("./routes");
-    mountMyRoutes(app, database);
-    mountPublicEnhancements(app, database);
-    mountApplicationsRoutes(app, database);
-    if (mountSubscriptionsRoutes) mountSubscriptionsRoutes(app, database);
-
     await client.db("admin").command({ ping: 1 });
-
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!",
-    );
+    dbReady = true;
+    console.log("MongoDB connected.");
+    return next();
   } catch (error) {
-    console.error("Failed to connect to MongoDB:", error);
-    process.exit(1);
+    console.error("MongoDB connect failed:", error?.message ?? error);
+    return res.status(503).json({ message: "Database starting, retry shortly" });
   }
 }
-run().catch(console.dir);
+
+// Warm up in background on cold start — non-blocking, never exits on Vercel.
+if (client) {
+  client
+    .connect()
+    .then(() => client.db("admin").command({ ping: 1 }))
+    .then(() => {
+      dbReady = true;
+      console.log(
+        "Pinged your deployment. You successfully connected to MongoDB!",
+      );
+    })
+    .catch((error) => {
+      console.error("MongoDB warmup failed (will retry per-request):", error?.message ?? error);
+    });
+}
+
+// Mount routes immediately so they exist on cold start — DB connects lazily
+// via ensureDb per request. DB-free routes (/, /health, webhook signature
+// check) work even before Mongo is up.
+if (database) {
+  app.use(["/api/my", "/api/jobs", "/api/companies", "/api/plans"], ensureDb);
+  const {
+    mountMyRoutes,
+    mountPublicEnhancements,
+    mountSubscriptionsRoutes,
+  } = require("./routes");
+  mountMyRoutes(app, database);
+  mountPublicEnhancements(app, database);
+  mountApplicationsRoutes(app, database);
+  if (mountSubscriptionsRoutes) mountSubscriptionsRoutes(app, database);
+} else {
+  console.error("MONGODB_URI missing — API routes not mounted.");
+}
 
 function mountApplicationsRoutes(app, database) {
   const applications = database.collection("applications");
@@ -379,6 +410,10 @@ function mountApplicationsRoutes(app, database) {
     }
   });
 }
+
+app.get("/health", (req, res) => {
+  res.json({ ok: true, db: dbReady ? "ready" : "starting" });
+});
 
 app.get("/", (req, res) => {
   res.send(`

@@ -1,7 +1,10 @@
 import { createAuthClient } from "better-auth/react";
 export const authClient = createAuthClient({
-  /** The base URL of the server (optional if you're using the same domain) */
-  baseURL: process.env.NEXT_PUBLIC_APP_URL,
+  // Automatically use the current window origin in the browser to avoid port conflicts (e.g. localhost:3001)
+  baseURL:
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_APP_URL,
 });
 
 export const { signIn, signUp, signOut, useSession } = authClient;

@@ -144,8 +144,6 @@ export default function JobForm({
       id: undefined,
     };
 
-    console.log("[JobForm] Payload:", payload);
-
     setIsSubmitting(true);
     try {
       if (isEditing) {

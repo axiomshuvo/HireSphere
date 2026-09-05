@@ -1,36 +1,39 @@
 # 🌐 HireSphere — Complete Website Architecture & Work Plan
 
-> A full-stack job marketplace connecting **Job Seekers** and **Recruiters**, built with Next.js 15, MongoDB, better-auth, and Stripe.
+> A full-stack job marketplace connecting **Job Seekers** and **Recruiters**, built with Next.js 16, MongoDB, better-auth, and Stripe.
+> Now includes a **Super Admin / Owner Panel** for platform management.
 
 ---
 
 ## 📐 High-Level Architecture
 
 ```
-┌────────────────────────────────────────────────────┐
-│              BROWSER (User)                        │
-└───────────────────┬────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                   BROWSER (User)                           │
+└───────────────────┬────────────────────────────────────────┘
                     │ HTTPS
-┌───────────────────▼────────────────────────────────┐
-│         NEXT.JS FRONTEND (Vercel / Node)           │
-│   - App Router (React Server Components + Client)  │
-│   - better-auth (session management)               │
-│   - Stripe Checkout API route                      │
-│   - Server Actions (data fetching via fetch)       │
-└──────────┬─────────────────────┬───────────────────┘
-           │ MongoDB (Auth only)  │ REST API calls
-           │                     │ (NEXT_PUBLIC_API_URL)
-┌──────────▼──────────┐ ┌────────▼──────────────────┐
-│  MongoDB Database   │ │  Backend REST API Server   │
-│  (better-auth only) │ │  (Express/Node — port 5000)│
-│  - users            │ │  - /api/jobs               │
-│  - sessions         │ │  - /api/companies          │
-│  - plans            │ │  - /api/my/jobs            │
-└─────────────────────┘ │  - /api/my/applications    │
-                        │  - /api/my/saved-jobs      │
-                        │  - /api/my/companies       │
-                        │  - /api/plans              │
-                        └───────────────────────────-┘
+┌───────────────────▼────────────────────────────────────────┐
+│          NEXT.JS FRONTEND (Vercel / Node)                  │
+│   - App Router (React Server Components + Client)          │
+│   - better-auth (session management)                       │
+│   - Stripe Checkout API route                              │
+│   - Server Actions (data fetching via fetch)               │
+│   - /dashboard/admin  ← NEW: Super Admin Panel             │
+└──────────┬────────────────────────┬───────────────────────-┘
+           │ MongoDB (Auth only)    │ REST API calls
+           │                       │ (NEXT_PUBLIC_API_URL)
+┌──────────▼──────────┐ ┌──────────▼───────────────────────┐
+│  MongoDB Database   │ │  Backend REST API Server          │
+│  (better-auth only) │ │  (Express/Node — port 5000)       │
+│  - users            │ │  - /api/jobs                      │
+│  - sessions         │ │  - /api/companies                 │
+│  - plans            │ │  - /api/my/jobs                   │
+└─────────────────────┘ │  - /api/my/applications           │
+                        │  - /api/my/saved-jobs             │
+                        │  - /api/my/companies              │
+                        │  - /api/plans                     │
+                        │  - /api/admin/*  ← NEW            │
+                        └──────────────────────────────────-┘
 ```
 
 > **Key Distinction:** MongoDB is used in TWO ways:
@@ -39,9 +42,173 @@
 
 ---
 
-## 🔑 Environment Variables
+## 👥 User Roles
 
-Create a `.env.local` file in the project root:
+| Role | Description | How Set |
+|------|-------------|---------|
+| `seeker` | Job seeker — applies to jobs, saves jobs | Chosen at signup |
+| `recruiter` | Employer — posts jobs, manages companies | Chosen at signup |
+| `admin` | Super Admin / Owner — full platform control | Set manually via DB script (never from UI) |
+
+---
+
+## 🛡️ Super Admin / Owner Panel
+
+### What the Admin Can Do
+
+| Category | Capabilities |
+|----------|-------------|
+| **Plans** | View, create, edit, delete plan tiers (name, price, limits, features, UI badges) |
+| **Pricing** | Change `pricing.amount`, `pricing.cadence`, `pricing.stripePriceId` per plan |
+| **Limits** | Edit `limits.activeJobPosts`, `limits.applicationsPerMonth`, `limits.savedJobs` |
+| **Users** | Search users by email/name, view role & plan, manually override plan |
+| **Recruiter Accounts** | Activate / deactivate recruiter accounts, view their active jobs |
+| **Revenue Stats** | Monthly MRR, total paying users, plan breakdown, recent payments (via Stripe API) |
+| **Job Listings** | View all jobs on the platform, force-close / delete abusive listings |
+| **Platform Stats** | Total users, total jobs, total applications, active companies |
+
+### Admin Dashboard Pages (`/dashboard/admin/*`)
+
+```
+/dashboard/admin                    → Overview stats (MRR, users, jobs, applications)
+/dashboard/admin/plans              → Plan management table (CRUD)
+/dashboard/admin/plans/[id]/edit    → Edit individual plan (limits, pricing, features)
+/dashboard/admin/users              → User table with search + role/plan override
+/dashboard/admin/users/[id]         → User detail — history, override plan, deactivate
+/dashboard/admin/jobs               → All jobs on platform with status controls
+/dashboard/admin/revenue            → Revenue dashboard (Stripe MRR, plan distribution)
+```
+
+### How Admin Login Is Secured — 5 Layers
+
+#### Layer 1 — Role flag in DB (set once manually)
+The owner account gets `role: "admin"` set directly in MongoDB via a one-time script. This is never exposed to the signup UI.
+
+```js
+// set-admin.js — run ONCE in your local terminal
+db.collection("users").updateOne(
+  { email: "owner@hiresphere.com" },
+  { $set: { role: "admin" } }
+)
+```
+
+#### Layer 2 — Server-side layout guard
+`/dashboard/admin/layout.js` is a **Server Component** — it runs only on the server and checks the session on every request before rendering any admin page:
+
+```js
+// src/app/dashboard/admin/layout.js
+export default async function AdminLayout({ children }) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) redirect("/auth/signin");
+  if (session.user.role !== "admin") redirect("/dashboard"); // block everyone else
+  return <>{children}</>;
+}
+```
+
+#### Layer 3 — Backend API secret header
+All `/api/admin/*` routes on the Express backend require a secret header that must match the env variable:
+
+```js
+// hiresphere-server/routes.js
+function requireAdmin(req, res, next) {
+  const secret = req.headers["x-admin-secret"];
+  if (!secret || secret !== process.env.ADMIN_SECRET_KEY) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+  next();
+}
+app.get("/api/admin/stats", requireAdmin, statsHandler);
+app.put("/api/admin/plans/:id", requireAdmin, updatePlanHandler);
+// etc.
+```
+
+#### Layer 4 — Server Actions inject secret automatically
+Frontend Server Actions for admin calls inject the secret from server-side env — it never touches the browser:
+
+```js
+// src/lib/actions/admin.js
+"use server";
+const adminHeaders = {
+  "Content-Type": "application/json",
+  "x-admin-secret": process.env.ADMIN_SECRET_KEY, // never in client bundle
+};
+```
+
+#### Layer 5 — Env isolation (no NEXT_PUBLIC_ prefix)
+`ADMIN_SECRET_KEY` is **never** prefixed with `NEXT_PUBLIC_`. It lives only in Node.js server processes and is completely absent from the browser JavaScript bundle.
+
+### Security Summary Table
+
+| Layer | Protection |
+|-------|-----------|
+| UI access | `role === "admin"` checked in Server Component layout |
+| Page rendering | Non-admin redirected to `/dashboard` before any admin HTML renders |
+| Backend API | `x-admin-secret` header validated on every `/api/admin/*` endpoint |
+| Secret transmission | Secret sent only from Server Actions (Node.js), never from the browser |
+| Env isolation | `ADMIN_SECRET_KEY` has no `NEXT_PUBLIC_` prefix — not in client bundle |
+| Session cookie | better-auth httpOnly cookie — cannot be read by JavaScript |
+| Brute force | better-auth rate-limits login attempts automatically |
+
+---
+
+## 🚀 Admin Implementation Plan (Phased)
+
+### Phase 1 — Core Auth & Routing
+- [ ] Add `role: "admin"` to `auth.js` additionalFields (already in schema)
+- [ ] Create `src/app/dashboard/admin/layout.js` with `role === "admin"` guard
+- [ ] Create `src/app/dashboard/admin/page.jsx` (platform stats overview)
+- [ ] Add admin sidebar section in `DashBoardSideBar.jsx` (only renders when `role === "admin"`)
+- [ ] Write `set-admin.js` script to promote the owner user
+- [ ] Add `ADMIN_SECRET_KEY` to `.env.local` and backend `.env`
+
+### Phase 2 — Plan & Pricing Management
+- [ ] Create `/dashboard/admin/plans` page — table of all plans in DB
+- [ ] Create `/dashboard/admin/plans/[id]/edit` — edit limits, pricing, features inline
+- [ ] Add backend `requireAdmin` middleware to Express
+- [ ] Add `GET /api/admin/plans`, `POST /api/admin/plans`, `PUT /api/admin/plans/:id`, `DELETE /api/admin/plans/:id`
+- [ ] Write `src/lib/actions/admin.js` server actions calling those endpoints
+
+### Phase 3 — User Management
+- [ ] Create `/dashboard/admin/users` page — searchable user table (name, email, role, plan, joined)
+- [ ] Add "Override Plan" action — admin can change any user's plan without payment
+- [ ] Add "Activate / Deactivate" toggle for recruiter accounts
+- [ ] Add `GET /api/admin/users`, `PUT /api/admin/users/:id`, `PATCH /api/admin/users/:id/status`
+
+### Phase 4 — Revenue Dashboard
+- [ ] Create `/dashboard/admin/revenue` page
+- [ ] Add `GET /api/admin/revenue` endpoint — calls `stripe.charges.list` + `stripe.subscriptions.list` server-side
+- [ ] Show: MRR, plan distribution pie chart, recent payments list
+
+### Phase 5 — Job Moderation
+- [ ] Create `/dashboard/admin/jobs` page — all platform jobs with moderation controls
+- [ ] Add `PATCH /api/admin/jobs/:id/status`, `DELETE /api/admin/jobs/:id`
+
+---
+
+## 📊 Admin Overview Page Wireframe
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  HireSphere Admin                     [Admin Badge] [Logout] │
+├──────────────┬───────────────┬──────────────┬────────────────┤
+│  Total Users │ Active Jobs   │ Applications │  MRR           │
+│  2,847       │ 413           │ 15,291       │  $4,820/mo     │
+├──────────────┴───────────────┴──────────────┴────────────────┤
+│  Plan Distribution                                           │
+│  [Recruiter Free ██████ 68%] [Pro ████ 24%] [Enterprise █ 8%]│
+├──────────────────────────────────────────────────────────────┤
+│  Recent Payments                      [View All Revenue →]   │
+│  John Doe → Pro Plan → $49  •  2 hrs ago                     │
+│  Acme Corp → Enterprise → $199  •  5 hrs ago                 │
+├──────────────────────────────────────────────────────────────┤
+│  Quick Actions                                               │
+│  [Manage Plans]  [View Users]  [Moderate Jobs]               │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔑 Environment Variables
 
 ```env
 # Backend REST API (your Express/Node server)
@@ -51,130 +218,87 @@ NEXT_PUBLIC_API_URL=http://localhost:5000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 BETTER_AUTH_URL=http://localhost:3000
 
-# MongoDB (for user auth only)
-MONGODB_URI=mongodb+srv://...
+# MongoDB
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster0.xxx.mongodb.net
 MONGODB_DB_NAME=hiresphere
 
-# Stripe (server-side only, never exposed to browser)
+# Stripe
 STRIPE_SECRET_KEY=sk_test_...
 
-# ImgBB (image hosting — exposed to browser)
-NEXT_PUBLIC_IMGBB_KEY=your_imgbb_key
+# ImgBB image upload
+NEXT_PUBLIC_IMGBB_KEY=...
+
+# Super Admin (server-side only — NO NEXT_PUBLIC_ prefix!)
+ADMIN_SECRET_KEY=replace-this-with-a-long-random-string-minimum-32-chars
 ```
 
 ---
 
-## 👤 User Model
+## 🗺️ Complete Route Map
 
-Users are stored in MongoDB by `better-auth`. Each user has:
+### Public Routes (`/(public)`)
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage (hero, stats, job board, features) |
+| `/jobs` | Filterable public job board |
+| `/jobs/[id]` | Individual job detail + apply |
+| `/company` | Company directory |
+| `/company/[id]` | Company profile + their jobs |
+| `/pricing` | Tabbed plan pricing (Recruiter / Seeker tabs) |
+| `/help` | Help / contact page |
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `id` | string | auto | Unique user ID |
-| `name` | string | — | Display name |
-| `email` | string | — | Login email |
-| `image` | string | null | Profile photo URL (via ImgBB) |
-| `role` | string | `"seeker"` | Either `"seeker"` or `"recruiter"` |
-| `plan` | string | `"free"` | Current plan ID (must match a `planId` in MongoDB `plans` collection) |
-| `createdAt` | date | auto | Signup timestamp |
+### Auth Routes (`/(auth)`)
+| Route | Description |
+|-------|-------------|
+| `/auth/signin` | Email + password login |
+| `/auth/signup` | Register (choose role: seeker/recruiter) |
 
----
+### Shared Dashboard (`/dashboard`)
+| Route | Roles |
+|-------|-------|
+| `/dashboard` | Seeker or Recruiter home |
+| `/dashboard/profile` | View & edit own profile |
+| `/dashboard/settings` | Account settings |
 
-## 🗺️ All Website Routes
+### Seeker Dashboard
+| Route | Description |
+|-------|-------------|
+| `/dashboard/applications` | My job applications list |
+| `/dashboard/saved-jobs` | My saved/bookmarked jobs |
 
-### 🌍 Public Pages (No login needed)
+### Recruiter Dashboard
+| Route | Description |
+|-------|-------------|
+| `/dashboard/recruiter/jobs` | My posted jobs table |
+| `/dashboard/recruiter/jobs/new` | Create a new job posting |
+| `/dashboard/recruiter/jobs/[id]` | View individual job detail |
+| `/dashboard/recruiter/jobs/[id]/edit` | Edit existing job |
+| `/dashboard/recruiter/applicants` | All applicants across all jobs |
+| `/dashboard/recruiter/applicants/[id]` | Individual applicant profile |
+| `/dashboard/mycompany` | My companies list |
+| `/dashboard/mycompany/new` | Create new company |
+| `/dashboard/mycompany/[id]` | Company detail with jobs list |
 
-| URL | What It Does |
-|-----|-------------|
-| `/` | Landing/home page with hero, features, job stats |
-| `/jobs` | Browse all job listings with search + filters |
-| `/jobs/[id]` | View a single job detail, see company info, apply |
-| `/company` | Browse all companies |
-| `/company/[id]` | View a company profile, open roles, team |
-| `/pricing` | View plan tiers, upgrade CTA, Stripe checkout trigger |
-| `/pricing/success` | Post-payment success page (updates user plan in DB) |
-| `/help` | FAQ and help page |
-| `/auth/signin` | Login page |
-| `/auth/signup` | Sign-up page (choose role: Seeker or Recruiter) |
-
-### 🔐 Dashboard Pages (Login required)
-
-All dashboard pages live at `/dashboard/...`. If a user visits without being logged in, they are redirected to `/auth/signin`.
-
-#### Shared (both Seeker and Recruiter)
-| URL | What It Does |
-|-----|-------------|
-| `/dashboard` | Overview stats, quick links, role-aware home view |
-| `/dashboard/profile` | Edit name, photo, view plan status and usage |
-| `/dashboard/settings` | Account settings, delete account, plan info |
-
-#### Seeker Only
-| URL | What It Does |
-|-----|-------------|
-| `/dashboard/applications` | View all submitted job applications + status |
-| `/dashboard/saved-jobs` | View bookmarked/saved jobs |
-
-#### Recruiter Only
-| URL | What It Does |
-|-----|-------------|
-| `/dashboard/mycompany` | List all registered companies |
-| `/dashboard/mycompany/new` | Create a new company profile |
-| `/dashboard/mycompany/[id]` | View/manage a specific company |
-| `/dashboard/mycompany/[id]/update` | Edit company info |
-| `/dashboard/recruiter/jobs` | View all posted jobs, filter, manage status |
-| `/dashboard/recruiter/jobs/new` | Post a brand new job |
-| `/dashboard/recruiter/jobs/[id]` | View a specific job's details and applicants |
-| `/dashboard/recruiter/jobs/[id]/edit` | Edit a posted job |
-| `/dashboard/recruiter/applications` | View all applicants across all jobs |
-| `/dashboard/recruiter/applications/[id]` | View a single applicant's profile + cover letter |
+### Admin Dashboard (`/dashboard/admin`) — NEW
+| Route | Description |
+|-------|-------------|
+| `/dashboard/admin` | Platform stats + quick actions |
+| `/dashboard/admin/plans` | Plan management table (CRUD) |
+| `/dashboard/admin/plans/[id]/edit` | Edit plan limits, pricing, features |
+| `/dashboard/admin/users` | All users — search, filter, override plan |
+| `/dashboard/admin/users/[id]` | User detail + override plan + deactivate |
+| `/dashboard/admin/jobs` | All platform jobs — moderate / delete |
+| `/dashboard/admin/revenue` | Stripe MRR + plan distribution + payments |
 
 ---
 
-## 🔒 Authentication Flow
+## 📦 Plans & Limits System
 
-**Library:** `better-auth` (email + password)
-
-```
-1. User visits /auth/signup
-   └─ Fills in: name, email, password, role (seeker/recruiter)
-   └─ SignUpForm calls signUp() from auth-client.js
-   └─ better-auth saves user to MongoDB with role + plan: "free"
-   └─ Session cookie is set
-   └─ User is redirected to /dashboard
-
-2. User visits /auth/signin
-   └─ Fills in: email, password
-   └─ signIn() from auth-client.js is called
-   └─ Session cookie is set
-   └─ User is redirected to /dashboard
-
-3. Protected pages (/dashboard/*)
-   └─ Layout calls auth.api.getSession({ headers })
-   └─ If no session → redirect("/auth/signin")
-   └─ If session → render page with user data
-
-4. Sign out
-   └─ signOut() from auth-client.js
-   └─ Session cookie cleared
-   └─ User redirected to /
-```
-
-### Server-Side Session Helpers (`src/lib/core/session.js`)
-
-| Helper | Does |
-|--------|------|
-| `getCurrentUser()` | Returns `session.user` or `null` |
-| `requireCurrentUser()` | Throws `"Unauthorized"` if not logged in |
-| `requireRecruiter()` | Throws `"Forbidden"` if user is not a recruiter |
-
----
-
-## 💳 Plans & Pricing System
-
-Plans are stored in the **MongoDB `plans` collection** (not hardcoded in the code). Each plan document looks like:
+### MongoDB `plans` Collection Schema
 
 ```json
 {
+  "_id": "ObjectId",
   "slug": "seeker_pro",
   "planId": "pro",
   "role": "seeker",
@@ -193,31 +317,27 @@ Plans are stored in the **MongoDB `plans` collection** (not hardcoded in the cod
     "savedJobs": -1,
     "activeJobPosts": 0
   },
-  "features": [...],
+  "features": [
+    { "text": "Apply to up to 30 jobs per month", "included": true },
+    { "text": "Unlimited saved jobs", "included": true }
+  ],
   "ui": { "icon": "rocket", "highlight": true, "badgeText": "Most popular" },
   "isActive": true
 }
 ```
 
-### Plan IDs and Roles
+### Current Plan Configuration
 
-| planId | role | Limit |
-|--------|------|-------|
-| `free` | seeker | 3 applications/month, 10 saved jobs |
-| `pro` | seeker | 30 applications/month, unlimited saved jobs |
-| `premium` | seeker | Unlimited everything |
-| `free` | recruiter | 3 active job posts |
-| `growth` | recruiter | 10 active job posts |
-| `enterprise` | recruiter | 50 active job posts |
+| planId | role | activeJobPosts | applicationsPerMonth | savedJobs |
+|--------|------|---------------|---------------------|-----------|
+| `free` | seeker | 0 | 5 | 10 |
+| `pro` | seeker | 0 | 30 | unlimited |
+| `premium` | seeker | 0 | unlimited | unlimited |
+| `free` | recruiter | 3 | — | — |
+| `pro` | recruiter | 20 | — | — |
+| `enterprise` | recruiter | unlimited | — | — |
 
 > `-1` in the limits object means **unlimited**.
-
-### How Plan Limits are Enforced
-
-The `src/lib/api/jobstruture.js` utility reads limits directly from the DB plan object:
-
-- **Recruiters:** `getPlanUsage(activeJobCount, dbPlan)` → reads `dbPlan.limits.activeJobPosts`
-- **Seekers:** `getSeekerPlanUsage(activeApplications, dbPlan)` → reads `dbPlan.limits.applicationsPerMonth` and `dbPlan.limits.savedJobs`
 
 ---
 
@@ -225,148 +345,59 @@ The `src/lib/api/jobstruture.js` utility reads limits directly from the DB plan 
 
 ```
 1. User clicks "Upgrade" on /pricing or PlanUpgradeModal
-   └─ Frontend sends POST /api/checkout_sessions with { plan: "pro" }
+   └─ POST /api/checkout_sessions { plan: "pro" }
 
-2. /api/checkout_sessions/route.js (Next.js API route)
-   └─ Calls getPlans() to fetch all plans from MongoDB
-   └─ Finds the matching plan by planId
-   └─ Rejects if plan is "free" (can't buy free)
-   └─ If plan has stripePriceId → uses it directly
-   └─ If no stripePriceId → builds price_data from DB pricing
-   └─ Creates Stripe Checkout Session (mode: "subscription")
+2. /api/checkout_sessions/route.js
+   └─ Fetches plan from DB → gets pricing.stripePriceId or pricing.amount
+   └─ Creates Stripe Checkout Session
    └─ Returns { url: "https://checkout.stripe.com/..." }
 
-3. Frontend redirects user to Stripe's hosted checkout page
-   └─ User enters card details on Stripe's UI
+3. User completes payment on Stripe hosted page
 
 4. Stripe redirects to /pricing/success?session_id=...&plan=pro
 
-5. /pricing/success page
-   └─ Reads the plan param from the URL
-   └─ Calls updateProfilePlan("pro") server action
-   └─ updateProfilePlan() validates plan against DB plans
-   └─ Calls auth.api.updateUser({ plan: "pro" })
-   └─ User's plan field in MongoDB is updated
-   └─ Revalidates /dashboard and /dashboard/profile caches
-   └─ User sees "Upgrade Successful!" page
+5. /pricing/success → calls updateProfilePlan("pro")
+   └─ Validates plan against DB
+   └─ auth.api.updateUser({ plan: "pro" })
+   └─ Revalidates dashboard caches
 ```
 
 ---
 
-## 🖼️ Image Upload Flow
+## 🔗 Backend API Endpoints
 
-Images (profile photos, company logos) are hosted on **ImgBB** (free image CDN):
+### Public
+| Method | Endpoint |
+|--------|----------|
+| GET | `/api/jobs` |
+| GET | `/api/jobs/:id` |
+| GET | `/api/companies` |
+| GET | `/api/companies/:id` |
+| GET | `/api/plans?role=seeker` |
 
-```
-1. User selects an image in ImageUploader component
-2. Client-side uploadImage(file) calls ImgBB API with NEXT_PUBLIC_IMGBB_KEY
-3. ImgBB returns a public URL (e.g. https://i.ibb.co/...)
-4. The URL is saved to MongoDB (profile) or backend API (company logo)
-```
-
----
-
-## 🔄 Data Fetching & Caching Strategy
-
-All business data comes from the backend REST API via Next.js Server Actions in `src/lib/actions/`.
-
-| Type | Cache Strategy | Why |
-|------|---------------|-----|
-| Public jobs (`/api/jobs`) | `revalidate: 30s` + tag `"jobs"` | Stale for max 30s, refreshed on mutations |
-| Public companies (`/api/companies`) | `revalidate: 30s` | Same pattern |
-| Plans (`/api/plans`) | `revalidate: 60s` + tag `"plans"` | Plans rarely change |
-| My jobs (`/api/my/jobs`) | `cache: "no-store"` | Per-user — must never be cached cross-user |
-| My applications (`/api/my/applications`) | `cache: "no-store"` | Per-user |
-| My saved jobs (`/api/my/saved-jobs`) | `cache: "no-store"` | Per-user |
-| Auth session | N/A | Managed by better-auth cookies |
-
----
-
-## 🏗️ Component Architecture
-
-### Layout Hierarchy
-
-```
-app/layout.js (root — Inter font, dark theme, Toast)
-├── (public)/layout.js
-│   ├── <Navbar />            ← role-aware top nav
-│   ├── <main>{children}</main>
-│   └── <Footer />
-├── (auth)/layout.js          ← no nav/footer
-│   └── auth pages (signin, signup)
-└── dashboard/layout.js
-    ├── <DashBoardSideBar />  ← role-aware sidebar
-    ├── <DashboardTopBar />   ← user info + plan badge
-    └── <main>{children}</main>
-```
-
-### Key Shared Components
-
-| Component | Purpose |
-|-----------|---------|
-| `Navbar.jsx` | Public navigation, role-aware links, login/logout |
-| `PlanUpgradeModal.jsx` | Full plan comparison modal with Stripe checkout trigger |
-| `SeekerPlanCard.jsx` | Shows seeker's current plan usage on profile |
-| `PlanUsageCard.jsx` | Shows recruiter's active job usage on profile |
-| `JobsOverview.jsx` | Recruiter dashboard job stats overview |
-| `JobForm.jsx` | Create/edit job form with plan limit guard |
-| `ApplyJobModal.jsx` | Full job application form (seeker) |
-| `ImageUploader.jsx` | Drag-and-drop image upload to ImgBB |
-| `DashBoardSideBar.jsx` | Role-aware sidebar navigation |
-
----
-
-## 🛡️ Security Model
-
-| Concern | How It's Handled |
-|---------|-----------------|
-| Auth | `better-auth` session cookies (httpOnly) |
-| Route protection | Dashboard layout checks session server-side |
-| Recruiter-only actions | `requireRecruiter()` throws if role ≠ recruiter |
-| Plan upgrade validation | `updateProfilePlan` cross-checks plan against DB |
-| Cross-user data leakage | `/api/my/*` endpoints use `cache: "no-store"` |
-| Stripe secret | `STRIPE_SECRET_KEY` server-side only (not `NEXT_PUBLIC_`) |
-| ImgBB key | `NEXT_PUBLIC_IMGBB_KEY` — client-safe (rate-limited by ImgBB) |
-
-> ⚠️ **Note:** There is no `middleware.js`. Route protection is done at the layout level only. A user who knows a dashboard URL can attempt to visit it, but the layout will catch the missing session and redirect them.
-
----
-
-## 🔗 Backend API Endpoints Used
-
-All backend calls go through `NEXT_PUBLIC_API_URL` (default: `http://localhost:5000`).
-
-### Public (no auth header needed)
-| Method | Endpoint | Used By |
-|--------|----------|---------|
-| GET | `/api/jobs` | Job board page |
-| GET | `/api/jobs/:id` | Job detail page |
-| GET | `/api/companies` | Company directory |
-| GET | `/api/companies/:id` | Company detail page |
-| GET | `/api/plans?role=seeker` | Pricing page, checkout, profile |
-
-### Protected (sends `x-recruiter-id` or `x-user-id` header)
+### Protected (x-recruiter-id / x-user-id header)
 | Method | Endpoint | Role |
 |--------|----------|------|
-| GET | `/api/my/jobs` | Recruiter |
-| GET | `/api/my/jobs/:id` | Recruiter |
-| GET | `/api/my/jobs/stats` | Recruiter |
-| POST | `/api/my/jobs` | Recruiter |
-| PUT | `/api/my/jobs/:id` | Recruiter |
+| GET/POST | `/api/my/jobs` | Recruiter |
+| GET/PUT/DELETE | `/api/my/jobs/:id` | Recruiter |
 | PATCH | `/api/my/jobs/:id/status` | Recruiter |
-| DELETE | `/api/my/jobs/:id` | Recruiter |
-| GET | `/api/my/companies` | Recruiter |
-| POST | `/api/my/companies` | Recruiter |
-| PUT | `/api/my/companies/:id` | Recruiter |
-| DELETE | `/api/my/companies/:id` | Recruiter |
+| GET/POST/DELETE | `/api/my/companies` | Recruiter |
 | GET | `/api/my/applicants` | Recruiter |
-| GET | `/api/my/applicants/:id` | Recruiter |
-| GET | `/api/my/applications` | Seeker |
-| POST | `/api/my/applications` | Seeker |
-| DELETE | `/api/my/applications/:jobId` | Seeker |
-| GET | `/api/my/saved-jobs` | Seeker |
-| POST | `/api/my/saved-jobs` | Seeker |
-| DELETE | `/api/my/saved-jobs/:jobId` | Seeker |
+| GET/POST/DELETE | `/api/my/applications` | Seeker |
+| GET/POST/DELETE | `/api/my/saved-jobs` | Seeker |
+
+### Admin (x-admin-secret header) — NEW
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/stats` | Platform overview numbers |
+| GET | `/api/admin/users` | All users (paginated + search) |
+| GET/PUT | `/api/admin/users/:id` | Single user + plan override |
+| PATCH | `/api/admin/users/:id/status` | Activate / deactivate |
+| GET/POST | `/api/admin/plans` | All plans + create new |
+| PUT/DELETE | `/api/admin/plans/:id` | Edit / delete plan |
+| GET | `/api/admin/jobs` | All platform jobs |
+| PATCH/DELETE | `/api/admin/jobs/:id` | Moderate / delete job |
+| GET | `/api/admin/revenue` | Stripe MRR + payments |
 
 ---
 
@@ -377,7 +408,7 @@ All backend calls go through `NEXT_PUBLIC_API_URL` (default: `http://localhost:5
 | `users` | better-auth | User accounts (id, name, email, role, plan, image) |
 | `sessions` | better-auth | Active login sessions |
 | `accounts` | better-auth | OAuth accounts (if added later) |
-| `plans` | Manual / App | Plan definitions with limits, pricing, features |
+| `plans` | Admin Panel / seed scripts | Plan definitions with limits, pricing, features |
 | `jobs` | Backend API | All job postings |
 | `companies` | Backend API | All company profiles |
 | `applications` | Backend API | All job applications |
@@ -389,8 +420,8 @@ All backend calls go through `NEXT_PUBLIC_API_URL` (default: `http://localhost:5
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 15 (App Router) |
-| UI Components | HeroUI (+ Tailwind CSS) |
+| Framework | Next.js 16 (App Router) |
+| UI Components | HeroUI v3 + Tailwind CSS |
 | Icons | `@gravity-ui/icons` |
 | Auth | better-auth (email + password) |
 | Database | MongoDB (Atlas) |

@@ -1,9 +1,9 @@
 "use client";
 
-import { RecruiterJobsSkeleton } from "@/components/dashboard/jobs/JobsTableSkeleton";
-import JobsOverview from "@/components/dashboard/jobs/JobsOverview";
 import JobsFilters from "@/components/dashboard/jobs/JobsFilters";
+import JobsOverview from "@/components/dashboard/jobs/JobsOverview";
 import JobsTable from "@/components/dashboard/jobs/JobsTable";
+import { RecruiterJobsSkeleton } from "@/components/dashboard/jobs/JobsTableSkeleton";
 import ButtonLink from "@/components/shared/ButtonLink";
 import { getRecruiterCompanies } from "@/lib/actions/company";
 import {
@@ -12,10 +12,10 @@ import {
   getRecruiterJobs,
   updateRecruiterJobStatus,
 } from "@/lib/actions/jobs";
+import { getPlans } from "@/lib/actions/plans";
 import { getCompanySlug, normalizeCompanies } from "@/lib/api/companies";
 import { getJobId, getPlanUsage } from "@/lib/api/jobstruture";
 import { useSession } from "@/lib/auth-client";
-import { getPlans } from "@/lib/actions/plans";
 import { CirclePlus } from "@gravity-ui/icons";
 import { Button, Card, Typography, toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -88,7 +88,7 @@ export default function RecruiterJobsPage() {
           : (jobsData?.items ?? []);
         setJobs(jobList.map(normalizeJob));
         setStats(statsData ?? {});
-        
+
         if (plansData) {
           setPlans(plansData);
         }
@@ -156,6 +156,14 @@ export default function RecruiterJobsPage() {
     const jobId = getJobId(job);
     if (!jobId) return;
     const nextStatus = job.status === "active" ? "closed" : "active";
+
+    if (nextStatus === "active" && !usage.hasAvailableSlots) {
+      toast.warning("Active job limit reached", {
+        description:
+          "You must close a job or upgrade your plan before reopening this job.",
+      });
+      return;
+    }
 
     if (
       nextStatus === "active" &&
@@ -260,7 +268,11 @@ export default function RecruiterJobsPage() {
           </div>
         </header>
 
-        <JobsOverview stats={stats} activeJobCount={stats.active ?? 0} userPlan={userPlan} />
+        <JobsOverview
+          stats={stats}
+          activeJobCount={stats.active ?? 0}
+          userPlan={userPlan}
+        />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[260px_1fr]">
           <JobsFilters

@@ -32,7 +32,7 @@ function requireRecruiter(req, res, next) {
 }
 
 function buildCompanyLookup(id) {
-  const or = [{ companySlug: id }, { companyId: id }];
+  const or = [{ companySlug: id }, { companyId: id }, { slug: id }];
   if (ObjectId.isValid(id) && String(new ObjectId(id)) === id) {
     or.push({ _id: new ObjectId(id) });
   }
@@ -61,8 +61,10 @@ function paginate(req) {
 }
 
 async function attachStats(companiesCollection, jobsCollection, companies) {
+  // A company document typically has `_id` and maybe `slug`.
+  // The jobs collection references them via `companyId` or `companySlug`.
   const slugs = companies
-    .map((c) => c.companySlug ?? c.companyId)
+    .map((c) => c.slug ?? c.companySlug ?? c.companyId ?? c._id?.toString())
     .filter(Boolean);
 
   if (slugs.length === 0) {
@@ -77,17 +79,21 @@ async function attachStats(companiesCollection, jobsCollection, companies) {
           status: "active",
         },
       },
-      { $group: { _id: "$companySlug", count: { $sum: 1 } } },
+      // Group by companyId if available, fallback to companySlug
+      { $group: { _id: { $ifNull: ["$companyId", "$companySlug"] }, count: { $sum: 1 } } },
     ])
     .toArray();
 
-  const countsByCompanySlug = Object.fromEntries(
-    counts.map((row) => [row._id, row.count]),
-  );
-
-  return companies.map((company) => {
-    const ref = company.companySlug ?? company.companyId;
-    return { ...company, activeJobs: countsByCompanySlug[ref] ?? 0 };
+  return companies.map((c) => {
+    // Find count by checking if the _id matches companyId or slug matches companySlug
+    const companyIdStr = c._id?.toString();
+    const stat = counts.find(
+      (countDoc) =>
+        countDoc._id === c.slug ||
+        countDoc._id === c.companySlug ||
+        countDoc._id === companyIdStr
+    );
+    return { ...c, activeJobs: stat ? stat.count : 0 };
   });
 }
 

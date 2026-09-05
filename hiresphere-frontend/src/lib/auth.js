@@ -1,46 +1,41 @@
+import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { betterAuth } from "better-auth";
-import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
 
-// Lazy-load the MongoDB client to prevent Next.js build from hanging
-let _client;
-let _db;
+// Lazy-load logic isn't needed with modern MongoDB driver as it connects automatically on first query.
+// However, we still support BUILD_MODE mock for safety during static generation.
+const isBuild = process.env.BUILD_MODE === "1";
 
-function getDb() {
-  // If we are in the Next.js build process, we use a dummy DB.
-  // Next.js static generation doesn't need to read from DB for static routes.
-  const isBuild = process.env.BUILD_MODE === "1";
-
-  if (isBuild) {
-    console.log("Mocking MongoDB during Next.js build to prevent hang...");
-    return {
-      collection: () => ({
-        findOne: async () => null,
-        find: () => ({ toArray: async () => [] }),
-      }),
-      databaseName: "dummy",
-    };
+let db;
+if (isBuild) {
+  console.log("Mocking MongoDB during Next.js build...");
+  db = {
+    collection: () => ({
+      findOne: async () => null,
+      find: () => ({ toArray: async () => [] }),
+      createIndex: async () => null,
+      updateOne: async () => null,
+      insertOne: async () => null,
+      deleteOne: async () => null,
+    }),
+    databaseName: "dummy",
+  };
+} else {
+  // In development, preserve the client across hot reloads
+  if (process.env.NODE_ENV === "development") {
+    if (!global._mongoClient) {
+      global._mongoClient = new MongoClient(process.env.MONGODB_URI);
+    }
+    db = global._mongoClient.db(process.env.MONGODB_DB_NAME);
+  } else {
+    const client = new MongoClient(process.env.MONGODB_URI);
+    db = client.db(process.env.MONGODB_DB_NAME);
   }
-
-  if (!_client) {
-    _client = new MongoClient(process.env.MONGODB_URI);
-    _db = _client.db(process.env.MONGODB_DB_NAME);
-  }
-  return _db;
 }
-
-const dbProxy = new Proxy(
-  {},
-  {
-    get(target, prop) {
-      return getDb()[prop];
-    },
-  },
-);
 
 export const auth = betterAuth({
   baseURL: process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL,
-  database: mongodbAdapter(dbProxy),
+  database: mongodbAdapter(db),
   emailAndPassword: {
     enabled: true,
   },

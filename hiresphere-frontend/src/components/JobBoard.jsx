@@ -45,10 +45,14 @@ export default function JobBoard() {
             <Card
               key={index}
               shadow="none"
-              className="bg-(color-surface-2) p-8 rounded-[20px] flex flex-col border border-(color-border)"
+              className="group relative overflow-hidden bg-(color-surface-2) p-8 rounded-[20px] flex flex-col border border-(color-border) transition-colors hover:border-indigo-500/50 cursor-pointer"
             >
+              <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+                <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+              </div>
+
               {/* Job Title & Description */}
-              <div className="flex flex-col gap-3">
+              <div className="relative z-10 flex flex-col gap-3">
                 <h3 className="text-(color-text) text-[24px] font-medium tracking-tight">
                   {job.title}
                 </h3>

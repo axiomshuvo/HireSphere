@@ -15,7 +15,7 @@ import {
   Star,
   Xmark,
 } from "@gravity-ui/icons";
-import { Accordion, Button, Card, toast } from "@heroui/react";
+import { Accordion, Button, Card, Tabs, toast } from "@heroui/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -123,12 +123,16 @@ function TierCard({ tier, planParam, planRole, isLoggedIn, onGetStarted }) {
     <Card
       className={
         tier.highlight
-          ? "relative flex flex-col gap-4 rounded-2xl border border-indigo-500/60 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] p-6 shadow-[0_0_0_1px_rgba(99,102,241,0.2)]"
-          : "flex flex-col gap-4 rounded-2xl border border-(color-border) bg-(color-surface) p-6"
+          ? "group relative flex flex-col gap-4 rounded-2xl border border-indigo-500/60 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.18),transparent_60%),linear-gradient(180deg,#1a1c22,#0f1013)] p-6 shadow-[0_0_0_1px_rgba(99,102,241,0.2)] transition-colors hover:border-indigo-400 cursor-pointer"
+          : "group relative flex flex-col gap-4 rounded-2xl border border-(color-border) bg-(color-surface) p-6 transition-colors hover:border-indigo-500/30 cursor-pointer"
       }
     >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+        <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+      </div>
+
       {tier.highlight && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-(color-text) shadow-lg">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-lg z-10">
           Most popular
         </span>
       )}
@@ -317,64 +321,93 @@ export default function PricingPage() {
         </p>
       </header>
 
-      {/* Recruiter tiers */}
-      <section className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {isLoading ? (
-          <>
-            <TierSkeleton />
-            <TierSkeleton />
-            <TierSkeleton />
-          </>
-        ) : (
-          activeRecruiterTiers.map((tier) => (
-            <TierCard
-              key={tier.id}
-              tier={tier}
-              planParam={tier.id}
-              planRole="recruiter"
-              isLoggedIn={isLoggedIn}
-              onGetStarted={handleGetStarted}
-            />
-          ))
-        )}
-      </section>
+      <div className="mt-10 flex flex-col items-center justify-center">
+        <Tabs.Root aria-label="Pricing plans" className="w-full">
+          <div className="flex w-full justify-center">
+            <Tabs.List className="inline-flex w-fit items-center justify-center gap-1 rounded-full bg-(color-surface-2) p-1 shadow-sm">
+              <Tabs.Tab
+                id="recruiter"
+                className="w-auto flex-none cursor-pointer rounded-full px-6 py-2 text-sm font-medium transition-all text-(color-text-muted) data-[selected=true]:bg-indigo-500 data-[selected=true]:text-white data-[selected=true]:shadow-md outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              >
+                For Recruiters
+              </Tabs.Tab>
+              <Tabs.Tab
+                id="seeker"
+                className="w-auto flex-none cursor-pointer rounded-full px-6 py-2 text-sm font-medium transition-all text-(color-text-muted) data-[selected=true]:bg-indigo-500 data-[selected=true]:text-white data-[selected=true]:shadow-md outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              >
+                For Job Seekers
+              </Tabs.Tab>
+            </Tabs.List>
+          </div>
 
-      {/* Seeker tiers */}
-      <section className="mt-16">
-        <header className="mb-6 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-(color-border) bg-(color-surface) px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-(color-text-muted)">
-            <Star className="size-3" />
-            For job seekers
-          </span>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-(color-text)">
-            Plans for your job search
-          </h2>
-          <p className="mt-2 text-sm text-(color-text-muted)">
-            Free for everyone, with Pro and Premium tiers for more applications
-            and recruiter visibility.
-          </p>
-        </header>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {isLoading ? (
-            <>
-              <TierSkeleton />
-              <TierSkeleton />
-              <TierSkeleton />
-            </>
-          ) : (
-            activeSeekerTiers.map((tier) => (
-              <TierCard
-                key={tier.id}
-                tier={tier}
-                planParam={tier.plan}
-                planRole="seeker"
-                isLoggedIn={isLoggedIn}
-                onGetStarted={handleGetStarted}
-              />
-            ))
-          )}
-        </div>
-      </section>
+          <Tabs.Panel id="recruiter">
+            <div className="mt-10">
+              <header className="mb-8 text-center">
+                <h2 className="text-2xl font-semibold tracking-tight text-(color-text)">
+                  Plans for hiring talent
+                </h2>
+                <p className="mt-2 text-sm text-(color-text-muted)">
+                  Find the perfect candidate with our powerful recruiter tools.
+                </p>
+              </header>
+              <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {isLoading ? (
+                  <>
+                    <TierSkeleton />
+                    <TierSkeleton />
+                    <TierSkeleton />
+                  </>
+                ) : (
+                  activeRecruiterTiers.map((tier) => (
+                    <TierCard
+                      key={tier.id}
+                      tier={tier}
+                      planParam={tier.id}
+                      planRole="recruiter"
+                      isLoggedIn={isLoggedIn}
+                      onGetStarted={handleGetStarted}
+                    />
+                  ))
+                )}
+              </section>
+            </div>
+          </Tabs.Panel>
+
+          <Tabs.Panel id="seeker">
+            <div className="mt-10">
+              <header className="mb-8 text-center">
+                <h2 className="text-2xl font-semibold tracking-tight text-(color-text)">
+                  Plans for your job search
+                </h2>
+                <p className="mt-2 text-sm text-(color-text-muted)">
+                  Free for everyone, with Pro and Premium tiers for more
+                  applications and recruiter visibility.
+                </p>
+              </header>
+              <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {isLoading ? (
+                  <>
+                    <TierSkeleton />
+                    <TierSkeleton />
+                    <TierSkeleton />
+                  </>
+                ) : (
+                  activeSeekerTiers.map((tier) => (
+                    <TierCard
+                      key={tier.id}
+                      tier={tier}
+                      planParam={tier.plan}
+                      planRole="seeker"
+                      isLoggedIn={isLoggedIn}
+                      onGetStarted={handleGetStarted}
+                    />
+                  ))
+                )}
+              </section>
+            </div>
+          </Tabs.Panel>
+        </Tabs.Root>
+      </div>
 
       {/* FAQ accordion */}
       <section className="mt-16">

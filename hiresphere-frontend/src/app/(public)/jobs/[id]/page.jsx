@@ -15,6 +15,7 @@ import { fetchApplicationForJob } from "@/lib/actions/applications";
 import { fetchPublicCompanyById } from "@/lib/actions/company";
 import { fetchPublicJobById, fetchPublicJobs } from "@/lib/actions/jobs";
 import { fetchSavedJobs } from "@/lib/actions/saved-jobs";
+import { getCompanySlug } from "@/lib/api/companies";
 import { getCurrentUser } from "@/lib/core/session";
 import {
   ArrowUpRightFromSquare,
@@ -161,7 +162,7 @@ export default async function PublicJobDetailPage({ params }) {
 
             {company && (
               <Link
-                href={`/company/${company.companySlug ?? company.id}`}
+                href={`/company/${getCompanySlug(company)}`}
                 className="mt-2 inline-flex items-center gap-2 text-sm text-(color-text-muted) transition-colors hover:text-(color-text)"
               >
                 <Avatar.Root className="size-5 shrink-0 rounded bg-(color-surface-2) text-[10px] font-semibold text-(color-text)">
@@ -322,7 +323,7 @@ export default async function PublicJobDetailPage({ params }) {
                 </p>
               )}
               <Link
-                href={`/company/${company.companySlug ?? company.id}`}
+                href={`/company/${getCompanySlug(company)}`}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-(color-surface-2) px-4 py-2 text-sm text-(color-text) transition-colors hover:border-indigo-500/50"
               >
                 <Briefcase className="size-4" />

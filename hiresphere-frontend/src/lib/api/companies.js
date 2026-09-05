@@ -11,7 +11,9 @@ export function generateCompanySlug(name) {
 }
 
 export function getCompanySlug(company) {
-  return company?.companySlug ?? company?.id ?? company?._id ?? null;
+  return (
+    company?.slug ?? company?.companySlug ?? company?.id ?? company?._id ?? null
+  );
 }
 
 export function getCompanyName(company) {

@@ -237,8 +237,12 @@ export default async function PublicCompanyPage({ params }) {
                   href={`/jobs/${jobId}`}
                   className="group block"
                 >
-                  <Card className="flex h-full flex-col gap-2 rounded-2xl border border-(color-border) bg-(color-surface) p-4 transition-colors group-hover:border-indigo-500/50">
-                    <div className="flex items-start justify-between gap-3">
+                  <Card className="relative overflow-hidden flex h-full flex-col gap-2 rounded-2xl border border-(color-border) bg-(color-surface) p-4 transition-colors group-hover:border-indigo-500/50 cursor-pointer">
+                    <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] z-0">
+                      <div className="absolute inset-0 -translate-x-[150%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-[150%]" />
+                    </div>
+
+                    <div className="relative z-10 flex items-start justify-between gap-3">
                       <h3 className="text-base font-semibold text-(color-text)">
                         {job.title ?? "Untitled role"}
                       </h3>
