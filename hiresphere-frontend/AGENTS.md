@@ -12,9 +12,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## 1. Check my stack before assuming anything
 - ALWAYS inspect `package.json` (frontend + server), configs (`next.config.*`, `jsconfig.json`, `eslint.*`, `postcss.*`), and `src/` structure BEFORE writing or judging code.
+- ONLY use the libraries listed in my `package.json`. DO NOT introduce new libraries, packages, or tools unless explicitly told to do so.
+- ALWAYS use the updated version of the libraries I have installed. 
 - NEVER assume library APIs from training data. Verify real exports in `node_modules/<lib>/dist/...` (e.g. HeroUI v3 uses `Dropdown.Menu`, `Drawer.Trigger` — not NextUI v2 syntax).
-- For Next.js specifics, read the local guide in `node_modules/next/dist/docs/` (Next 16 has breaking changes). Heed deprecation notices.
-- If unsure about a version/API, grep/read the code and say so — do not hallucinate downgrades or upgrades.
 
 ## 2. Plan before work, wait for confirmation
 - For ANY non-trivial task (multi-step, edits, deletes, renames, installs): first CHECK the code, then give a short PLAN (what files, what changes, risks), then STOP and wait for explicit confirmation.

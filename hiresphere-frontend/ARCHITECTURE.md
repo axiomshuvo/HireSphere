@@ -18,7 +18,7 @@
 │   - better-auth (session management)                       │
 │   - Stripe Checkout API route                              │
 │   - Server Actions (data fetching via fetch)               │
-│   - /dashboard/admin  ← NEW: Super Admin Panel             │
+│   - /admin  ← NEW: Super Admin Panel             │
 └──────────┬────────────────────────┬───────────────────────-┘
            │ MongoDB (Auth only)    │ REST API calls
            │                       │ (NEXT_PUBLIC_API_URL)
@@ -63,20 +63,23 @@
 | **Limits** | Edit `limits.activeJobPosts`, `limits.applicationsPerMonth`, `limits.savedJobs` |
 | **Users** | Search users by email/name, view role & plan, manually override plan |
 | **Recruiter Accounts** | Activate / deactivate recruiter accounts, view their active jobs |
+| **Company Approval** | Newly created companies are `pending` and cannot post jobs until approved. |
 | **Revenue Stats** | Monthly MRR, total paying users, plan breakdown, recent payments (via Stripe API) |
+| **Sub Requests** | Approve or reject user requests to downgrade or cancel plans. |
 | **Job Listings** | View all jobs on the platform, force-close / delete abusive listings |
 | **Platform Stats** | Total users, total jobs, total applications, active companies |
 
-### Admin Dashboard Pages (`/dashboard/admin/*`)
+### Admin Dashboard Pages (`/admin/*`)
 
 ```
-/dashboard/admin                    → Overview stats (MRR, users, jobs, applications)
-/dashboard/admin/plans              → Plan management table (CRUD)
-/dashboard/admin/plans/[id]/edit    → Edit individual plan (limits, pricing, features)
-/dashboard/admin/users              → User table with search + role/plan override
-/dashboard/admin/users/[id]         → User detail — history, override plan, deactivate
-/dashboard/admin/jobs               → All jobs on platform with status controls
-/dashboard/admin/revenue            → Revenue dashboard (Stripe MRR, plan distribution)
+/admin                    → Overview stats (MRR, users, jobs, applications)
+/admin/plans              → Plan management table (CRUD)
+/admin/plans/[id]/edit    → Edit individual plan (limits, pricing, features)
+/admin/users              → User table with search + role/plan override
+/admin/users/[id]         → User detail — history, override plan, deactivate
+/admin/requests           → Sub downgrade/cancel requests queue
+/admin/jobs               → All jobs on platform with status controls
+/admin/revenue            → Revenue dashboard (Stripe MRR, plan distribution)
 ```
 
 ### How Admin Login Is Secured — 5 Layers
@@ -93,10 +96,10 @@ db.collection("users").updateOne(
 ```
 
 #### Layer 2 — Server-side layout guard
-`/dashboard/admin/layout.js` is a **Server Component** — it runs only on the server and checks the session on every request before rendering any admin page:
+`/admin/layout.js` is a **Server Component** — it runs only on the server and checks the session on every request before rendering any admin page:
 
 ```js
-// src/app/dashboard/admin/layout.js
+// src/app/admin/layout.js
 export default async function AdminLayout({ children }) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/auth/signin");
@@ -153,35 +156,36 @@ const adminHeaders = {
 
 ## 🚀 Admin Implementation Plan (Phased)
 
-### Phase 1 — Core Auth & Routing
-- [ ] Add `role: "admin"` to `auth.js` additionalFields (already in schema)
-- [ ] Create `src/app/dashboard/admin/layout.js` with `role === "admin"` guard
-- [ ] Create `src/app/dashboard/admin/page.jsx` (platform stats overview)
-- [ ] Add admin sidebar section in `DashBoardSideBar.jsx` (only renders when `role === "admin"`)
-- [ ] Write `set-admin.js` script to promote the owner user
-- [ ] Add `ADMIN_SECRET_KEY` to `.env.local` and backend `.env`
+### Phase 1 — Foundation (Core Auth & Admin Shell)
+- [ ] Create isolated `/admin/login` page
+- [ ] Create `AdminLayout` with Mod/Admin role guards
+- [ ] Create Admin Sidebar & Topbar UI
+- [ ] Add `ADMIN_SECRET_KEY` and backend `requireAdmin` middleware
+- [ ] Write `set-admin.js` script for initial owner promotion
 
-### Phase 2 — Plan & Pricing Management
-- [ ] Create `/dashboard/admin/plans` page — table of all plans in DB
-- [ ] Create `/dashboard/admin/plans/[id]/edit` — edit limits, pricing, features inline
-- [ ] Add backend `requireAdmin` middleware to Express
-- [ ] Add `GET /api/admin/plans`, `POST /api/admin/plans`, `PUT /api/admin/plans/:id`, `DELETE /api/admin/plans/:id`
-- [ ] Write `src/lib/actions/admin.js` server actions calling those endpoints
+### Phase 2 — User Management & Moderation
+- [ ] Create `/admin/users` list and detail pages
+- [ ] Implement Activate/Deactivate users
+- [ ] **Backend Logic:** Add Cascading Deactivation (deactivating a user auto-closes jobs/companies)
+- [ ] Add Mod capabilities (View individual payment history, flag users)
+- [ ] Add `GET /api/admin/users`, `PATCH /api/admin/users/:id/status`
 
-### Phase 3 — User Management
-- [ ] Create `/dashboard/admin/users` page — searchable user table (name, email, role, plan, joined)
-- [ ] Add "Override Plan" action — admin can change any user's plan without payment
-- [ ] Add "Activate / Deactivate" toggle for recruiter accounts
-- [ ] Add `GET /api/admin/users`, `PUT /api/admin/users/:id`, `PATCH /api/admin/users/:id/status`
+### Phase 3 — Subscriptions & Billing Flow
+- [ ] Implement Automated Stripe Downgrade (`proration_behavior: 'none'`) to replace the Mod Queue
+- [ ] **Backend Logic:** Implement Plan Reconciliation Script on webhook downgrade (auto-pause excess jobs)
+- [ ] **Backend Logic:** Billing-cycle Quota Math (calculate limits based on Stripe period, not calendar month)
+- [ ] **Backend Logic:** Add Subscription History Ledger (push events to `subscriptions.history` array)
 
-### Phase 4 — Revenue Dashboard
-- [ ] Create `/dashboard/admin/revenue` page
-- [ ] Add `GET /api/admin/revenue` endpoint — calls `stripe.charges.list` + `stripe.subscriptions.list` server-side
-- [ ] Show: MRR, plan distribution pie chart, recent payments list
+### Phase 4 — Company & Job Moderation
+- [ ] Create `/admin/companies` & `/admin/jobs` moderation pages
+- [ ] Implement Company Approval Flow (`pending` status upon creation, jobs hidden until approved)
+- [ ] **Backend Logic:** Apply-Button Race Condition fix (verify active status at exact moment of apply)
+- [ ] **Backend Logic:** Orphaned Image ImgBB deletion hook
 
-### Phase 5 — Job Moderation
-- [ ] Create `/dashboard/admin/jobs` page — all platform jobs with moderation controls
-- [ ] Add `PATCH /api/admin/jobs/:id/status`, `DELETE /api/admin/jobs/:id`
+### Phase 5 — Owner Features (Admin Only)
+- [ ] Create Plan Management CRUD (`/admin/plans`)
+- [ ] Create Revenue Dashboard fetching from Stripe API (`/admin/revenue`)
+- [ ] Create Moderator Management (invite/remove mods via `/admin/moderators`)
 
 ---
 
@@ -279,16 +283,16 @@ ADMIN_SECRET_KEY=replace-this-with-a-long-random-string-minimum-32-chars
 | `/dashboard/mycompany/new` | Create new company |
 | `/dashboard/mycompany/[id]` | Company detail with jobs list |
 
-### Admin Dashboard (`/dashboard/admin`) — NEW
+### Admin Dashboard (`/admin`) — NEW
 | Route | Description |
 |-------|-------------|
-| `/dashboard/admin` | Platform stats + quick actions |
-| `/dashboard/admin/plans` | Plan management table (CRUD) |
-| `/dashboard/admin/plans/[id]/edit` | Edit plan limits, pricing, features |
-| `/dashboard/admin/users` | All users — search, filter, override plan |
-| `/dashboard/admin/users/[id]` | User detail + override plan + deactivate |
-| `/dashboard/admin/jobs` | All platform jobs — moderate / delete |
-| `/dashboard/admin/revenue` | Stripe MRR + plan distribution + payments |
+| `/admin` | Platform stats + quick actions |
+| `/admin/plans` | Plan management table (CRUD) |
+| `/admin/plans/[id]/edit` | Edit plan limits, pricing, features |
+| `/admin/users` | All users — search, filter, override plan |
+| `/admin/users/[id]` | User detail + override plan + deactivate |
+| `/admin/jobs` | All platform jobs — moderate / delete |
+| `/admin/revenue` | Stripe MRR + plan distribution + payments |
 
 ---
 
@@ -364,6 +368,45 @@ ADMIN_SECRET_KEY=replace-this-with-a-long-random-string-minimum-32-chars
 
 ---
 
+## 🧾 Subscription Ledger System
+
+To maintain a perfect timeline of a user's billing history without creating scattered records, the `subscriptions` collection acts as an append-only ledger for each user.
+
+### Key Workflows
+- **Upgrades (Instant):** Processed instantly via Stripe checkout. A webhook updates the document and pushes an `upgraded` event to the history array.
+- **Downgrades & Cancellations (Manual):** To prevent breaking job/application limits unexpectedly, users submit a request. Mod/Admin reviews it in the `/admin/requests` queue. Upon approval, the backend cancels it via Stripe API and pushes a `canceled` event to the history array.
+
+### Schema Structure
+```json
+{
+  "_id": "ObjectId",
+  "userId": "string",
+  "stripeSubscriptionId": "string",
+  
+  // Current Active State
+  "planId": "enterprise",
+  "status": "active",
+  
+  // Master Timestamps
+  "createdAt": "2026-09-05T...",
+  "currentPeriodEnd": "2026-10-05T...", 
+  "canceledAt": null,
+  
+  // The Timeline Ledger (populated via backend webhooks/actions)
+  "history": [
+    {
+      "type": "created", // created, upgraded, downgrade_requested, canceled, expired
+      "planId": "pro",
+      "timestamp": "2026-09-05T00:00:00Z",
+      "expireTime": "2026-10-05T00:00:00Z"
+    }
+  ]
+}
+```
+
+
+---
+
 ## 🔗 Backend API Endpoints
 
 ### Public
@@ -393,6 +436,9 @@ ADMIN_SECRET_KEY=replace-this-with-a-long-random-string-minimum-32-chars
 | GET | `/api/admin/users` | All users (paginated + search) |
 | GET/PUT | `/api/admin/users/:id` | Single user + plan override |
 | PATCH | `/api/admin/users/:id/status` | Activate / deactivate |
+| GET | `/api/admin/requests` | View downgrade/cancel requests |
+| POST | `/api/admin/requests/:id/approve` | Approve downgrade/cancel request |
+| POST | `/api/admin/companies/:id/approve` | Approve a pending company |
 | GET/POST | `/api/admin/plans` | All plans + create new |
 | PUT/DELETE | `/api/admin/plans/:id` | Edit / delete plan |
 | GET | `/api/admin/jobs` | All platform jobs |
@@ -400,6 +446,17 @@ ADMIN_SECRET_KEY=replace-this-with-a-long-random-string-minimum-32-chars
 | GET | `/api/admin/revenue` | Stripe MRR + payments |
 
 ---
+
+## 🛡️ Edge Case & Integrity Rules
+
+To prevent data corruption and ensure a fair platform, the backend enforces these automated rules:
+
+1. **Cascading Deactivation:** Deactivating a Recruiter automatically forces all their companies to `deactivated` and jobs to `closed`.
+2. **Plan Downgrade Reconciliation:** If an Enterprise user downgrades to Free, the backend automatically sets their oldest active jobs to `paused` so they don't exceed the Free limit (e.g., 3 jobs).
+3. **Billing-Cycle Math:** Quotas (like 30 applications/month) are calculated dynamically using the Stripe `currentPeriodEnd` timestamp, not calendar months.
+4. **ImgBB Orphaned File Cleanup:** Images stored in MongoDB now require the `delete_url`. Replacing an image triggers the deletion of the old image on ImgBB.
+5. **Race Condition Prevention:** Job application endpoints double-check job and company `status === 'active'` at the exact millisecond of submission.
+
 
 ## 🗂️ MongoDB Collections
 
@@ -413,6 +470,7 @@ ADMIN_SECRET_KEY=replace-this-with-a-long-random-string-minimum-32-chars
 | `companies` | Backend API | All company profiles |
 | `applications` | Backend API | All job applications |
 | `saved-jobs` | Backend API | Seeker bookmarks |
+| `subscriptions` | Backend API | Active stripe subscriptions + historical ledger |
 
 ---
 
