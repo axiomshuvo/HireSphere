@@ -9,7 +9,8 @@ import {
   TrashBin,
   Wallet,
 } from "@gravity-ui/icons";
-import { Card, toast } from "@heroui/react";
+import { Card } from "@heroui/react";
+import { authToasts } from "@/lib/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -51,10 +52,10 @@ export default function SavedJobCard({ saved, job }) {
     setRemoving(true);
     try {
       await unsaveJob(saved.jobId);
-      toast.success("Removed from saved jobs");
+      authToasts.success("Removed from saved jobs");
       router.refresh();
     } catch (error) {
-      toast.warning("Could not remove", {
+      authToasts.error("Could not remove", {
         description: error?.message ?? "Unknown error",
       });
     } finally {

@@ -15,7 +15,7 @@ export default function CompanyCard({ company }) {
 
   return (
     <Link
-      href={`/dashboard/mycompany/${getCompanySlug(company)}`}
+      href={`/recruiter/companies/${getCompanySlug(company)}`}
       className="group block h-full outline-none"
     >
       <Card className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl border border-default bg-content1 p-5 transition-colors group-hover:border-emerald-500/50">

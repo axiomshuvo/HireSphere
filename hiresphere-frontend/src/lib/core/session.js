@@ -20,3 +20,19 @@ export async function requireRecruiter() {
   }
   return user;
 }
+
+export async function requireMod() {
+  const user = await requireCurrentUser();
+  if (user.role !== "admin" && user.role !== "mod") {
+    throw new Error("Forbidden: admin or moderator role required");
+  }
+  return user;
+}
+
+export async function requireAdmin() {
+  const user = await requireCurrentUser();
+  if (user.role !== "admin") {
+    throw new Error("Forbidden: admin role required");
+  }
+  return user;
+}

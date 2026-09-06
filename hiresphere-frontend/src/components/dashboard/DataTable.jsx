@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight } from "@gravity-ui/icons";
-import { Button, Card, Table, Typography } from "@heroui/react";
+import { Button, Card, Table } from "@heroui/react";
 
 import Link from "next/link";
 
@@ -23,12 +23,12 @@ export default function DataTable({
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-indigo-500/0 via-indigo-500/60 to-indigo-500/0"
       />
       <div className="mb-4 flex items-center justify-between">
-        <Typography.Heading
+        <h2
           className="text-lg font-semibold text-foreground"
           level={2}
         >
           {title}
-        </Typography.Heading>
+        </h2>
         {viewAllHref && (
           <Button
             as={Link}

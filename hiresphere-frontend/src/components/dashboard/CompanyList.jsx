@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight } from "@gravity-ui/icons";
-import { Button, Card, Typography } from "@heroui/react";
+import { Button, Card } from "@heroui/react";
 import Link from "next/link";
 import CompanyListItem from "./CompanyListItem";
 
@@ -20,12 +20,12 @@ export default function CompanyList({
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-500/0 via-emerald-500/60 to-emerald-500/0"
       />
       <div className="mb-4 flex items-center justify-between">
-        <Typography.Heading
+        <h2
           className="text-lg font-semibold text-foreground"
           level={2}
         >
           {title}
-        </Typography.Heading>
+        </h2>
         {viewAllHref && (
           <Button
             as={Link}

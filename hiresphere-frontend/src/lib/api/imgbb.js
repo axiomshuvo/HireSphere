@@ -12,7 +12,7 @@ function validate(file) {
   }
 }
 
-export async function uploadImage(file) {
+export async function uploadOne(file) {
   if (!API_KEY) throw new Error("imgbb API key is not configured");
   validate(file);
 
@@ -35,6 +35,11 @@ export async function uploadImage(file) {
   return data;
 }
 
+export async function uploadImage(file) {
+  const data = await uploadOne(file);
+  return data;
+}
+
 export async function uploadImages(files) {
   if (!API_KEY) throw new Error("imgbb API key is not configured");
   if (!Array.isArray(files) || files.length === 0) {
@@ -43,22 +48,30 @@ export async function uploadImages(files) {
 
   const urls = [];
   for (const file of files) {
-    validate(file);
-    const form = new FormData();
-    form.append("key", API_KEY);
-    form.append("image", file);
-
-    const res = await fetch(ENDPOINT, { method: "POST", body: form });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err?.error?.message ?? "imgbb upload failed");
-    }
-    const data = await res.json();
-    if (!data?.success || !data?.data?.url) {
-      throw new Error("imgbb response did not include an image URL");
-    }
+    const data = await uploadOne(file);
     urls.push(data.data.url ?? data.data.display_url);
   }
 
   return urls;
+}
+
+// Phase 4: delete an orphaned ImgBB image via the delete_url stored in Mongo.
+// Stored shape: { url, deleteUrl }. Call this before replacing an image.
+export async function deleteImage(deleteUrl) {
+  if (!deleteUrl) return false;
+  try {
+    await fetch(deleteUrl);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Normalize any stored image value to { url, deleteUrl } for the DB.
+export function toStoredImage(uploadResponse, fallbackUrl) {
+  if (!uploadResponse?.data) return { url: fallbackUrl ?? null, deleteUrl: null };
+  return {
+    url: uploadResponse.data.url ?? uploadResponse.data.display_url ?? fallbackUrl ?? null,
+    deleteUrl: uploadResponse.data.delete_url ?? null,
+  };
 }

@@ -1,4 +1,5 @@
 "use server";
+import { apiFetch } from "@/lib/api/client";
 
 import { getPlans } from "@/lib/actions/plans";
 import { auth } from "@/lib/auth";
@@ -81,24 +82,13 @@ export async function verifyStripePayment(sessionId) {
     throw new Error("Unauthorized");
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  
+    
   try {
-    const res = await fetch(`${baseUrl}/api/my/subscriptions/verify`, {
+    const data = await apiFetch(`/api/my/subscriptions/verify`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-recruiter-id": session.user.id,
-      },
       body: JSON.stringify({ sessionId }),
+      requireAuth: true
     });
-
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.message || "Failed to verify subscription");
-    }
-
-    const data = await res.json();
 
     // Update better-auth user so the UI reflects it instantly
     if (data.planId) {

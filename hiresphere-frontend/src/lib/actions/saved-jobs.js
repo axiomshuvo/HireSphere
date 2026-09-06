@@ -1,10 +1,8 @@
 "use server";
-
+import { apiFetch } from "@/lib/api/client";
 import { getCurrentUser } from "@/lib/core/session";
 import { revalidatePath, revalidateTag } from "next/cache";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-const REVALIDATE_SECONDS = 30;
 
 // Accept any common list shape the backend might return. The contract
 // isn't documented, so we look for items / data / savedJobs / applications
@@ -41,36 +39,6 @@ function normalizeList(payload, hint) {
   return { items: [], page: 1, pageSize: 0, total: 0, totalPages: 0 };
 }
 
-async function request(
-  path,
-  { tags: extraTags, revalidate, recruiterId, ...options } = {},
-) {
-  const headers = { "Content-Type": "application/json" };
-  if (recruiterId) headers["x-recruiter-id"] = recruiterId;
-
-  // Per-user endpoints must bypass Next's data cache: the cache key is
-  // URL-only and does NOT include x-recruiter-id, so a cached response
-  // for one user would be served to another. The /api/my/* routes are
-  // always per-user; everything else is public.
-  const cacheDirective = path.startsWith("/api/my/")
-    ? { cache: "no-store" }
-    : {
-        next: { revalidate: revalidate ?? REVALIDATE_SECONDS, tags: extraTags },
-      };
-
-  const res = await fetch(`${baseUrl}${path}`, {
-    headers,
-    ...cacheDirective,
-    ...options,
-  });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.message || `Request failed (${res.status})`);
-  }
-
-  return res.json();
-}
 
 export async function fetchSavedJobs({ page = 1, pageSize = 12 } = {}) {
   const user = await getCurrentUser();
@@ -80,7 +48,7 @@ export async function fetchSavedJobs({ page = 1, pageSize = 12 } = {}) {
     pageSize: String(pageSize),
   });
   try {
-    const result = await request(`/api/my/saved-jobs?${params.toString()}`, {
+    const result = await apiFetch(`/api/my/saved-jobs?${params.toString()}`, {
       tags: ["saved-jobs"],
       recruiterId: user.id,
     });
@@ -95,7 +63,7 @@ export async function fetchSavedJobs({ page = 1, pageSize = 12 } = {}) {
 export async function saveJob({ jobId, title, companySlug, recruiterId }) {
   const user = await getCurrentUser();
   if (!user) throw new Error("Sign in to save jobs");
-  const result = await request("/api/my/saved-jobs", {
+  const result = await apiFetch("/api/my/saved-jobs", {
     method: "POST",
     body: JSON.stringify({ jobId, title, companySlug }),
     recruiterId: user.id,
@@ -110,7 +78,7 @@ export async function saveJob({ jobId, title, companySlug, recruiterId }) {
 export async function unsaveJob(jobId) {
   const user = await getCurrentUser();
   if (!user) throw new Error("Sign in to manage saved jobs");
-  const result = await request(
+  const result = await apiFetch(
     `/api/my/saved-jobs/${encodeURIComponent(jobId)}`,
     {
       method: "DELETE",

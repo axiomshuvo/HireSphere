@@ -16,7 +16,7 @@ import {
   Persons,
   Wallet,
 } from "@gravity-ui/icons";
-import { Card, Chip, Typography } from "@heroui/react";
+import { Card, Chip } from "@heroui/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -176,12 +176,12 @@ export default async function PublicCompanyPage({ params }) {
 
       {company.description && (
         <section className="mt-8">
-          <Typography.Heading
+          <h2
             className="mb-2 text-sm font-semibold uppercase tracking-wider text-(color-text-muted)"
             level={2}
           >
             About
-          </Typography.Heading>
+          </h2>
           <p className="whitespace-pre-line text-sm leading-relaxed text-(color-text)">
             {company.description}
           </p>
@@ -191,17 +191,17 @@ export default async function PublicCompanyPage({ params }) {
       <section className="mt-10">
         <div className="mb-4 flex items-end justify-between">
           <div>
-            <Typography.Heading
+            <h2
               className="text-xl font-semibold text-(color-text)"
               level={2}
             >
               Open Roles
-            </Typography.Heading>
-            <Typography.Paragraph className="text-sm text-(color-text-muted)">
+            </h2>
+            <p className="text-sm text-(color-text-muted)">
               {activeJobs.length === 0
                 ? "No open roles at the moment."
                 : `${activeJobs.length} ${activeJobs.length === 1 ? "role" : "roles"} hiring now`}
-            </Typography.Paragraph>
+            </p>
           </div>
         </div>
 

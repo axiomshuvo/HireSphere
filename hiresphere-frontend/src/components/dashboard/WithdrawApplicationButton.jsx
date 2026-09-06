@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, toast } from "@heroui/react";
+import { Button } from "@heroui/react";
+import { authToasts } from "@/lib/toast";
 import { Xmark } from "@gravity-ui/icons";
 import { withdrawApplication } from "@/lib/actions/applications";
 
@@ -15,12 +16,12 @@ export default function WithdrawApplicationButton({ jobId, jobTitle, className =
     setLoading(true);
     try {
       await withdrawApplication(jobId);
-      toast.success("Application withdrawn", {
+      authToasts.success("Application withdrawn", {
         description: `Your application for ${jobTitle ?? "this role"} has been removed.`,
       });
       router.refresh();
     } catch (error) {
-      toast.danger("Could not withdraw application", {
+      authToasts.error("Could not withdraw application", {
         description: error?.message ?? "Unknown error",
       });
     } finally {
@@ -39,7 +40,7 @@ export default function WithdrawApplicationButton({ jobId, jobTitle, className =
           variant="flat"
           color="default"
           isDisabled={loading}
-          onPress={() => setConfirming(false)}
+          onClick={() => setConfirming(false)}
           className="cursor-pointer text-xs"
         >
           Cancel
@@ -49,7 +50,7 @@ export default function WithdrawApplicationButton({ jobId, jobTitle, className =
           radius="md"
           color="danger"
           isLoading={loading}
-          onPress={handleWithdraw}
+          onClick={handleWithdraw}
           className="cursor-pointer text-xs"
         >
           Yes, withdraw

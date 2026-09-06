@@ -15,7 +15,8 @@ import {
   Star,
   Xmark,
 } from "@gravity-ui/icons";
-import { Accordion, Button, Card, Tabs, toast } from "@heroui/react";
+import { Accordion, Button, Card, Tabs } from "@heroui/react";
+import { authToasts } from "@/lib/toast";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -190,7 +191,7 @@ function TierCard({ tier, planParam, planRole, isLoggedIn, onGetStarted }) {
           <Button
             variant={tier.highlight ? "primary" : "secondary"}
             className="w-full"
-            onPress={() => onGetStarted?.(planParam ?? tier.id, planRole)}
+            onClick={() => onGetStarted?.(planParam ?? tier.id, planRole)}
           >
             {buttonContent}
           </Button>
@@ -287,11 +288,11 @@ export default function PricingPage() {
     }
 
     if (planRole === "recruiter") {
-      toast.info(
+      authToasts.success(
         "This plan is for recruiters. Switch to a recruiter account to use it.",
       );
     } else {
-      toast.info(
+      authToasts.success(
         "This plan is for job seekers. Switch to a job seeker account to use it.",
       );
     }

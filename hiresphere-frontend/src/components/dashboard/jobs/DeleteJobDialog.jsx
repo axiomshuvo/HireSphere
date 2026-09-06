@@ -1,8 +1,8 @@
 "use client";
 
 import { TrashBin } from "@gravity-ui/icons";
-import { Button, Modal, Typography, useOverlayState } from "@heroui/react";
-import { toast } from "@heroui/react";
+import { Button, Modal, useOverlayState } from "@heroui/react";
+import { authToasts } from "@/lib/toast";
 
 export default function DeleteJobDialog({ job, onConfirm }) {
   const state = useOverlayState();
@@ -10,7 +10,7 @@ export default function DeleteJobDialog({ job, onConfirm }) {
   const handleConfirm = () => {
     onConfirm?.(job);
     state.close();
-    toast.danger("Job deleted", {
+    authToasts.error("Job deleted", {
       description: `${job.title} was removed from your job posts.`,
     });
   };
@@ -23,7 +23,7 @@ export default function DeleteJobDialog({ job, onConfirm }) {
         variant="light"
         className="text-muted-foreground hover:text-danger"
         aria-label={`Delete ${job.title}`}
-        onPress={state.open}
+        onClick={state.open}
       >
         <TrashBin className="size-4" />
       </Button>
@@ -35,16 +35,16 @@ export default function DeleteJobDialog({ job, onConfirm }) {
               <Modal.CloseTrigger />
               <Modal.Header>
                 <Modal.Heading>Delete job post?</Modal.Heading>
-                <Typography.Paragraph className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   This will permanently remove <span className="font-medium text-foreground">{job.title}</span>.
-                </Typography.Paragraph>
+                </p>
               </Modal.Header>
 
               <Modal.Footer>
-                <Button variant="secondary" onPress={state.close}>
+                <Button variant="secondary" onClick={state.close}>
                   Cancel
                 </Button>
-                <Button variant="danger" onPress={handleConfirm}>
+                <Button variant="danger" onClick={handleConfirm}>
                   Delete Job
                 </Button>
               </Modal.Footer>

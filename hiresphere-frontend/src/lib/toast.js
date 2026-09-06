@@ -57,6 +57,13 @@ export function friendlyAuthError(error, fallback) {
 }
 
 export const authToasts = {
+  // Generic helpers (used across admin/recruiter components).
+  success(message, opts) {
+    toast.success(message, opts);
+  },
+  error(message, opts) {
+    toast.danger(message, opts);
+  },
   signInSuccess(user) {
     const name = displayName(user);
     const role = user?.role;
@@ -101,5 +108,12 @@ export const authToasts = {
         ? `See you soon, ${name}.`
         : "You have been signed out securely.",
     });
+  },
+
+  success(message, options) {
+    toast.success(message, options);
+  },
+  error(message, options) {
+    toast.danger(message, options);
   },
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Typography } from "@heroui/react";
+import { Card } from "@heroui/react";
 
 function InfoRow({ label, value, href }) {
   return (
@@ -41,9 +41,9 @@ export default function CompanyQuickInfo({ company }) {
 
   return (
     <Card className="rounded-2xl border border-default bg-content1 p-5">
-      <Typography.Paragraph className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Quick Info
-      </Typography.Paragraph>
+      </p>
 
       <div>
         <InfoRow label="Website" value={company.website ?? "—"} href={websiteUrl} />

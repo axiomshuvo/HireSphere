@@ -1,0 +1,261 @@
+"use client";
+
+import CompanyFormFields from "@/components/dashboard/company/CompanyFormFields";
+import ButtonLink from "@/components/shared/ButtonLink";
+import { getRecruiterCompanies, updateRecruiterCompany } from "@/lib/actions/company";
+import {
+  generateCompanySlug,
+  getCompanySlug,
+  matchCompanyId,
+  normalizeCompany,
+} from "@/lib/api/companies";
+import { ArrowLeft } from "@gravity-ui/icons";
+import { Button } from "@heroui/react";
+import { authToasts } from "@/lib/toast";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+
+const EMPTY_FORM = {
+  name: "",
+  industry: "Technology",
+  tagline: "",
+  website: "",
+  location: "",
+  employeeCount: "1-10 employees",
+  description: "",
+  logo: "",
+  gallery: [],
+};
+
+function buildFormData(company) {
+  if (!company) return EMPTY_FORM;
+  return {
+    name: company.name ?? "",
+    industry: company.industry ?? "Technology",
+    tagline: company.tagline ?? "",
+    website: company.website ?? "",
+    location: company.location ?? "",
+    employeeCount: company.employeeCount ?? "1-10 employees",
+    description: company.description ?? "",
+    logo: company.logo ?? "",
+    gallery: Array.isArray(company.gallery) ? company.gallery : [],
+  };
+}
+
+export default function EditCompanyPage({ params }) {
+  const { id } = use(params);
+  const router = useRouter();
+
+  const [company, setCompany] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getRecruiterCompanies({ pageSize: 100 })
+      .then((data) => {
+        if (cancelled) return;
+        const list = Array.isArray(data) ? data : (data?.items ?? []);
+        const found =
+          list.map(normalizeCompany).find((c) => matchCompanyId(c, id)) ??
+          null;
+        setCompany(found);
+        setFormData(buildFormData(found));
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error("[EditCompanyPage] Failed to load company:", error);
+        setHasError(true);
+        authToasts.error("Could not load company", {
+          description: "Make sure the API server is running.",
+        });
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Company name is required.";
+    if (!formData.tagline.trim()) newErrors.tagline = "Tagline is required.";
+    if (!formData.website.trim())
+      newErrors.website = "Website URL is required.";
+    if (!formData.location.trim()) newErrors.location = "Location is required.";
+    if (!formData.employeeCount) {
+      newErrors.employeeCount = "Employee count range is required.";
+    }
+    if (!formData.description.trim()) {
+      newErrors.description = "Brief description is required.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsSubmitting(false);
+      return;
+    }
+
+    const trimmedName = formData.name.trim();
+    const originalSlug = getCompanySlug(company);
+    const originalName = company?.name ?? "";
+    const newSlug =
+      trimmedName !== originalName
+        ? generateCompanySlug(trimmedName)
+        : originalSlug;
+
+    const payload = {
+      name: trimmedName,
+      industry: formData.industry,
+      tagline: formData.tagline.trim(),
+      website: formData.website.trim(),
+      location: formData.location.trim(),
+      employeeCount: formData.employeeCount,
+      description: formData.description.trim(),
+      logo: formData.logo,
+      gallery: formData.gallery,
+      companySlug: newSlug,
+    };
+
+    try {
+      const result = await updateRecruiterCompany(originalSlug, payload);
+      const closedJobs = result?.closedJobs ?? 0;
+      if (closedJobs > 0) {
+        authToasts.error(
+          "Company renamed",
+          {
+            description: `${closedJobs} active job${closedJobs === 1 ? "" : "s"} were closed and hidden from the public board because they were indexed under the old company URL.`,
+          },
+        );
+      } else {
+        authToasts.success("Company updated", {
+          description: `${trimmedName} is saved.`,
+        });
+      }
+      router.push(`/recruiter/companies/${newSlug}`);
+    } catch (error) {
+      console.error("[EditCompanyPage] Error updating company:", error);
+      authToasts.error("Could not update company. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-1 items-center justify-center px-4 py-16">
+        <p className="text-sm text-muted-foreground">
+          Loading company…
+        </p>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-16">
+        <p className="text-sm text-muted-foreground">
+          Could not load company.
+        </p>
+        <Button variant="primary" onClick={() => window.location.reload()}>
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  if (!company) {
+    return (
+      <div className="flex flex-1 items-center justify-center px-4 py-16">
+        <div className="rounded-2xl border border-default bg-content1 p-8 text-center">
+          <h2
+            className="text-xl font-semibold text-foreground"
+            level={2}
+          >
+            No company found
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We couldn&apos;t find a company with the id{" "}
+            <span className="font-mono text-foreground">{id}</span>.
+          </p>
+          <ButtonLink
+            href="/recruiter/companies"
+            variant="primary"
+            className="mx-auto mt-6"
+          >
+            <ArrowLeft className="size-4" />
+            Back to My Companies
+          </ButtonLink>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 px-4 py-8 lg:px-8">
+      <div className="mx-auto mb-6 max-w-3xl">
+        <ButtonLink
+          href={`/recruiter/companies/${id}`}
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Back to Company
+        </ButtonLink>
+      </div>
+
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-6">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+            Update company
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Update the details for{" "}
+            <span className="text-foreground">{company.name}</span>.
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="rounded-2xl border border-white/10 bg-[#121316] p-5 sm:p-6"
+        >
+          <CompanyFormFields
+            formData={formData}
+            errors={errors}
+            onChange={handleChange}
+          />
+
+          <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-4">
+            <ButtonLink href={`/recruiter/companies/${id}`} variant="secondary">
+              Cancel
+            </ButtonLink>
+            <Button type="submit" variant="primary" isDisabled={isSubmitting}>
+              {isSubmitting ? "Updating…" : "Update Company"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

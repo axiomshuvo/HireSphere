@@ -160,7 +160,7 @@ export default function ApplyJobModal({
               Sign in to your HireSphere account to apply. We&apos;ll prefill your
               name and email.
             </p>
-            <Button variant="primary" onPress={handleSignIn}>
+            <Button variant="primary" onClick={handleSignIn}>
               Sign in to apply
               <ArrowRight className="size-4" />
             </Button>
@@ -175,7 +175,7 @@ export default function ApplyJobModal({
               Applications are submitted through a seeker account. Sign in
               with a seeker account to apply to this role.
             </p>
-            <Button variant="secondary" onPress={onClose}>
+            <Button variant="secondary" onClick={onClose}>
               Close
             </Button>
           </div>

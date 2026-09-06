@@ -4,7 +4,7 @@ import JobStatusChip from "@/components/dashboard/jobs/JobStatusChip";
 import DeadlineCountdown from "@/components/shared/DeadlineCountdown";
 import { formatJobDate, getJobCreatedAt } from "@/lib/api/jobstruture";
 import { ArrowRight } from "@gravity-ui/icons";
-import { Card, Typography } from "@heroui/react";
+import { Card } from "@heroui/react";
 import Link from "next/link";
 
 function formatLocation(job) {
@@ -45,12 +45,12 @@ export default function CompanyJobsStrip({ jobs = [] }) {
   return (
     <Card className="rounded-2xl border border-default bg-content1 p-5">
       <div className="mb-3 flex items-center justify-between">
-        <Typography.Heading
+        <h2
           className="text-lg font-semibold text-foreground"
           level={2}
         >
           Recent Jobs
-        </Typography.Heading>
+        </h2>
         <Link
           href="/dashboard/recruiter/jobs"
           className="text-xs text-indigo-500 transition-colors hover:text-indigo-500"

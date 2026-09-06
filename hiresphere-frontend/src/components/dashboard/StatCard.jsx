@@ -7,8 +7,10 @@ import {
   Persons,
   FaceSmile,
   Thunderbolt,
+  ChartLineArrowUp,
+  LayoutCells,
 } from "@gravity-ui/icons";
-import { Card, Typography } from "@heroui/react";
+import { Card } from "@heroui/react";
 
 const TONES = {
   indigo: {
@@ -40,6 +42,8 @@ const ICONS = {
   smile: FaceSmile,
   bookmark: Bookmark,
   magnifier: Magnifier,
+  chart: ChartLineArrowUp,
+  layout: LayoutCells,
 };
 
 export default function StatCard({
@@ -64,15 +68,15 @@ export default function StatCard({
       />
       <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <Typography.Paragraph className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             {label}
-          </Typography.Paragraph>
-          <Typography.Heading
+          </p>
+          <h2
             className="mt-2 text-3xl font-semibold tabular-nums text-(color-foreground)"
             level={2}
           >
             {value}
-          </Typography.Heading>
+          </h2>
           {(hint || trend) && (
             <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
               {trend}

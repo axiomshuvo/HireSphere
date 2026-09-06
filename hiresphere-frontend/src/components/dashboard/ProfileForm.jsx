@@ -4,8 +4,10 @@ import { updateProfileName } from "@/lib/actions/profile";
 import { Check, Pencil } from "@gravity-ui/icons";
 import { Button, Input, toast } from "@heroui/react";
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProfileForm({ initialName, email, role }) {
+  const router = useRouter();
   const [name, setName] = useState(String(initialName ?? ""));
   const [savedName, setSavedName] = useState(String(initialName ?? ""));
   const [isPending, startTransition] = useTransition();
@@ -30,10 +32,11 @@ export default function ProfileForm({ initialName, email, role }) {
         await updateProfileName(trimmed);
         setSavedName(trimmed);
         toast.success("Profile updated");
+        router.refresh();
       } catch (err) {
         const message = err?.message ?? "Could not save profile";
         setError(message);
-        toast.warning("Could not save profile", { description: message });
+        toast.danger("Could not save profile", { description: message });
       }
     });
   };

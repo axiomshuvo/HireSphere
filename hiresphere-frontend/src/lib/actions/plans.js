@@ -1,6 +1,6 @@
 "use server";
+import { apiFetch } from "@/lib/api/client";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 /**
  * Fetch plans dynamically from MongoDB /api/plans endpoint
@@ -9,16 +9,10 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 export async function getPlans(role) {
   try {
     const query = role ? `?role=${encodeURIComponent(role)}` : "";
-    const res = await fetch(`${baseUrl}/api/plans${query}`, {
-      headers: { "Content-Type": "application/json" },
-      next: { revalidate: 60, tags: ["plans"] },
+    const data = await apiFetch(`/api/plans${query}`, {
+      tags: ["plans"],
+      revalidate: 60,
     });
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch plans: ${res.status}`);
-    }
-
-    const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
       return data;
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import { MapPin } from "@gravity-ui/icons";
-import { Avatar, Card, Typography } from "@heroui/react";
+import { Avatar, Card } from "@heroui/react";
 
 function RoleCard({ role }) {
   const avatars = role.avatars?.slice(0, 2) ?? [];
@@ -50,12 +50,12 @@ export default function OpenRoles({ roles }) {
   return (
     <Card className="rounded-2xl border border-default bg-content1 p-5 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
-        <Typography.Heading
+        <h2
           className="text-lg font-semibold text-foreground"
           level={2}
         >
           Open Roles
-        </Typography.Heading>
+        </h2>
         <span className="text-xs text-muted-foreground">
           {roles.length} {roles.length === 1 ? "role" : "roles"}
         </span>

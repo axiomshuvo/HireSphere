@@ -31,7 +31,7 @@ const RECRUITER_DROPDOWN = [
   {
     id: "companies",
     label: "Companies",
-    href: "/dashboard/mycompany",
+    href: "/recruiter/companies",
     icon: OfficeBadge,
   },
   {

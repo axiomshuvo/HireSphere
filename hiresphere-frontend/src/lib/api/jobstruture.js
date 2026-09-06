@@ -22,6 +22,14 @@ export const DEMO_ACCOUNTS = {
     email: "recruiter@demo.com",
     password: "password123",
   },
+  admin: {
+    email: "demo@admin.com",
+    password: "admin@1234",
+  },
+  mod: {
+    email: "mod@admin.com",
+    password: "admin@1234",
+  },
 };
 
 export const JOB_CATEGORIES = [

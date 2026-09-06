@@ -13,13 +13,11 @@ import {
   Star,
   Xmark,
 } from "@gravity-ui/icons";
-import {
-  Button,
+import { Button,
   Modal,
-  toast,
-  Typography,
-  useOverlayState,
-} from "@heroui/react";
+
+  useOverlayState } from "@heroui/react";
+import { authToasts } from "@/lib/toast";
 import { useCallback, useEffect, useState, useTransition } from "react";
 
 const ICON_MAP = {
@@ -185,12 +183,12 @@ export default function PlanUpgradeModal({
 
         // Fallback to direct plan update
         await updateProfilePlan(selectedPlan.id);
-        toast.success("Plan updated", {
+        authToasts.success("Plan updated", {
           description: `You are now on the ${selectedPlan.name} plan.`,
         });
         state.close();
       } catch (err) {
-        toast.danger("Upgrade failed", {
+        authToasts.error("Upgrade failed", {
           description:
             err?.message ?? "Could not initiate checkout. Please try again.",
         });
@@ -228,10 +226,10 @@ export default function PlanUpgradeModal({
                 )}
               </Modal.Heading>
               {step === "select" && (
-                <Typography.Paragraph className="text-sm text-default-500">
+                <p className="text-sm text-default-500">
                   Choose a plan to unlock more features. Payment integration is
                   coming soon — plan switches take effect immediately.
-                </Typography.Paragraph>
+                </p>
               )}
             </Modal.Header>
 
@@ -410,7 +408,7 @@ export default function PlanUpgradeModal({
                                     ? "w-full bg-indigo-500 text-white shadow-md hover:bg-indigo-600 font-medium"
                                     : "w-full border-default-200 hover:border-indigo-500 hover:text-indigo-500 font-medium transition-colors"
                                 }
-                                onPress={() => handlePlanSelect(plan)}
+                                onClick={() => handlePlanSelect(plan)}
                               >
                                 {isSelected ? "Selected" : "Select plan"}
                               </Button>
@@ -502,7 +500,7 @@ export default function PlanUpgradeModal({
               {step === "select" ? (
                 <Button
                   variant="flat"
-                  onPress={state.close}
+                  onClick={state.close}
                   className="w-full sm:w-auto bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
                 >
                   Cancel
@@ -510,7 +508,7 @@ export default function PlanUpgradeModal({
               ) : (
                 <Button
                   variant="secondary"
-                  onPress={handleBack}
+                  onClick={handleBack}
                   className="w-full sm:w-auto"
                 >
                   <ArrowChevronLeft className="size-4" />
@@ -520,7 +518,7 @@ export default function PlanUpgradeModal({
               {step === "confirm" && (
                 <Button
                   variant="primary"
-                  onPress={handleConfirm}
+                  onClick={handleConfirm}
                   isDisabled={isPending}
                   className="w-full sm:w-auto"
                 >

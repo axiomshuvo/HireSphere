@@ -133,11 +133,11 @@ export default function CompanyHeader({ company, onEdit, onDelete }) {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <Button variant="secondary" onPress={onDelete}>
+          <Button variant="secondary" onClick={onDelete}>
             <TrashBin className="size-4" />
             Delete
           </Button>
-          <Button variant="primary" onPress={onEdit}>
+          <Button variant="primary" onClick={onEdit}>
             <Pencil className="size-4" />
             Update
           </Button>

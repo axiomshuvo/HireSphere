@@ -26,7 +26,7 @@ import {
   MapPin,
   Wallet,
 } from "@gravity-ui/icons";
-import { Avatar, Card, Typography } from "@heroui/react";
+import { Avatar, Card } from "@heroui/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -287,12 +287,12 @@ export default async function PublicJobDetailPage({ params }) {
         <aside className="flex flex-col gap-4">
           {company && (
             <Card className="rounded-2xl border border-(color-border) bg-(color-surface) p-5">
-              <Typography.Heading
+              <h2
                 className="mb-3 text-xs font-semibold uppercase tracking-wider text-(color-text-muted)"
                 level={2}
               >
                 Hiring Company
-              </Typography.Heading>
+              </h2>
               <div className="flex items-center gap-3">
                 <CompanyLogo
                   logo={company.logo}
@@ -327,12 +327,12 @@ export default async function PublicJobDetailPage({ params }) {
           )}
 
           <Card className="rounded-2xl border border-(color-border) bg-(color-surface) p-5">
-            <Typography.Heading
+            <h2
               className="mb-3 text-xs font-semibold uppercase tracking-wider text-(color-text-muted)"
               level={2}
             >
               Quick Info
-            </Typography.Heading>
+            </h2>
             <dl className="flex flex-col gap-2 text-sm">
               <div className="flex items-center justify-between">
                 <dt className="text-(color-text-muted)">Type</dt>

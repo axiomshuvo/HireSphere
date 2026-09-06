@@ -115,7 +115,7 @@ export default function Navbar() {
           <Dropdown.Item
             id="signout"
             variant="danger"
-            onPress={handleSignOut}
+            onClick={handleSignOut}
             textValue="Sign Out"
           >
             <ArrowRightFromSquare className="w-4 h-4 shrink-0 text-danger" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Button, Card, Typography } from "@heroui/react";
+import { Avatar, Button, Card } from "@heroui/react";
 
 export default function HiringTeamCard({
   title = "HIRING TEAM",
@@ -13,21 +13,21 @@ export default function HiringTeamCard({
 }) {
   return (
     <Card className="rounded-2xl border border-default bg-content1 p-5">
-      <Typography.Paragraph className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {title}
-      </Typography.Paragraph>
+      </p>
 
       <div className="flex items-center gap-3">
         <Avatar.Root className="size-12 shrink-0 rounded-full bg-default text-sm font-semibold text-default-foreground">
           <Avatar.Fallback>{member.initials}</Avatar.Fallback>
         </Avatar.Root>
         <div>
-          <Typography.Paragraph className="font-medium text-foreground">
+          <p className="font-medium text-foreground">
             {member.name}
-          </Typography.Paragraph>
-          <Typography.Paragraph className="text-sm text-muted-foreground">
+          </p>
+          <p className="text-sm text-muted-foreground">
             {member.title}
-          </Typography.Paragraph>
+          </p>
         </div>
       </div>
 

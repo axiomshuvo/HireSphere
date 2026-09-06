@@ -2,7 +2,7 @@
 
 import ButtonLink from "@/components/shared/ButtonLink";
 import { ArrowLeft, Magnifier } from "@gravity-ui/icons";
-import { Card, Typography } from "@heroui/react";
+import { Card } from "@heroui/react";
 
 export default function CompanyNotFound({ companySlug }) {
   return (
@@ -12,21 +12,21 @@ export default function CompanyNotFound({ companySlug }) {
           <Magnifier className="size-6" />
         </div>
 
-        <Typography.Heading
+        <h2
           className="text-xl font-semibold text-foreground"
           level={2}
         >
           No company found
-        </Typography.Heading>
+        </h2>
 
-        <Typography.Paragraph className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-muted-foreground">
           We couldn&apos;t find a company with the id{" "}
           <span className="font-mono text-foreground">{companySlug}</span>. It may
           have been removed or the link is incorrect.
-        </Typography.Paragraph>
+        </p>
 
         <ButtonLink
-          href="/dashboard/mycompany"
+          href="/recruiter/companies"
           variant="primary"
           className="mx-auto mt-6"
         >

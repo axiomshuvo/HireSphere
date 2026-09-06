@@ -16,7 +16,7 @@ import {
   Play,
   Wallet,
 } from "@gravity-ui/icons";
-import { Button, Card, Typography } from "@heroui/react";
+import { Button, Card } from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DeleteJobDialog from "./DeleteJobDialog";
@@ -63,15 +63,15 @@ export default function JobsTable({
     <Card className="rounded-2xl border border-default bg-content1 p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <Typography.Heading
+          <h2
             className="text-lg font-semibold text-foreground"
             level={2}
           >
             Jobs
-          </Typography.Heading>
-          <Typography.Paragraph className="text-sm text-muted-foreground">
+          </h2>
+          <p className="text-sm text-muted-foreground">
             {jobs.length} {jobs.length === 1 ? "job" : "jobs"} shown
-          </Typography.Paragraph>
+          </p>
         </div>
       </div>
 
@@ -154,7 +154,7 @@ export default function JobsTable({
                   <Button
                     size="sm"
                     variant="secondary"
-                    onPress={() => handleView(job)}
+                    onClick={() => handleView(job)}
                     className="cursor-pointer"
                   >
                     <Eye className="size-4" />
@@ -163,7 +163,7 @@ export default function JobsTable({
                   <Button
                     size="sm"
                     variant="secondary"
-                    onPress={() => handleEdit(job)}
+                    onClick={() => handleEdit(job)}
                     className="cursor-pointer"
                   >
                     <Pencil className="size-4" />
@@ -172,7 +172,7 @@ export default function JobsTable({
                   <Button
                     size="sm"
                     variant={status === "active" ? "secondary" : "primary"}
-                    onPress={() => onToggleStatus?.(job)}
+                    onClick={() => onToggleStatus?.(job)}
                     className="cursor-pointer"
                   >
                     {status === "active" ? (

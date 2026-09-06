@@ -14,7 +14,8 @@ import {
   jobToFormValues,
 } from "@/lib/api/jobstruture";
 import { CircleCheckFill, CircleInfo } from "@gravity-ui/icons";
-import { ListBox, ListBoxItem, Select, toast } from "@heroui/react";
+import { ListBox, ListBoxItem, Select } from "@heroui/react";
+import { authToasts } from "@/lib/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -149,19 +150,19 @@ export default function JobForm({
       if (isEditing) {
         const jobId = getJobId(job);
         await updateRecruiterJob(jobId, payload);
-        toast.success("Job updated", {
+        authToasts.success("Job updated", {
           description: `${formData.title} is saved.`,
         });
       } else {
         await createRecruiterJob(payload);
-        toast.success("Job posted successfully", {
+        authToasts.success("Job posted successfully", {
           description: `${formData.title} is saved.`,
         });
       }
       router.push("/dashboard/recruiter/jobs");
     } catch (error) {
       console.error("[JobForm] Error submitting job form:", error);
-      toast.warning("An error occurred while saving the job.");
+      authToasts.error("An error occurred while saving the job.");
     } finally {
       setIsSubmitting(false);
     }
@@ -207,7 +208,7 @@ export default function JobForm({
                 <p className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-200">
                   You don&apos;t have any companies yet.{" "}
                   <Link
-                    href="/dashboard/mycompany/new"
+                    href="/recruiter/companies/new"
                     className="font-medium text-yellow-100 underline"
                   >
                     Add a company

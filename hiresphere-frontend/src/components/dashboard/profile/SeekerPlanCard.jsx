@@ -4,7 +4,7 @@ import ButtonLink from "@/components/shared/ButtonLink";
 import PlanUpgradeModal from "@/components/shared/PlanUpgradeModal";
 import { getSeekerPlanUsage } from "@/lib/api/jobstruture";
 import { Rocket } from "@gravity-ui/icons";
-import { Button, Card, ProgressBar, Typography } from "@heroui/react";
+import { Button, Card, ProgressBar } from "@heroui/react";
 import { useState } from "react";
 
 function formatPlan(plan) {
@@ -25,17 +25,17 @@ export default function SeekerPlanCard({ userPlan, activeApplications }) {
       <Card className="rounded-2xl border border-default bg-content1 p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <Typography.Heading
+            <h2
               className="text-lg font-semibold text-foreground"
               level={2}
             >
               Current plan · {formatPlan(usage.plan)}
-            </Typography.Heading>
-            <Typography.Paragraph className="mt-1 text-sm text-muted-foreground">
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
               {isUnlimited
                 ? `${usage.used} active applications · unlimited applications`
                 : `${usage.used} of ${usage.limit} active applications`}
-            </Typography.Paragraph>
+            </p>
           </div>
           <div className="flex items-center gap-2">
             {(usage.plan === "free" || usage.plan === "pro") && (
@@ -43,7 +43,7 @@ export default function SeekerPlanCard({ userPlan, activeApplications }) {
                 variant="primary"
                 size="sm"
                 className="cursor-pointer"
-                onPress={() => setIsPlanModalOpen(true)}
+                onClick={() => setIsPlanModalOpen(true)}
               >
                 {usage.plan === "free"
                   ? "Upgrade to Pro"

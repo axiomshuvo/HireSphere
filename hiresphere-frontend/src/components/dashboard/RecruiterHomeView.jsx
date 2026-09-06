@@ -94,9 +94,9 @@ export default function RecruiterHomeView({
         <CompanyList
           title="My Companies"
           companies={companyItems}
-          viewAllHref="/dashboard/mycompany"
+          viewAllHref="/recruiter/companies"
           actionLabel="Add Company"
-          actionHref="/dashboard/mycompany/new"
+          actionHref="/recruiter/companies/new"
         />
       </section>
 

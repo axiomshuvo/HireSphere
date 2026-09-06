@@ -4,7 +4,7 @@ import { updateProfileImage } from "@/lib/actions/profile";
 import { uploadImage } from "@/lib/api/imgbb";
 import { authClient } from "@/lib/auth-client";
 import { Pencil, TrashBin } from "@gravity-ui/icons";
-import { toast } from "@heroui/react";
+import { authToasts } from "@/lib/toast";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
@@ -32,10 +32,10 @@ export default function ProfileImageField({ name, image }) {
         await authClient.updateUser({ image: url }); // Immediately updates global session
         setCurrent(url);
         router.refresh();
-        toast.success("Profile image updated");
+        authToasts.success("Profile image updated");
       }
     } catch (err) {
-      toast.warning(err?.message ?? "Upload failed");
+      authToasts.error(err?.message ?? "Upload failed");
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -50,9 +50,9 @@ export default function ProfileImageField({ name, image }) {
       await authClient.updateUser({ image: "" });
       setCurrent("");
       router.refresh();
-      toast.success("Profile image removed");
+      authToasts.success("Profile image removed");
     } catch (err) {
-      toast.warning("Could not remove image");
+      authToasts.error("Could not remove image");
     } finally {
       setUploading(false);
     }

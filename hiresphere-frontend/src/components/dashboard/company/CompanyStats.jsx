@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Typography } from "@heroui/react";
+import { Card } from "@heroui/react";
 
 function CompanyStatCard({ label, value, icon: Icon }) {
   return (
@@ -12,12 +12,12 @@ function CompanyStatCard({ label, value, icon: Icon }) {
           </div>
         )}
         <div className="min-w-0">
-          <Typography.Paragraph className="truncate text-xs uppercase tracking-wider text-muted-foreground">
+          <p className="truncate text-xs uppercase tracking-wider text-muted-foreground">
             {label}
-          </Typography.Paragraph>
-          <Typography.Paragraph className="truncate text-sm font-semibold text-foreground">
+          </p>
+          <p className="truncate text-sm font-semibold text-foreground">
             {value ?? "—"}
-          </Typography.Paragraph>
+          </p>
         </div>
       </div>
     </Card>

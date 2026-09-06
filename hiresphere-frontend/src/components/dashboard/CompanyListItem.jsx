@@ -1,7 +1,7 @@
 "use client";
 
 import { MapPin } from "@gravity-ui/icons";
-import { Avatar, Typography } from "@heroui/react";
+import { Avatar } from "@heroui/react";
 import Link from "next/link";
 
 const AVATAR_GRADIENTS = [
@@ -43,9 +43,9 @@ export default function CompanyListItem({
         <Avatar.Fallback>{initials}</Avatar.Fallback>
       </Avatar.Root>
       <div className="relative z-10 min-w-0 flex-1">
-        <Typography.Paragraph className="truncate font-medium text-foreground group-hover:text-indigo-500 transition-colors">
+        <p className="truncate font-medium text-foreground group-hover:text-indigo-500 transition-colors">
           {name}
-        </Typography.Paragraph>
+        </p>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <span>{field}</span>
           <span>•</span>
@@ -54,19 +54,19 @@ export default function CompanyListItem({
         </div>
       </div>
       <div className="relative z-10 text-right">
-        <Typography.Paragraph className="text-sm font-semibold tabular-nums text-foreground group-hover:text-indigo-400 transition-colors">
+        <p className="text-sm font-semibold tabular-nums text-foreground group-hover:text-indigo-400 transition-colors">
           {activeJobs}
-        </Typography.Paragraph>
-        <Typography.Paragraph className="text-[10px] uppercase tracking-wide text-muted-foreground">
+        </p>
+        <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
           Active Jobs
-        </Typography.Paragraph>
+        </p>
       </div>
     </li>
   );
 
   if (id) {
     return (
-      <Link href={`/dashboard/mycompany/${id}`} className="block">
+      <Link href={`/recruiter/companies/${id}`} className="block">
         {content}
       </Link>
     );

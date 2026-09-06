@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Typography } from "@heroui/react";
+import { Card } from "@heroui/react";
 
 export default function CompanyAbout({ company }) {
   const first = company.aboutFirstParagraph;
@@ -11,12 +11,12 @@ export default function CompanyAbout({ company }) {
 
   return (
     <Card className="rounded-2xl border border-default bg-content1 p-5 sm:p-6">
-      <Typography.Heading
+      <h2
         className="mb-4 text-lg font-semibold text-foreground"
         level={2}
       >
         About
-      </Typography.Heading>
+      </h2>
 
       {first || second ? (
         <div className="grid grid-cols-1 gap-4 text-sm leading-relaxed text-muted-foreground md:grid-cols-2">

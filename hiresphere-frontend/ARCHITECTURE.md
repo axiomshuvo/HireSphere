@@ -48,6 +48,7 @@
 |------|-------------|---------|
 | `seeker` | Job seeker — applies to jobs, saves jobs | Chosen at signup |
 | `recruiter` | Employer — posts jobs, manages companies | Chosen at signup |
+| `mod` | Moderator — reviews users/companies/jobs, handles requests | Promoted via `set-admin.js <email> mod` (never from UI) |
 | `admin` | Super Admin / Owner — full platform control | Set manually via DB script (never from UI) |
 
 ---
@@ -89,24 +90,27 @@ The owner account gets `role: "admin"` set directly in MongoDB via a one-time sc
 
 ```js
 // set-admin.js — run ONCE in your local terminal
-db.collection("users").updateOne(
+// NOTE: the auth collection is `user` (singular), not `users`.
+db.collection("user").updateOne(
   { email: "owner@hiresphere.com" },
   { $set: { role: "admin" } }
 )
 ```
 
 #### Layer 2 — Server-side layout guard
-`/admin/layout.js` is a **Server Component** — it runs only on the server and checks the session on every request before rendering any admin page:
+`src/app/admin/(protected)/layout.js` is a **Server Component** — it runs only on the server and checks the session on every request before rendering any admin page. `/admin/login` lives **outside** this guard (in `src/app/admin/login/`) under a passthrough `src/app/admin/layout.js`, otherwise login would redirect to itself:
 
 ```js
-// src/app/admin/layout.js
-export default async function AdminLayout({ children }) {
+// src/app/admin/(protected)/layout.js
+export default async function ProtectedAdminLayout({ children }) {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) redirect("/auth/signin");
-  if (session.user.role !== "admin") redirect("/dashboard"); // block everyone else
+  if (!session?.user) redirect("/admin/login");
+  if (session.user.role !== "admin" && session.user.role !== "mod") redirect("/dashboard"); // block everyone else
   return <>{children}</>;
 }
 ```
+
+> Open gap: backend `audit_log` entries currently carry no per-admin actor identity (shared secret only) — forward the admin user id from Server Actions so actions are attributable.
 
 #### Layer 3 — Backend API secret header
 All `/api/admin/*` routes on the Express backend require a secret header that must match the env variable:
@@ -156,36 +160,41 @@ const adminHeaders = {
 
 ## 🚀 Admin Implementation Plan (Phased)
 
+> Status as of this edit: Phase 1–2 built; Phase 3–5 endpoints + UI built, enforcement gaps listed under Edge Cases. Boxes stay unchecked until verified against a live DB.
+
 ### Phase 1 — Foundation (Core Auth & Admin Shell)
-- [ ] Create isolated `/admin/login` page
-- [ ] Create `AdminLayout` with Mod/Admin role guards
-- [ ] Create Admin Sidebar & Topbar UI
-- [ ] Add `ADMIN_SECRET_KEY` and backend `requireAdmin` middleware
-- [ ] Write `set-admin.js` script for initial owner promotion
+- [x] Create isolated `/admin/login` page (outside guard — see Layer 2)
+- [x] Create `(protected)` layout with Mod/Admin role guards
+- [x] Create Admin Sidebar & Topbar UI
+- [x] Add `ADMIN_SECRET_KEY` and backend `requireAdmin` middleware
+- [x] Write `set-admin.js` script for initial owner promotion
+- [ ] Rotate `ADMIN_SECRET_KEY` + all `.env` secrets (still on disk — unverified)
 
 ### Phase 2 — User Management & Moderation
-- [ ] Create `/admin/users` list and detail pages
-- [ ] Implement Activate/Deactivate users
-- [ ] **Backend Logic:** Add Cascading Deactivation (deactivating a user auto-closes jobs/companies)
-- [ ] Add Mod capabilities (View individual payment history, flag users)
-- [ ] Add `GET /api/admin/users`, `PATCH /api/admin/users/:id/status`
+- [x] Create `/admin/users` list and detail pages
+- [x] Implement Activate/Deactivate users
+- [x] **Backend Logic:** Add Cascading Deactivation (deactivating a user auto-closes jobs/companies)
+- [x] Add Mod capabilities (View individual payment history, flag users)
+- [x] Add `GET /api/admin/users`, `PATCH /api/admin/users/:id/status`
 
 ### Phase 3 — Subscriptions & Billing Flow
-- [ ] Implement Automated Stripe Downgrade (`proration_behavior: 'none'`) to replace the Mod Queue
-- [ ] **Backend Logic:** Implement Plan Reconciliation Script on webhook downgrade (auto-pause excess jobs)
-- [ ] **Backend Logic:** Billing-cycle Quota Math (calculate limits based on Stripe period, not calendar month)
-- [ ] **Backend Logic:** Add Subscription History Ledger (push events to `subscriptions.history` array)
+- [x] Implement Automated Stripe Downgrade (`proration_behavior: 'none'`) to replace the Mod Queue
+- [x] **Backend Logic:** Implement Plan Reconciliation Script on webhook downgrade (auto-pause excess jobs)
+- [x] **Backend Logic:** Billing-cycle Quota Math helper (`billingPeriodStart`) + `currentPeriodEnd` tracking
+- [x] **Backend Logic:** Add Subscription History Ledger (push events to `subscriptions.history` array)
+- [ ] Enforce quotas at create/activate time (currently reconcile-only)
 
 ### Phase 4 — Company & Job Moderation
-- [ ] Create `/admin/companies` & `/admin/jobs` moderation pages
-- [ ] Implement Company Approval Flow (`pending` status upon creation, jobs hidden until approved)
-- [ ] **Backend Logic:** Apply-Button Race Condition fix (verify active status at exact moment of apply)
-- [ ] **Backend Logic:** Orphaned Image ImgBB deletion hook
+- [x] Create `/admin/companies` & `/admin/jobs` moderation pages
+- [x] Implement Company Approval Flow (`pending` status upon creation, jobs hidden until approved)
+- [x] **Backend Logic:** Apply-Button Race Condition fix (verify active status at exact moment of apply)
+- [x] **Backend Logic:** Orphaned Image ImgBB helpers (`uploadOne`, `toStoredImage`, `deleteImage`)
+- [ ] Unique `(userId, jobId)` index + backend image-delete endpoint (still open)
 
 ### Phase 5 — Owner Features (Admin Only)
-- [ ] Create Plan Management CRUD (`/admin/plans`)
-- [ ] Create Revenue Dashboard fetching from Stripe API (`/admin/revenue`)
-- [ ] Create Moderator Management (invite/remove mods via `/admin/moderators`)
+- [x] Create Plan Management CRUD (`/admin/plans`)
+- [x] Create Revenue Dashboard (`/admin/revenue`, DB-price MRR + payments list)
+- [x] Create Moderator Management (invite/remove mods via `/admin/moderators`)
 
 ---
 
@@ -260,39 +269,42 @@ ADMIN_SECRET_KEY=replace-this-with-a-long-random-string-minimum-32-chars
 ### Shared Dashboard (`/dashboard`)
 | Route | Roles |
 |-------|-------|
-| `/dashboard` | Seeker or Recruiter home |
-| `/dashboard/profile` | View & edit own profile |
-| `/dashboard/settings` | Account settings |
+| `/dashboard` | Role redirect (recruiter → `/recruiter`, seeker → `/seeker`, admin/mod → `/admin`) |
 
-### Seeker Dashboard
+### Seeker Dashboard (`/seeker/*`)
 | Route | Description |
 |-------|-------------|
-| `/dashboard/applications` | My job applications list |
-| `/dashboard/saved-jobs` | My saved/bookmarked jobs |
+| `/seeker` | Seeker home |
+| `/seeker/applications` | My job applications list |
+| `/seeker/saved-jobs` | My saved/bookmarked jobs |
+| `/seeker/profile` | View & edit own profile |
+| `/seeker/settings` | Account settings |
 
-### Recruiter Dashboard
+### Recruiter Dashboard (`/recruiter/*`)
 | Route | Description |
 |-------|-------------|
-| `/dashboard/recruiter/jobs` | My posted jobs table |
-| `/dashboard/recruiter/jobs/new` | Create a new job posting |
-| `/dashboard/recruiter/jobs/[id]` | View individual job detail |
-| `/dashboard/recruiter/jobs/[id]/edit` | Edit existing job |
-| `/dashboard/recruiter/applicants` | All applicants across all jobs |
-| `/dashboard/recruiter/applicants/[id]` | Individual applicant profile |
-| `/dashboard/mycompany` | My companies list |
-| `/dashboard/mycompany/new` | Create new company |
-| `/dashboard/mycompany/[id]` | Company detail with jobs list |
+| `/recruiter` | Recruiter home |
+| `/recruiter/companies` | My companies list (+ new / `[id]`) |
+| `/recruiter/jobs` | My posted jobs table (+ new / `[id]` / `[id]/edit`) |
+| `/recruiter/applicants` | All applicants (+ `[id]`) |
+| `/recruiter/profile` | View & edit own profile |
+| `/recruiter/settings` | Account settings |
 
-### Admin Dashboard (`/admin`) — NEW
+### Admin Dashboard (`/admin`)
 | Route | Description |
 |-------|-------------|
+| `/admin/login` | Isolated login (public, outside the guard) |
 | `/admin` | Platform stats + quick actions |
 | `/admin/plans` | Plan management table (CRUD) |
 | `/admin/plans/[id]/edit` | Edit plan limits, pricing, features |
 | `/admin/users` | All users — search, filter, override plan |
 | `/admin/users/[id]` | User detail + override plan + deactivate |
+| `/admin/requests` | Sub downgrade/cancel requests queue |
+| `/admin/companies` | All companies — approve / status |
 | `/admin/jobs` | All platform jobs — moderate / delete |
 | `/admin/revenue` | Stripe MRR + plan distribution + payments |
+| `/admin/moderators` | Invite / remove moderators (admin only) |
+| `/admin/activity` | Recent signups, jobs, applications |
 
 ---
 
@@ -374,7 +386,7 @@ To maintain a perfect timeline of a user's billing history without creating scat
 
 ### Key Workflows
 - **Upgrades (Instant):** Processed instantly via Stripe checkout. A webhook updates the document and pushes an `upgraded` event to the history array.
-- **Downgrades & Cancellations (Manual):** To prevent breaking job/application limits unexpectedly, users submit a request. Mod/Admin reviews it in the `/admin/requests` queue. Upon approval, the backend cancels it via Stripe API and pushes a `canceled` event to the history array.
+- **Downgrades & Cancellations (Automated via Stripe):** Users manage their plan via billing. If they downgrade (e.g. Enterprise to Free), Stripe is told to apply it at the end of the current billing cycle (`proration_behavior: 'none'`). This completely bypasses the need for manual Mod approval, while keeping quotas mathematically safe.
 
 ### Schema Structure
 ```json
@@ -395,7 +407,7 @@ To maintain a perfect timeline of a user's billing history without creating scat
   // The Timeline Ledger (populated via backend webhooks/actions)
   "history": [
     {
-      "type": "created", // created, upgraded, downgrade_requested, canceled, expired
+      "type": "created", // created, upgraded, downgraded, canceled, expired
       "planId": "pro",
       "timestamp": "2026-09-05T00:00:00Z",
       "expireTime": "2026-10-05T00:00:00Z"
@@ -403,7 +415,6 @@ To maintain a perfect timeline of a user's billing history without creating scat
   ]
 }
 ```
-
 
 ---
 
@@ -429,21 +440,33 @@ To maintain a perfect timeline of a user's billing history without creating scat
 | GET/POST/DELETE | `/api/my/applications` | Seeker |
 | GET/POST/DELETE | `/api/my/saved-jobs` | Seeker |
 
-### Admin (x-admin-secret header) — NEW
+### Admin (x-admin-secret header)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/admin/stats` | Platform overview numbers |
 | GET | `/api/admin/users` | All users (paginated + search) |
-| GET/PUT | `/api/admin/users/:id` | Single user + plan override |
-| PATCH | `/api/admin/users/:id/status` | Activate / deactivate |
+| GET | `/api/admin/users/:id` | Single user + activity + subscription |
+| PATCH | `/api/admin/users/:id/status` | Activate / deactivate (+ cascade) |
+| POST | `/api/admin/users/:id/flag` | Flag / unflag user |
+| POST | `/api/admin/users/:id/notes` | Internal mod note |
+| PUT | `/api/admin/users/:id/plan` | Owner plan override (+ reconcile) |
 | GET | `/api/admin/requests` | View downgrade/cancel requests |
 | POST | `/api/admin/requests/:id/approve` | Approve downgrade/cancel request |
+| POST | `/api/admin/requests/:id/reject` | Reject request |
+| POST | `/api/admin/subscriptions/downgrade` | Automated downgrade (`proration_behavior: 'none'` + reconcile) |
+| POST | `/api/my/subscriptions/request` | User submits downgrade/cancel request |
+| GET | `/api/admin/companies` | All companies (paginated + search) |
 | POST | `/api/admin/companies/:id/approve` | Approve a pending company |
+| PATCH | `/api/admin/companies/:id/status` | Activate / pending / deactivate |
 | GET/POST | `/api/admin/plans` | All plans + create new |
-| PUT/DELETE | `/api/admin/plans/:id` | Edit / delete plan |
+| PUT/DELETE | `/api/admin/plans/:id` | Edit / deactivate plan |
 | GET | `/api/admin/jobs` | All platform jobs |
-| PATCH/DELETE | `/api/admin/jobs/:id` | Moderate / delete job |
-| GET | `/api/admin/revenue` | Stripe MRR + payments |
+| PATCH/DELETE | `/api/admin/jobs/:id` | Moderate / delete job (+ `/status`) |
+| GET | `/api/admin/revenue` | MRR (DB prices) + payments |
+| GET/POST/DELETE | `/api/admin/moderators` | List / invite / remove (+ `/invite`) |
+| GET | `/api/admin/activity` | Recent signups, jobs, applications |
+| GET | `/api/admin/audit-log` | Audit trail (admin only) |
+| GET/PUT | `/api/admin/settings` | Platform settings (admin only) |
 
 ---
 
@@ -451,26 +474,28 @@ To maintain a perfect timeline of a user's billing history without creating scat
 
 To prevent data corruption and ensure a fair platform, the backend enforces these automated rules:
 
-1. **Cascading Deactivation:** Deactivating a Recruiter automatically forces all their companies to `deactivated` and jobs to `closed`.
-2. **Plan Downgrade Reconciliation:** If an Enterprise user downgrades to Free, the backend automatically sets their oldest active jobs to `paused` so they don't exceed the Free limit (e.g., 3 jobs).
-3. **Billing-Cycle Math:** Quotas (like 30 applications/month) are calculated dynamically using the Stripe `currentPeriodEnd` timestamp, not calendar months.
-4. **ImgBB Orphaned File Cleanup:** Images stored in MongoDB now require the `delete_url`. Replacing an image triggers the deletion of the old image on ImgBB.
-5. **Race Condition Prevention:** Job application endpoints double-check job and company `status === 'active'` at the exact millisecond of submission.
+1. **Cascading Deactivation:** Deactivating a Recruiter automatically forces all their companies to `deactivated` and jobs to `closed`. One-way (reactivation does not restore prior states) and non-transactional; Stripe subscriptions keep billing unless cancelled separately.
+2. **Plan Downgrade Reconciliation:** If an Enterprise user downgrades to Free, the backend keeps the oldest N `active` jobs and sets the excess to `paused`. Gap: create/reactivate endpoints do not re-check plan caps, so limits are advisory until enforced there.
+3. **Billing-Cycle Math:** Quotas (like 30 applications/month) are calculated dynamically using the Stripe `currentPeriodEnd` timestamp, not calendar months. Gap: no appliedAt-window enforcement query exists yet.
+4. **ImgBB Orphaned File Cleanup:** Images stored in MongoDB use `{ url, deleteUrl }` (`toStoredImage()`). Replacing an image should call `deleteImage(oldDeleteUrl)`. Gap: frontend-only, fire-and-forget — no backend delete endpoint or orphan GC.
+5. **Race Condition Prevention:** Job application endpoints re-check job and company `status === 'active'` at submission time. Gap: check-then-insert without a unique `(userId, jobId)` index still allows duplicates under fast retry.
 
 
 ## 🗂️ MongoDB Collections
 
 | Collection | Managed By | Contents |
 |------------|-----------|----------|
-| `users` | better-auth | User accounts (id, name, email, role, plan, image) |
+| `user` | better-auth | User accounts (id, name, email, role, plan, status) — singular, not `users` |
 | `sessions` | better-auth | Active login sessions |
 | `accounts` | better-auth | OAuth accounts (if added later) |
 | `plans` | Admin Panel / seed scripts | Plan definitions with limits, pricing, features |
-| `jobs` | Backend API | All job postings |
-| `companies` | Backend API | All company profiles |
+| `jobs` | Backend API | All job postings (`active`/`paused`/`closed`/`draft`) |
+| `companies` | Backend API | All company profiles (`pending`/`active`/`deactivated`) |
 | `applications` | Backend API | All job applications |
-| `saved-jobs` | Backend API | Seeker bookmarks |
-| `subscriptions` | Backend API | Active stripe subscriptions + historical ledger |
+| `savedJobs` | Backend API | Seeker bookmarks — camelCase, not `saved-jobs` |
+| `subscriptions` | Backend API | Stripe subs + `history[]` ledger + `pendingRequest` queue |
+| `audit_log` | Backend API | Admin/mod action trail |
+| `platform_settings` | Owner settings page | Feature flags, announcements |
 
 ---
 

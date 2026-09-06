@@ -141,3 +141,15 @@ public/uploads/
 .Spotlight-V100
 .Trashes
 ._*
+# Scratch AI Scripts
+fix_*.js
+patch_*.js
+rewrite_*.js
+check_*.js
+test_*.js
+unify_*.js
+append_*.js
+clean_*.js
+finish_*.js
+update_*.js
+scratch/
